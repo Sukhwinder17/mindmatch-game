@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MindMatch 🧠❤️ — How Well Do You Know Each Other?</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a0533">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="/socket.io/socket.io.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c1:#ff6b6b;--c2:#ffa94d;--c3:#ffe066;--c4:#69db7c;--c5:#4dabf7;--c6:#cc5de8;--c7:#ff8cc8;
+  --bg:#0d0b1e;--bg2:#16122e;--bg3:#1f1940;
+  --card:#201b3a;--card2:#2a2448;--border:#3a3460;
+  --text:#f5f0ff;--muted:#9b8ec4;--dim:#6b5fa0;
+  --success:#69db7c;--error:#ff6b6b;--warn:#ffa94d;
+  --r:20px;--r2:14px;--r3:10px;
+  --font-display:'Nunito',sans-serif;--font-body:'Cabin',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+
+/* ═══════════════════════════════════════════════════════════════
+   BACKGROUND BLOBS
+═══════════════════════════════════════════════════════════════ */
+.bg-blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.18;pointer-events:none;z-index:0;animation:blobFloat 8s ease-in-out infinite}
+.blob1{width:500px;height:500px;background:var(--c6);top:-150px;left:-150px;animation-delay:0s}
+.blob2{width:400px;height:400px;background:var(--c1);top:40%;right:-100px;animation-delay:2s}
+.blob3{width:350px;height:350px;background:var(--c5);bottom:-100px;left:20%;animation-delay:4s}
+@keyframes blobFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREENS / ROUTER
+═══════════════════════════════════════════════════════════════ */
+.screen{display:none;min-height:100vh;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column;align-items:center}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════════════════ */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.brand{font-family:var(--font-display);font-size:20px;font-weight:900;background:linear-gradient(135deg,var(--c7),var(--c6),var(--c5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer;letter-spacing:-.5px}
+.nav-actions{display:flex;gap:8px}
+.nav-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);font-family:var(--font-body);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;transition:all .2s}
+.nav-btn:hover{background:rgba(255,255,255,.12);color:var(--text)}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:var(--r2);font-family:var(--font-display);font-size:15px;font-weight:800;cursor:pointer;transition:all .22s;border:none;text-decoration:none;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s}
+.btn:hover::after{background:rgba(255,255,255,.08)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--c7),var(--c6));color:#fff;box-shadow:0 4px 20px rgba(204,93,232,.4)}
+.btn-primary:hover{box-shadow:0 6px 28px rgba(204,93,232,.55);transform:translateY(-1px)}
+.btn-success{background:linear-gradient(135deg,#69db7c,#20c997);color:#0a2010;box-shadow:0 4px 20px rgba(105,219,124,.35)}
+.btn-success:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(105,219,124,.5)}
+.btn-warm{background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;box-shadow:0 4px 20px rgba(255,107,107,.35)}
+.btn-warm:hover{transform:translateY(-1px)}
+.btn-cool{background:linear-gradient(135deg,var(--c5),#7950f2);color:#fff;box-shadow:0 4px 20px rgba(77,171,247,.35)}
+.btn-cool:hover{transform:translateY(-1px)}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--c7);color:var(--text)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.btn-lg{padding:16px 36px;font-size:17px;border-radius:16px}
+.btn-sm{padding:9px 18px;font-size:13px;border-radius:10px}
+.btn-full{width:100%}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none!important}
+
+/* ═══════════════════════════════════════════════════════════════
+   INPUTS
+═══════════════════════════════════════════════════════════════ */
+.input{width:100%;background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:var(--r2);padding:14px 18px;font-family:var(--font-body);font-size:16px;color:var(--text);outline:none;transition:all .2s}
+.input:focus{border-color:var(--c6);background:rgba(204,93,232,.08);box-shadow:0 0 0 4px rgba(204,93,232,.12)}
+.input::placeholder{color:var(--dim)}
+.input-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════════════════════ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:28px}
+.card-sm{padding:18px}
+.card-glow{box-shadow:0 0 40px rgba(204,93,232,.12)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: HOME
+═══════════════════════════════════════════════════════════════ */
+#screen-home{padding-top:56px;justify-content:flex-start}
+.home-hero{width:100%;max-width:900px;padding:60px 24px 40px;text-align:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(204,93,232,.15);border:1px solid rgba(204,93,232,.3);border-radius:100px;padding:6px 18px;font-size:13px;font-weight:700;color:var(--c6);letter-spacing:.5px;margin-bottom:28px}
+.hero-title{font-family:var(--font-display);font-size:clamp(36px,8vw,80px);font-weight:900;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
+.hero-title .line1{display:block;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-title .line2{display:block;background:linear-gradient(135deg,var(--c5),var(--c4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(15px,2.5vw,19px);color:var(--muted);max-width:500px;margin:0 auto 40px;line-height:1.6}
+.hero-actions{display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;max-width:400px;margin:0 auto 50px}
+.hero-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.stat-pill{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:100px;padding:10px 22px;font-size:14px;font-weight:700;color:var(--text)}
+.stat-pill span{color:var(--c4)}
+.mode-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:900px;padding:0 24px 60px}
+.mode-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:24px;cursor:pointer;transition:all .25s;text-align:center}
+.mode-card:hover{border-color:var(--c6);transform:translateY(-3px);box-shadow:0 8px 32px rgba(204,93,232,.2)}
+.mode-card.selected{border-color:var(--c6);background:rgba(204,93,232,.1)}
+.mode-icon{font-size:36px;margin-bottom:12px}
+.mode-name{font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:6px}
+.mode-desc{font-size:13px;color:var(--muted);line-height:1.5}
+.mode-badge{display:inline-block;margin-top:10px;background:rgba(255,255,255,.08);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--muted)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: SETUP
+═══════════════════════════════════════════════════════════════ */
+#screen-setup{padding-top:56px}
+.setup-wrap{width:100%;max-width:560px;padding:40px 24px 60px}
+.setup-header{text-align:center;margin-bottom:36px}
+.screen-title{font-family:var(--font-display);font-size:28px;font-weight:900;margin-bottom:8px}
+.screen-sub{color:var(--muted);font-size:15px}
+.form-group{margin-bottom:22px}
+.rel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rel-btn{background:rgba(255,255,255,.05);border:2px solid var(--border);border-radius:var(--r2);padding:12px 8px;cursor:pointer;transition:all .2s;text-align:center;font-size:22px}
+.rel-btn span{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-top:4px}
+.rel-btn:hover,.rel-btn.selected{border-color:var(--c6);background:rgba(204,93,232,.12)}
+.rel-btn.selected span{color:var(--c6)}
+.tab-bar{display:flex;background:rgba(255,255,255,.04);border-radius:var(--r2);padding:4px;gap:4px;margin-bottom:24px}
+.tab{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.tab.active{background:var(--card2);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,.3)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: LOBBY / WAITING
+═══════════════════════════════════════════════════════════════ */
+#screen-lobby{padding-top:56px}
+.lobby-wrap{width:100%;max-width:500px;padding:40px 24px 60px;text-align:center}
+.room-code-display{background:var(--card2);border:2px solid var(--c6);border-radius:var(--r);padding:32px;margin:24px 0;position:relative;overflow:hidden}
+.room-code-display::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(204,93,232,.08),rgba(77,171,247,.08))}
+.rcd-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.rcd-code{font-family:var(--font-display);font-size:52px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,var(--c6),var(--c5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rcd-copy{margin-top:16px}
+.waiting-animation{display:flex;gap:8px;justify-content:center;margin:24px 0}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--c6);animation:dotPulse 1.4s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s;background:var(--c5)}
+.dot:nth-child(3){animation-delay:.4s;background:var(--c4)}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.partner-joined{background:rgba(105,219,124,.12);border:2px solid rgba(105,219,124,.3);border-radius:var(--r);padding:20px;display:none}
+.partner-joined.show{display:block;animation:fadeIn .4s ease}
+.qr-area{margin-top:16px;padding:16px;background:rgba(255,255,255,.04);border-radius:var(--r2)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: COUNTDOWN
+═══════════════════════════════════════════════════════════════ */
+#screen-countdown{padding-top:56px;justify-content:center;text-align:center}
+.countdown-wrap{padding:40px 24px}
+.countdown-number{font-family:var(--font-display);font-size:120px;font-weight:900;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:countPop .5s cubic-bezier(.68,-0.6,.32,1.6)}
+@keyframes countPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.countdown-label{font-size:18px;color:var(--muted);margin-top:12px}
+.players-preview{display:flex;gap:20px;justify-content:center;margin-top:40px;flex-wrap:wrap}
+.player-chip{background:var(--card2);border:2px solid var(--border);border-radius:var(--r);padding:16px 24px;text-align:center;min-width:140px}
+.pc-emoji{font-size:36px}
+.pc-name{font-family:var(--font-display);font-size:16px;font-weight:800;margin-top:8px}
+.vs-badge{background:linear-gradient(135deg,var(--c1),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-display);font-size:28px;font-weight:900;align-self:center}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: QUESTION
+═══════════════════════════════════════════════════════════════ */
+#screen-question{padding-top:56px}
+.question-wrap{width:100%;max-width:640px;padding:20px 20px 60px}
+
+/* Top bar */
+.q-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
+.q-progress-wrap{flex:1;background:rgba(255,255,255,.08);border-radius:100px;height:8px;overflow:hidden}
+.q-progress-fill{height:100%;background:linear-gradient(90deg,var(--c6),var(--c5));border-radius:100px;transition:width .4s}
+.q-counter{font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--muted);white-space:nowrap}
+.q-scores-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.score-chip{background:var(--card2);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-family:var(--font-display);font-size:14px;font-weight:800}
+.score-chip.p1{color:var(--c7)}
+.score-chip.p2{color:var(--c5)}
+.score-vs{font-size:11px;color:var(--dim);font-weight:700}
+.score-spacer{flex:1}
+
+/* Timer ring */
+.timer-container{position:relative;width:90px;height:90px;margin:0 auto 24px;flex-shrink:0}
+.timer-svg{width:90px;height:90px;transform:rotate(-90deg)}
+.timer-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:6}
+.timer-ring{fill:none;stroke:var(--c4);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .9s linear,stroke .3s}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:24px;font-weight:900;color:var(--text)}
+.timer-low .timer-ring{stroke:var(--c1)}
+.timer-low .timer-num{color:var(--c1);animation:timerShake .1s ease-in-out infinite alternate}
+@keyframes timerShake{0%{transform:translateX(-1px)}100%{transform:translateX(1px)}}
+
+/* Question card */
+.q-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:28px;margin-bottom:20px;text-align:center}
+.q-number{font-size:11px;font-weight:700;color:var(--c6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.q-text{font-family:var(--font-display);font-size:clamp(18px,4vw,24px);font-weight:800;line-height:1.35;color:var(--text)}
+
+/* Mode indicator */
+.q-mode-row{display:flex;gap:10px;margin-bottom:20px;align-items:center}
+.mode-pill{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--muted)}
+
+/* Answer + predict sections */
+.answer-section{margin-bottom:24px}
+.section-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-label .badge{background:rgba(204,93,232,.2);color:var(--c6);padding:2px 10px;border-radius:100px;font-size:11px}
+.options-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.opt-btn{background:rgba(255,255,255,.05);border:2px solid var(--border);border-radius:var(--r2);padding:12px 14px;font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s;text-align:left;line-height:1.3}
+.opt-btn:hover:not([disabled]){border-color:var(--c6);background:rgba(204,93,232,.1);transform:translateY(-1px)}
+.opt-btn.selected{border-color:var(--c6);background:rgba(204,93,232,.18);color:var(--c6)}
+.opt-btn.predict-selected{border-color:var(--c5);background:rgba(77,171,247,.18);color:var(--c5)}
+.opt-btn[disabled]{opacity:.5;cursor:default}
+
+/* Waiting for partner */
+.waiting-msg{text-align:center;padding:20px;background:rgba(105,219,124,.08);border:1px solid rgba(105,219,124,.2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--c4)}
+.locked-msg{text-align:center;padding:16px;background:rgba(204,93,232,.08);border:1px solid rgba(204,93,232,.2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--c6)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: REVEAL
+═══════════════════════════════════════════════════════════════ */
+#screen-reveal{padding-top:56px;justify-content:center}
+.reveal-wrap{width:100%;max-width:560px;padding:30px 20px 60px;text-align:center}
+.reveal-q{font-size:14px;color:var(--muted);margin-bottom:24px;font-weight:600}
+.reveal-cards{display:flex;gap:16px;margin-bottom:24px}
+.reveal-card{flex:1;background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;transition:all .4s;animation:revealPop .5s cubic-bezier(.68,-0.6,.32,1.6) forwards}
+.reveal-card.match{border-color:var(--c4);background:rgba(105,219,124,.1)}
+.reveal-card.nomatch{border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.06)}
+@keyframes revealPop{from{transform:scale(0.7) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.rc-player{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.rc-answer{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px}
+.rc-predict{font-size:12px;color:var(--dim);padding:4px 10px;background:rgba(255,255,255,.05);border-radius:100px;display:inline-block}
+.rc-tick{font-size:28px;margin-top:10px}
+.match-banner{background:linear-gradient(135deg,rgba(105,219,124,.2),rgba(32,201,151,.1));border:2px solid rgba(105,219,124,.4);border-radius:var(--r);padding:20px;margin-bottom:20px;animation:bannerIn .4s ease}
+.nomatch-banner{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:var(--r);padding:16px;margin-bottom:20px}
+@keyframes bannerIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.match-title{font-family:var(--font-display);font-size:24px;font-weight:900;margin-bottom:4px}
+.match-title.ok{background:linear-gradient(135deg,var(--c4),#20c997);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.match-title.fail{color:var(--c1)}
+.next-timer{font-size:13px;color:var(--dim);margin-top:16px}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: GAME OVER
+═══════════════════════════════════════════════════════════════ */
+#screen-gameover{padding-top:56px;justify-content:flex-start}
+.go-wrap{width:100%;max-width:640px;padding:40px 20px 80px}
+.go-title{font-family:var(--font-display);font-size:clamp(26px,6vw,46px);font-weight:900;text-align:center;margin-bottom:6px}
+.go-subtitle{text-align:center;color:var(--muted);font-size:16px;margin-bottom:32px}
+.compat-ring{position:relative;width:160px;height:160px;margin:0 auto 32px}
+.compat-svg{width:160px;height:160px;transform:rotate(-90deg)}
+.compat-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:12}
+.compat-fill{fill:none;stroke:url(#compatGrad);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
+.compat-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.compat-pct{font-family:var(--font-display);font-size:38px;font-weight:900;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.compat-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
+.score-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center}
+.sb-val{font-family:var(--font-display);font-size:30px;font-weight:900;margin-bottom:4px}
+.sb-lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.players-score{display:flex;gap:12px;margin-bottom:24px}
+.ps-card{flex:1;background:var(--card2);border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center}
+.ps-name{font-family:var(--font-display);font-size:17px;font-weight:800;margin-bottom:6px}
+.ps-score{font-family:var(--font-display);font-size:36px;font-weight:900}
+.ps-card.winner{border-color:var(--c3)}
+.ps-card.winner .ps-score{background:linear-gradient(135deg,var(--c3),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.result-title-box{background:linear-gradient(135deg,rgba(204,93,232,.15),rgba(77,171,247,.1));border:2px solid rgba(204,93,232,.3);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:24px}
+.rtb-title{font-family:var(--font-display);font-size:22px;font-weight:900;margin-bottom:6px}
+.ai-report{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:24px}
+.air-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.air-icon{font-size:24px}
+.air-title{font-family:var(--font-display);font-size:16px;font-weight:800}
+.air-text{color:var(--muted);font-size:15px;line-height:1.65}
+.share-section{margin-bottom:24px}
+.share-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.share-btns{display:flex;gap:10px;flex-wrap:wrap}
+.share-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--r2);border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.share-btn:hover{background:rgba(255,255,255,.1);border-color:var(--c6)}
+.recap-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.recap-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px}
+.ri-q{font-size:13px;color:var(--muted);margin-bottom:8px}
+.ri-answers{display:flex;gap:8px}
+.ri-a{flex:1;text-align:center;font-size:12px;font-weight:700;padding:6px 10px;border-radius:8px}
+.ri-a.match{background:rgba(105,219,124,.15);color:var(--c4)}
+.ri-a.nomatch{background:rgba(255,107,107,.12);color:var(--c1)}
+.go-actions{display:flex;flex-direction:column;gap:12px}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN: JOIN
+═══════════════════════════════════════════════════════════════ */
+#screen-join{padding-top:56px}
+.join-wrap{width:100%;max-width:440px;padding:40px 24px 60px;text-align:center}
+.code-inputs{display:flex;gap:10px;justify-content:center;margin:24px 0}
+.code-digit{width:52px;height:64px;text-align:center;font-family:var(--font-display);font-size:28px;font-weight:900;background:var(--card2);border:2px solid var(--border);border-radius:var(--r2);color:var(--text);outline:none;transition:all .2s}
+.code-digit:focus{border-color:var(--c6);box-shadow:0 0 0 4px rgba(204,93,232,.15)}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST / ALERTS
+═══════════════════════════════════════════════════════════════ */
+#toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:90%;max-width:400px}
+.toast{background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 20px;font-size:14px;font-weight:600;text-align:center;animation:toastIn .3s ease;pointer-events:auto}
+.toast.success{border-color:rgba(105,219,124,.4);color:var(--c4)}
+.toast.error{border-color:rgba(255,107,107,.4);color:var(--c1)}
+.toast.info{border-color:rgba(77,171,247,.4);color:var(--c5)}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════════════════════ */
+.confetti-piece{position:fixed;width:10px;height:10px;top:-20px;z-index:999;pointer-events:none;border-radius:2px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════ */
+.hidden{display:none!important}
+.flex{display:flex}
+.flex-center{display:flex;align-items:center;justify-content:center}
+.gap-8{gap:8px}
+.gap-12{gap:12px}
+.mb-8{margin-bottom:8px}
+.mb-16{margin-bottom:16px}
+.mb-24{margin-bottom:24px}
+.text-center{text-align:center}
+.text-muted{color:var(--muted)}
+.text-sm{font-size:13px}
+.fw-bold{font-weight:700}
+.divider{height:1px;background:var(--border);margin:24px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--muted)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--c6);border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+@media(max-width:600px){
+  .reveal-cards{flex-direction:column}
+  .options-grid{grid-template-columns:1fr}
+  .score-grid{grid-template-columns:1fr}
+  .code-inputs{gap:7px}
+  .code-digit{width:44px;height:56px;font-size:22px}
+  .rel-grid{grid-template-columns:repeat(4,1fr)}
+  .mode-cards{grid-template-columns:1fr 1fr}
+  .players-score{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND BLOBS -->
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
+<div class="bg-blob blob3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="brand" onclick="goHome()">🧠❤️ MindMatch</div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="goHome()">🏠 Home</button>
+    <button class="nav-btn" id="nav-room-code" style="display:none" onclick="copyRoomCode()">Copy Code</button>
+  </div>
+</nav>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: HOME
+════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-hero">
+    <div class="hero-eyebrow">🎮 Real-time Multiplayer • Live Rooms • No App Needed</div>
+    <h1 class="hero-title">
+      <span class="line1">How Well Do You</span>
+      <span class="line2">Know Each Other?</span>
+    </h1>
+    <p class="hero-sub">Answer questions, predict your partner, and discover how deep your connection really goes. Play with friends or match with strangers!</p>
+
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg btn-full" onclick="showScreen('screen-setup');document.getElementById('setup-tab-create').click()">
+        🚀 Create New Room
+      </button>
+      <button class="btn btn-cool btn-lg btn-full" onclick="showScreen('screen-join')">
+        🎮 Join a Room
+      </button>
+      <button class="btn btn-warm btn-lg btn-full" onclick="quickMatch()">
+        ⚡ Quick Match (Random)
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-pill">🎯 <span id="stat-questions">38</span> Questions</div>
+      <div class="stat-pill">🏠 <span id="stat-rooms">0</span> Active Rooms</div>
+      <div class="stat-pill">⚡ <span id="stat-queue">0</span> In Queue</div>
+    </div>
+  </div>
+
+  <!-- Game mode cards -->
+  <div style="width:100%;max-width:900px;padding:0 20px">
+    <p style="font-family:var(--font-display);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px;text-align:center">Choose Your Mode</p>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card selected" data-mode="quick" onclick="selectMode(this)">
+      <div class="mode-icon">⚡</div>
+      <div class="mode-name">Quick Match</div>
+      <div class="mode-desc">5 questions, fast & fun. Perfect for a quick vibe check.</div>
+      <div class="mode-badge">~2 min</div>
+    </div>
+    <div class="mode-card" data-mode="standard" onclick="selectMode(this)">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-name">Standard</div>
+      <div class="mode-desc">20 questions. The real test of how well you know each other.</div>
+      <div class="mode-badge">~8 min</div>
+    </div>
+    <div class="mode-card" data-mode="blitz" onclick="selectMode(this)">
+      <div class="mode-icon">🔥</div>
+      <div class="mode-name">Blitz Mode</div>
+      <div class="mode-desc">20 questions, 3 seconds each. Gut feeling only. No thinking!</div>
+      <div class="mode-badge">~2 min</div>
+    </div>
+    <div class="mode-card" data-mode="survival" onclick="selectMode(this)">
+      <div class="mode-icon">💀</div>
+      <div class="mode-name">Survival</div>
+      <div class="mode-desc">Timer shrinks every round. How long can you survive?</div>
+      <div class="mode-badge">~6 min</div>
+    </div>
+    <div class="mode-card" data-mode="ultimate" onclick="selectMode(this)">
+      <div class="mode-icon">👑</div>
+      <div class="mode-name">Ultimate Match</div>
+      <div class="mode-desc">50 questions. The most thorough compatibility test ever.</div>
+      <div class="mode-badge">~18 min</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: SETUP (CREATE / JOIN TABS)
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-setup">
+  <div class="setup-wrap">
+    <div class="setup-header">
+      <div class="screen-title">🎮 Set Up Your Game</div>
+      <div class="screen-sub">Create a room and share the code with your friend</div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab active" id="setup-tab-create" onclick="switchTab('create')">Create Room</button>
+      <button class="tab" id="setup-tab-join" onclick="switchTab('join')">Join Room</button>
+    </div>
+
+    <!-- CREATE TAB -->
+    <div id="tab-create">
+      <div class="form-group">
+        <label class="input-label">Your Nickname</label>
+        <input class="input" id="create-nickname" placeholder="e.g. Sukhwinder 😎" maxlength="20">
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">Game Mode</label>
+        <select class="input" id="create-mode">
+          <option value="quick">⚡ Quick Match (5Q · 10s)</option>
+          <option value="standard" selected>🎯 Standard (20Q · 10s)</option>
+          <option value="blitz">🔥 Blitz Mode (20Q · 3s)</option>
+          <option value="survival">💀 Survival (15Q · shrinking timer)</option>
+          <option value="ultimate">👑 Ultimate Match (50Q · 15s)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">Relationship Type</label>
+        <div class="rel-grid">
+          <div class="rel-btn selected" data-rel="❤️ Couple" onclick="selectRel(this)">❤️<span>Couple</span></div>
+          <div class="rel-btn" data-rel="👫 Best Friends" onclick="selectRel(this)">👫<span>BFFs</span></div>
+          <div class="rel-btn" data-rel="👨‍👩‍👧 Family" onclick="selectRel(this)">👨‍👩‍👧<span>Family</span></div>
+          <div class="rel-btn" data-rel="🎓 Classmates" onclick="selectRel(this)">🎓<span>Class</span></div>
+          <div class="rel-btn" data-rel="💼 Coworkers" onclick="selectRel(this)">💼<span>Work</span></div>
+          <div class="rel-btn" data-rel="🎮 Gaming Friends" onclick="selectRel(this)">🎮<span>Gaming</span></div>
+          <div class="rel-btn" data-rel="🌍 Long Distance" onclick="selectRel(this)">🌍<span>Long Dist.</span></div>
+          <div class="rel-btn" data-rel="🎭 Custom" onclick="selectRel(this)">🎭<span>Custom</span></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="createRoom()">
+        🚀 Create Room & Get Code
+      </button>
+    </div>
+
+    <!-- JOIN TAB (same as join screen inline) -->
+    <div id="tab-join" style="display:none">
+      <div class="form-group">
+        <label class="input-label">Your Nickname</label>
+        <input class="input" id="join-nickname-setup" placeholder="e.g. Priya ✨" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label class="input-label">Room Code (6 digits)</label>
+        <input class="input" id="join-code-setup" placeholder="e.g. 482731" maxlength="6" style="letter-spacing:8px;font-size:22px;font-family:var(--font-display);font-weight:900;text-align:center">
+      </div>
+      <button class="btn btn-cool btn-full" onclick="joinRoom()">🎮 Join Room</button>
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-ghost btn-full" onclick="goHome()">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: LOBBY
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-lobby">
+  <div class="lobby-wrap">
+    <div class="setup-header">
+      <div class="screen-title">🏠 Room Created!</div>
+      <div class="screen-sub">Share this code with your friend</div>
+    </div>
+
+    <div class="room-code-display">
+      <div class="rcd-label">Room Code</div>
+      <div class="rcd-code" id="lobby-code">------</div>
+      <div class="rcd-copy">
+        <button class="btn btn-ghost btn-sm" onclick="copyRoomCode()">📋 Copy Code</button>
+        <button class="btn btn-ghost btn-sm" onclick="shareRoom()">📤 Share</button>
+      </div>
+    </div>
+
+    <div class="chip mb-24" style="margin:0 auto 24px">
+      <span>Mode:</span><strong id="lobby-mode">Standard</strong> &nbsp;|&nbsp;
+      <span>Relationship:</span><strong id="lobby-rel">Couple</strong>
+    </div>
+
+    <div id="lobby-waiting">
+      <p class="text-muted text-sm mb-16">Waiting for your friend to join...</p>
+      <div class="waiting-animation">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+
+    <div id="lobby-joined" class="partner-joined">
+      <div style="font-size:32px;margin-bottom:8px">🎉</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:4px" id="lobby-partner-name">Friend</div>
+      <div style="color:var(--c4);font-size:14px;font-weight:600">Partner Connected! Starting soon...</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:16px;text-align:left">
+      <p style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">How to invite</p>
+      <p style="font-size:14px;color:var(--muted);line-height:1.6">Send the <strong style="color:var(--text)">6-digit code</strong> above to your friend. They open MindMatch → click <strong style="color:var(--text)">"Join a Room"</strong> → enter the code → done!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: JOIN
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-join">
+  <div class="join-wrap">
+    <div class="setup-header">
+      <div class="screen-title">🎮 Join a Room</div>
+      <div class="screen-sub">Enter the 6-digit code from your friend</div>
+    </div>
+
+    <div class="form-group">
+      <label class="input-label">Your Nickname</label>
+      <input class="input" id="join-nickname" placeholder="e.g. Priya ✨" maxlength="20">
+    </div>
+
+    <div class="form-group">
+      <label class="input-label">Room Code</label>
+      <div class="code-inputs" id="code-digit-inputs">
+        <input class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      </div>
+    </div>
+
+    <button class="btn btn-cool btn-full btn-lg" onclick="joinRoomFromCode()">🎮 Join Room</button>
+
+    <div class="divider"></div>
+    <button class="btn btn-ghost btn-full" onclick="goHome()">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: QUICK MATCH WAITING
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-quickwait">
+  <div style="padding:120px 24px;text-align:center;width:100%">
+    <div style="font-size:64px;margin-bottom:20px;animation:blobFloat 2s ease-in-out infinite">🔍</div>
+    <div class="screen-title mb-16">Finding Your Match...</div>
+    <p class="text-muted mb-24">We're searching for someone online to play with you right now</p>
+    <div class="waiting-animation" style="justify-content:center">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div style="margin-top:40px">
+      <button class="btn btn-ghost" onclick="cancelQuickMatch()">✕ Cancel Search</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: COUNTDOWN
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-countdown">
+  <div class="countdown-wrap">
+    <div class="countdown-number" id="countdown-num">3</div>
+    <div class="countdown-label" id="countdown-label">Get Ready!</div>
+
+    <div class="players-preview">
+      <div class="player-chip">
+        <div class="pc-emoji">😎</div>
+        <div class="pc-name" id="cd-p1-name">Player 1</div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="player-chip">
+        <div class="pc-emoji">🤩</div>
+        <div class="pc-name" id="cd-p2-name">Player 2</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: QUESTION
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-question">
+  <div class="question-wrap">
+
+    <!-- Top bar -->
+    <div class="q-topbar">
+      <div class="q-progress-wrap">
+        <div class="q-progress-fill" id="q-progress" style="width:0%"></div>
+      </div>
+      <div class="q-counter" id="q-counter">1 / 20</div>
+    </div>
+
+    <!-- Scores -->
+    <div class="q-scores-bar">
+      <div class="score-chip p1" id="q-score-p1">😎 You: 0</div>
+      <div class="score-spacer"></div>
+      <div class="score-chip p2" id="q-score-p2">🤩 Friend: 0</div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-container" id="timer-container">
+      <svg class="timer-svg" viewBox="0 0 90 90">
+        <defs>
+          <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff6b6b"/>
+            <stop offset="100%" stop-color="#ffa94d"/>
+          </linearGradient>
+        </defs>
+        <circle class="timer-bg" cx="45" cy="45" r="38"/>
+        <circle class="timer-ring" id="timer-ring" cx="45" cy="45" r="38"/>
+      </svg>
+      <div class="timer-num" id="timer-num">10</div>
+    </div>
+
+    <!-- Question -->
+    <div class="q-card">
+      <div class="q-number" id="q-num-label">Question 1</div>
+      <div class="q-text" id="q-text">Loading question...</div>
+    </div>
+
+    <!-- YOUR ANSWER -->
+    <div class="answer-section">
+      <div class="section-label">
+        🙋 Your Answer
+        <span class="badge">What YOU pick for yourself</span>
+      </div>
+      <div class="options-grid" id="answer-opts"></div>
+    </div>
+
+    <!-- PREDICT PARTNER -->
+    <div class="answer-section" id="predict-section">
+      <div class="section-label">
+        🔮 Predict Your Partner
+        <span class="badge" style="background:rgba(77,171,247,.2);color:var(--c5)">What THEY will pick</span>
+      </div>
+      <div class="options-grid" id="predict-opts"></div>
+    </div>
+
+    <!-- Status messages -->
+    <div id="q-waiting" class="waiting-msg hidden">
+      ✅ Answers locked! Waiting for partner...
+      <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+
+    <div id="q-submit-btn-wrap">
+      <button class="btn btn-primary btn-full" id="q-submit-btn" onclick="submitAnswer()" disabled>
+        🔒 Lock In Answers
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--dim);margin-top:8px">Select both your answer and your prediction to submit</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: REVEAL
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-reveal">
+  <div class="reveal-wrap">
+    <div class="reveal-q" id="reveal-q-text">Question text here</div>
+
+    <div id="reveal-match-banner" class="match-banner hidden">
+      <div class="match-title ok">🎉 PERFECT MATCH!</div>
+      <div style="color:var(--c4);font-size:14px;margin-top:4px">You both answered the same!</div>
+    </div>
+    <div id="reveal-nomatch-banner" class="nomatch-banner hidden">
+      <div class="match-title fail">❌ No Match</div>
+      <div style="color:var(--c1);font-size:13px;margin-top:4px">Different answers this round</div>
+    </div>
+
+    <div class="reveal-cards" id="reveal-cards">
+      <!-- filled by JS -->
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:700">🔮 PREDICTIONS</div>
+      <div style="display:flex;gap:10px;font-size:13px">
+        <div style="flex:1;text-align:center">
+          <div id="p1-predict-lbl" style="color:var(--c7)">—</div>
+          <div style="color:var(--dim);font-size:11px;margin-top:3px">guessed</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div id="p2-predict-lbl" style="color:var(--c5)">—</div>
+          <div style="color:var(--dim);font-size:11px;margin-top:3px">guessed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-timer" id="reveal-next">Next question in 3s...</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     SCREEN: GAME OVER
+════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-gameover">
+  <div class="go-wrap">
+    <div class="go-title" id="go-result-title">✨ Soul Readers</div>
+    <div class="go-subtitle" id="go-names">You + Friend</div>
+
+    <!-- Compat ring -->
+    <div class="compat-ring">
+      <svg class="compat-svg" viewBox="0 0 160 160">
+        <defs>
+          <linearGradient id="compatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff8cc8"/>
+            <stop offset="50%" stop-color="#cc5de8"/>
+            <stop offset="100%" stop-color="#4dabf7"/>
+          </linearGradient>
+        </defs>
+        <circle class="compat-bg" cx="80" cy="80" r="68"/>
+        <circle class="compat-fill" id="compat-ring-fill" cx="80" cy="80" r="68" stroke-dasharray="427" stroke-dashoffset="427"/>
+      </svg>
+      <div class="compat-num">
+        <div class="compat-pct" id="compat-pct">0%</div>
+        <div class="compat-lbl">Match</div>
+      </div>
+    </div>
+
+    <!-- Player scores -->
+    <div class="players-score" id="go-player-scores">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Score boxes -->
+    <div class="score-grid" id="go-score-grid">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Result title box -->
+    <div class="result-title-box" id="go-title-box">
+      <div class="rtb-title" id="go-compat-title">✨ Soul Readers</div>
+      <div style="font-size:14px;color:var(--muted)" id="go-match-count">17 / 20 questions matched</div>
+    </div>
+
+    <!-- AI Report -->
+    <div class="ai-report">
+      <div class="air-header">
+        <div class="air-icon">🤖</div>
+        <div class="air-title">AI Compatibility Report</div>
+      </div>
+      <div class="air-text" id="go-ai-report">Generating your report...</div>
+    </div>
+
+    <!-- Recap -->
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px">🎥 Reaction Recap</div>
+    <div class="recap-list" id="go-recap"></div>
+
+    <!-- Share -->
+    <div class="share-section">
+      <div class="share-label">Share Your Results</div>
+      <div class="share-btns">
+        <button class="share-btn" onclick="shareWhatsApp()">💬 WhatsApp</button>
+        <button class="share-btn" onclick="shareTwitter()">🐦 X / Twitter</button>
+        <button class="share-btn" onclick="copyShareText()">📋 Copy Text</button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="go-actions">
+      <button class="btn btn-primary btn-full" onclick="playAgain()">🔄 Play Again</button>
+      <button class="btn btn-ghost btn-full" onclick="goHome()">🏠 Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+const state = {
+  socket: null,
+  nickname: '',
+  roomCode: '',
+  mode: 'quick',
+  relationship: '❤️ Couple',
+  isP1: false,
+  p1Name: '',
+  p2Name: '',
+  currentAnswer: null,
+  currentPredict: null,
+  answerLocked: false,
+  timerInterval: null,
+  timerMax: 10,
+  timerLeft: 10,
+  gameData: null,
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  SOCKET INIT
+// ═══════════════════════════════════════════════════════════════
+function initSocket() {
+  if (state.socket && state.socket.connected) return;
+
+  const BACKEND = window.location.origin;
+  state.socket = io(BACKEND, { transports: ['websocket', 'polling'] });
+
+  state.socket.on('connect', () => { console.log('Connected:', state.socket.id); fetchStats(); });
+  state.socket.on('disconnect', () => toast('Disconnected from server', 'error'));
+
+  state.socket.on('error', ({ msg }) => toast(msg, 'error'));
+
+  state.socket.on('room_created', (data) => {
+    state.roomCode = data.code;
+    state.isP1 = true;
+    document.getElementById('lobby-code').textContent = data.code;
+    document.getElementById('lobby-mode').textContent = data.mode;
+    document.getElementById('lobby-rel').textContent = data.relationship;
+    document.getElementById('nav-room-code').style.display = 'block';
+    document.getElementById('nav-room-code').textContent = `Room: ${data.code}`;
+    showScreen('screen-lobby');
+  });
+
+  state.socket.on('partner_joined', (data) => {
+    state.p1Name = data.p1;
+    state.p2Name = data.p2;
+    const partnerName = state.isP1 ? data.p2 : data.p1;
+    document.getElementById('lobby-partner-name').textContent = partnerName + ' joined!';
+    document.getElementById('lobby-waiting').style.display = 'none';
+    document.getElementById('lobby-joined').classList.add('show');
+    toast(`${partnerName} joined the room! 🎉`, 'success');
+    document.getElementById('cd-p1-name').textContent = data.p1;
+    document.getElementById('cd-p2-name').textContent = data.p2;
+  });
+
+  state.socket.on('game_countdown', ({ count }) => {
+    showScreen('screen-countdown');
+    const el = document.getElementById('countdown-num');
+    el.textContent = count > 0 ? count : '🚀';
+    el.style.animation = 'none';
+    requestAnimationFrame(() => { el.style.animation = 'countPop .5s cubic-bezier(.68,-0.6,.32,1.6)'; });
+    document.getElementById('countdown-label').textContent = count > 0 ? 'Get ready...' : "Let's go!";
+  });
+
+  state.socket.on('quick_match_waiting', ({ msg }) => {
+    showScreen('screen-quickwait');
+    toast(msg, 'info');
+  });
+
+  state.socket.on('question', (data) => {
+    showScreen('screen-question');
+    renderQuestion(data);
+  });
+
+  state.socket.on('partner_answered', () => {
+    if (!state.answerLocked) return;
+    // Partner answered while we're done too - handled by reveal
+  });
+
+  state.socket.on('reveal', (data) => {
+    showScreen('screen-reveal');
+    renderReveal(data);
+  });
+
+  state.socket.on('game_over', (data) => {
+    state.gameData = data;
+    showScreen('screen-gameover');
+    renderGameOver(data);
+  });
+
+  state.socket.on('partner_disconnected', ({ msg }) => {
+    toast(msg, 'error');
+    setTimeout(goHome, 2500);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  showScreen('screen-home');
+  document.getElementById('nav-room-code').style.display = 'none';
+  clearTimer();
+  fetchStats();
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-create').style.display = tab === 'create' ? '' : 'none';
+  document.getElementById('tab-join').style.display   = tab === 'join'   ? '' : 'none';
+  document.getElementById('setup-tab-create').classList.toggle('active', tab === 'create');
+  document.getElementById('setup-tab-join').classList.toggle('active', tab === 'join');
+}
+
+function selectMode(el) {
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.mode = el.dataset.mode;
+  // Sync dropdown if setup screen
+  const sel = document.getElementById('create-mode');
+  if (sel) sel.value = state.mode;
+}
+
+function selectRel(el) {
+  document.querySelectorAll('.rel-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.relationship = el.dataset.rel;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ROOM ACTIONS
+// ═══════════════════════════════════════════════════════════════
+function createRoom() {
+  const nick = document.getElementById('create-nickname').value.trim();
+  if (!nick) { toast('Enter your nickname first!', 'error'); return; }
+  state.nickname = nick;
+  state.mode = document.getElementById('create-mode').value;
+  initSocket();
+  state.socket.emit('create_room', { nickname: nick, mode: state.mode, relationship: state.relationship });
+}
+
+function joinRoom() {
+  const nick = document.getElementById('join-nickname-setup').value.trim();
+  const code = document.getElementById('join-code-setup').value.trim();
+  if (!nick) { toast('Enter your nickname!', 'error'); return; }
+  if (!code || code.length !== 6) { toast('Enter valid 6-digit code!', 'error'); return; }
+  state.nickname = nick;
+  state.isP1 = false;
+  initSocket();
+  state.socket.emit('join_room', { code, nickname: nick });
+}
+
+function joinRoomFromCode() {
+  const nick = document.getElementById('join-nickname').value.trim();
+  const digits = document.querySelectorAll('.code-digit');
+  const code = Array.from(digits).map(d => d.value).join('');
+  if (!nick) { toast('Enter your nickname!', 'error'); return; }
+  if (code.length !== 6) { toast('Enter all 6 digits!', 'error'); return; }
+  state.nickname = nick;
+  state.isP1 = false;
+  initSocket();
+  state.socket.emit('join_room', { code, nickname: nick });
+}
+
+function quickMatch() {
+  const nick = prompt('Your nickname?', 'Player');
+  if (!nick || !nick.trim()) return;
+  state.nickname = nick.trim();
+  state.isP1 = false;
+  initSocket();
+  state.socket.emit('quick_match', { nickname: state.nickname });
+}
+
+function cancelQuickMatch() {
+  if (state.socket) state.socket.emit('cancel_quick_match');
+  goHome();
+}
+
+function copyRoomCode() {
+  navigator.clipboard.writeText(state.roomCode).then(() => toast('Room code copied! 📋', 'success'));
+}
+
+function shareRoom() {
+  const url = `${window.location.origin}?join=${state.roomCode}`;
+  const text = `Join my MindMatch room! Code: ${state.roomCode}\n${url}`;
+  if (navigator.share) { navigator.share({ title: 'MindMatch', text, url }); }
+  else { navigator.clipboard.writeText(text).then(() => toast('Share text copied!', 'success')); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  QUESTION RENDERING
+// ═══════════════════════════════════════════════════════════════
+function renderQuestion(data) {
+  state.currentAnswer  = null;
+  state.currentPredict = null;
+  state.answerLocked   = false;
+
+  // Progress
+  const pct = (data.index / data.total) * 100;
+  document.getElementById('q-progress').style.width = pct + '%';
+  document.getElementById('q-counter').textContent = `${data.index + 1} / ${data.total}`;
+  document.getElementById('q-num-label').textContent = `Question ${data.index + 1}`;
+  document.getElementById('q-text').textContent = data.question;
+
+  // Scores
+  const myScore = state.isP1 ? (data.p1Score || 0) : (data.p2Score || 0);
+  const theirScore = state.isP1 ? (data.p2Score || 0) : (data.p1Score || 0);
+  document.getElementById('q-score-p1').textContent = `😎 ${state.nickname}: ${myScore}`;
+  document.getElementById('q-score-p2').textContent = `🤩 ${state.isP1 ? data.p2Name : data.p1Name}: ${theirScore}`;
+
+  // Build option buttons
+  function buildOpts(containerId, cls, onSelect) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    data.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = `opt-btn`;
+      btn.textContent = opt;
+      btn.onclick = () => onSelect(opt, btn, containerId, cls);
+      container.appendChild(btn);
+    });
+  }
+
+  buildOpts('answer-opts', 'selected', (opt, btn, cid, cls) => {
+    document.querySelectorAll(`#${cid} .opt-btn`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.currentAnswer = opt;
+    checkBothSelected();
+  });
+
+  buildOpts('predict-opts', 'predict-selected', (opt, btn, cid, cls) => {
+    document.querySelectorAll(`#${cid} .opt-btn`).forEach(b => b.classList.remove('predict-selected'));
+    btn.classList.add('predict-selected');
+    state.currentPredict = opt;
+    checkBothSelected();
+  });
+
+  document.getElementById('q-waiting').classList.add('hidden');
+  document.getElementById('q-submit-btn-wrap').style.display = '';
+  document.getElementById('q-submit-btn').disabled = true;
+
+  // Timer
+  startTimer(data.timer);
+}
+
+function checkBothSelected() {
+  const ready = state.currentAnswer && state.currentPredict;
+  document.getElementById('q-submit-btn').disabled = !ready;
+}
+
+function submitAnswer() {
+  if (!state.currentAnswer || !state.currentPredict) return;
+  const time = state.timerMax - state.timerLeft;
+  state.answerLocked = true;
+  clearTimer();
+
+  // Disable all buttons
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  document.getElementById('q-submit-btn-wrap').style.display = 'none';
+  document.getElementById('q-waiting').classList.remove('hidden');
+
+  state.socket.emit('submit_answer', {
+    answer: state.currentAnswer,
+    predict: state.currentPredict,
+    time,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════════════════
+function startTimer(seconds) {
+  clearTimer();
+  state.timerMax  = seconds;
+  state.timerLeft = seconds;
+
+  const ring = document.getElementById('timer-ring');
+  const num  = document.getElementById('timer-num');
+  const container = document.getElementById('timer-container');
+  const circumference = 2 * Math.PI * 38; // r=38
+
+  ring.style.strokeDasharray  = circumference;
+  ring.style.strokeDashoffset = 0;
+  num.textContent = seconds;
+  container.classList.remove('timer-low');
+
+  state.timerInterval = setInterval(() => {
+    state.timerLeft--;
+    num.textContent = state.timerLeft;
+    const offset = circumference * (1 - state.timerLeft / state.timerMax);
+    ring.style.strokeDashoffset = offset;
+
+    if (state.timerLeft <= 3) {
+      container.classList.add('timer-low');
+    }
+    if (state.timerLeft <= 0) {
+      clearTimer();
+      if (!state.answerLocked) {
+        // Auto-submit with whatever we have (or nothing)
+        if (!state.currentAnswer) state.currentAnswer = '(No answer)';
+        if (!state.currentPredict) state.currentPredict = '(No answer)';
+        submitAnswer();
+      }
+    }
+  }, 1000);
+}
+
+function clearTimer() {
+  if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  REVEAL
+// ═══════════════════════════════════════════════════════════════
+function renderReveal(data) {
+  document.getElementById('reveal-q-text').textContent = data.question;
+
+  const isMatch = data.p1Answer === data.p2Answer;
+
+  document.getElementById('reveal-match-banner').classList.toggle('hidden', !isMatch);
+  document.getElementById('reveal-nomatch-banner').classList.toggle('hidden', isMatch);
+
+  if (isMatch) launchConfetti();
+
+  const cards = document.getElementById('reveal-cards');
+  cards.innerHTML = `
+    <div class="reveal-card ${isMatch ? 'match' : 'nomatch'}" style="animation-delay:.1s">
+      <div class="rc-player">${data.p1Name}</div>
+      <div class="rc-answer">${data.p1Answer}</div>
+      <div class="rc-tick">${data.p1Answer === data.p2Answer ? '✅' : '❌'}</div>
+    </div>
+    <div class="reveal-card ${isMatch ? 'match' : 'nomatch'}" style="animation-delay:.25s">
+      <div class="rc-player">${data.p2Name}</div>
+      <div class="rc-answer">${data.p2Answer}</div>
+      <div class="rc-tick">${data.p2Answer === data.p1Answer ? '✅' : '❌'}</div>
+    </div>`;
+
+  document.getElementById('p1-predict-lbl').textContent = `${data.p1Name} predicted: ${data.p1Predict}`;
+  document.getElementById('p2-predict-lbl').textContent = `${data.p2Name} predicted: ${data.p2Predict}`;
+
+  let nextN = 3;
+  const nextEl = document.getElementById('reveal-next');
+  nextEl.textContent = `Next question in ${nextN}s...`;
+  const ni = setInterval(() => {
+    nextN--;
+    nextEl.textContent = nextN > 0 ? `Next question in ${nextN}s...` : 'Loading...';
+    if (nextN <= 0) clearInterval(ni);
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GAME OVER
+// ═══════════════════════════════════════════════════════════════
+const AI_REPORTS = [
+  (d) => `You both have ${d.compatibility >= 80 ? 'remarkably similar' : 'quite different'} instincts and decision-making styles. Your communication score of ${d.communication}% suggests you ${d.communication >= 75 ? 'understand each other deeply' : 'still have room to grow in understanding'}. Your humor alignment at ${d.humor}% means you ${d.humor >= 85 ? 'laugh at the same things — a great foundation!' : 'bring different vibes to the table.'}`,
+  (d) => `Compatibility: ${d.compatibility}%. That's ${d.compatibility >= 80 ? 'genuinely impressive' : 'a solid start'}. The most revealing part? You scored ${d.p1Understanding}% and ${d.p2Understanding}% on predicting each other's answers — ${Math.abs(d.p1Understanding - d.p2Understanding) < 10 ? 'almost perfectly balanced!' : 'one of you knows the other better — interesting...'}`,
+  (d) => `${d.compatibility >= 95 ? '🤯 This score is almost suspicious. Are you secretly the same person?' : d.compatibility >= 80 ? '💫 You clearly pay attention to each other — this kind of understanding takes real effort.' : d.compatibility >= 60 ? '🌱 Good connection here. You know the big things, but the details might surprise you.' : '👀 Hey, knowing someone takes time. Keep playing!'}`,
+];
+
+function renderGameOver(data) {
+  document.getElementById('go-result-title').textContent = data.title;
+  document.getElementById('go-names').textContent = `${data.p1Name} + ${data.p2Name}`;
+
+  // Compat ring
+  const circumference = 2 * Math.PI * 68;
+  const fill = document.getElementById('compat-ring-fill');
+  fill.style.strokeDasharray  = circumference;
+  fill.style.strokeDashoffset = circumference;
+  setTimeout(() => {
+    const offset = circumference * (1 - data.compatibility / 100);
+    fill.style.strokeDashoffset = offset;
+    animateNumber(document.getElementById('compat-pct'), 0, data.compatibility, 1500, v => v + '%');
+  }, 400);
+
+  // Player scores
+  const myScore    = state.isP1 ? data.p1Score : data.p2Score;
+  const theirScore = state.isP1 ? data.p2Score : data.p1Score;
+  const theirName  = state.isP1 ? data.p2Name  : data.p1Name;
+  const iWin = myScore >= theirScore;
+
+  document.getElementById('go-player-scores').innerHTML = `
+    <div class="ps-card ${iWin ? 'winner' : ''}">
+      <div class="ps-name">😎 ${state.nickname} ${iWin ? '👑' : ''}</div>
+      <div class="ps-score" style="color:var(--c7)">${myScore}</div>
+      <div style="font-size:12px;color:var(--dim);margin-top:4px">pts</div>
+    </div>
+    <div class="ps-card ${!iWin ? 'winner' : ''}">
+      <div class="ps-name">🤩 ${theirName} ${!iWin ? '👑' : ''}</div>
+      <div class="ps-score" style="color:var(--c5)">${theirScore}</div>
+      <div style="font-size:12px;color:var(--dim);margin-top:4px">pts</div>
+    </div>`;
+
+  // Score grid
+  document.getElementById('go-score-grid').innerHTML = `
+    <div class="score-box"><div class="sb-val" style="color:var(--c7)">${data.trust}%</div><div class="sb-lbl">Trust</div></div>
+    <div class="score-box"><div class="sb-val" style="color:var(--c4)">${data.communication}%</div><div class="sb-lbl">Communication</div></div>
+    <div class="score-box"><div class="sb-val" style="color:var(--c3)">${data.humor}%</div><div class="sb-lbl">Humor Match</div></div>
+    <div class="score-box"><div class="sb-val" style="color:var(--c1)">${data.matchCount}/${data.total}</div><div class="sb-lbl">Exact Matches</div></div>`;
+
+  document.getElementById('go-compat-title').textContent = data.title;
+  document.getElementById('go-match-count').textContent = `${data.matchCount} / ${data.total} questions matched`;
+
+  // AI Report
+  const reportFn = AI_REPORTS[Math.floor(Math.random() * AI_REPORTS.length)];
+  document.getElementById('go-ai-report').textContent = reportFn(data);
+
+  // Recap
+  const recap = document.getElementById('go-recap');
+  recap.innerHTML = '';
+  const highlights = data.results.filter(r => r.match || (!r.p1Correct && !r.p2Correct)).slice(0, 8);
+  highlights.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'recap-item fade-in';
+    div.innerHTML = `
+      <div class="ri-q">${r.question}</div>
+      <div class="ri-answers">
+        <div class="ri-a ${r.p1Correct ? 'match' : 'nomatch'}">${data.p1Name}: ${r.p1Answer} ${r.p1Correct ? '✅' : '❌'}</div>
+        <div class="ri-a ${r.p2Correct ? 'match' : 'nomatch'}">${data.p2Name}: ${r.p2Answer} ${r.p2Correct ? '✅' : '❌'}</div>
+      </div>`;
+    recap.appendChild(div);
+  });
+
+  if (data.compatibility >= 80) launchConfetti(80);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SHARE
+// ═══════════════════════════════════════════════════════════════
+function getShareText() {
+  const d = state.gameData;
+  if (!d) return '';
+  return `🧠❤️ MindMatch Result\n${d.p1Name} + ${d.p2Name}\nCompatibility: ${d.compatibility}%\n${d.title}\nPlay at: ${window.location.origin}`;
+}
+
+function shareWhatsApp() {
+  window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`);
+}
+function shareTwitter() {
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`);
+}
+function copyShareText() {
+  navigator.clipboard.writeText(getShareText()).then(() => toast('Share text copied! 📋', 'success'));
+}
+
+function playAgain() {
+  if (state.socket) { state.socket.disconnect(); state.socket = null; }
+  goHome();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════════════════════
+function launchConfetti(count = 40) {
+  const colors = ['#ff6b6b','#ffa94d','#ffe066','#69db7c','#4dabf7','#cc5de8','#ff8cc8'];
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width  = (Math.random() * 8 + 6) + 'px';
+    p.style.height = (Math.random() * 8 + 6) + 'px';
+    p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+    p.style.animationDelay    = (Math.random() * .8) + 's';
+    p.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════════
+function toast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════
+function animateNumber(el, from, to, duration, fmt = v => v) {
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = fmt(Math.round(from + (to - from) * eased));
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+async function fetchStats() {
+  try {
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    document.getElementById('stat-rooms').textContent = d.activeRooms;
+    document.getElementById('stat-queue').textContent = d.queueLength;
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DIGIT INPUT (join screen)
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.code-digit').forEach((input, i, all) => {
+  input.addEventListener('input', e => {
+    if (input.value.length === 1 && i < all.length - 1) all[i + 1].focus();
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !input.value && i > 0) all[i - 1].focus();
+  });
+  input.addEventListener('paste', e => {
+    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+    if (paste.length === 6) {
+      all.forEach((inp, idx) => inp.value = paste[idx] || '');
+      all[5].focus();
+    }
+    e.preventDefault();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  AUTO-JOIN FROM URL
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  fetchStats();
+  setInterval(fetchStats, 10000);
+
+  // sync selected mode from home screen
+  document.getElementById('create-mode').addEventListener('change', e => {
+    state.mode = e.target.value;
+  });
+
+  // Check ?join=CODE in URL
+  const params = new URLSearchParams(window.location.search);
+  const joinCode = params.get('join');
+  if (joinCode && joinCode.length === 6) {
+    document.getElementById('join-code-setup').value = joinCode;
+    showScreen('screen-setup');
+    document.getElementById('setup-tab-join').click();
+    toast(`Joining room ${joinCode}...`, 'info');
+  }
+});
+</script>
+</body>
+</html>
