@@ -840,7 +840,7 @@ const state = {
 function initSocket() {
   if (state.socket && state.socket.connected) return;
 
-  const BACKEND = window.location.origin;
+  const BACKEND = "https://mindmatch-game.onrender.com";
   state.socket = io(BACKEND, { transports: ['websocket', 'polling'] });
 
   state.socket.on('connect', () => { console.log('Connected:', state.socket.id); fetchStats(); });
