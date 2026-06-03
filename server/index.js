@@ -14,19 +14,18 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 const rooms = new Map();
 
-// ── CHANGE 1: Replace single quickQueue with per-mode queues ──────────────
-// OLD: const quickQueue = [];
-// NEW: separate queue per mode so players only match within same mode
+// Per-mode queues — blitz removed, guess added
 const modeQueues = {
   quick:    [],
   standard: [],
-  blitz:    [],
+  guess:    [],
   survival: [],
   ultimate: [],
 };
 
 const socketRoom = new Map();
 
+// ─── STANDARD QUESTIONS (for Quick/Standard/Survival/Ultimate) ───────────────
 const QUESTIONS = {
   favorites: [
     { q: "What's my favorite food?", opts: ["Pizza","Biryani","Sushi","Burger","Tacos","Pasta","Noodles","Salad"] },
@@ -71,6 +70,30 @@ const QUESTIONS = {
   ]
 };
 
+// ─── GUESS MODE QUESTIONS (open-ended, no options) ───────────────────────────
+const GUESS_QUESTIONS = [
+  "What is my favorite food?",
+  "What is my favorite movie?",
+  "What is my favorite song or artist?",
+  "What is my dream vacation destination?",
+  "Who is my favorite celebrity?",
+  "What is my biggest fear?",
+  "What is my biggest goal in life?",
+  "What is my favorite hobby?",
+  "What is my favorite childhood memory?",
+  "What is my favorite animal?",
+  "What is my most used app?",
+  "What is my favorite game?",
+  "What is my dream job?",
+  "What is my most annoying habit?",
+  "What does my perfect weekend look like?",
+  "What is my favorite season?",
+  "What is my favorite drink?",
+  "What was my favorite subject in school?",
+  "What is my favorite childhood cartoon?",
+  "What word describes me best?",
+];
+
 const ALL_QUESTIONS = Object.values(QUESTIONS).flat();
 
 function shuffleArray(arr) {
@@ -89,6 +112,35 @@ function generateRoomCode() {
   return code;
 }
 
+// ─── SMART MATCHING for Guess Mode ───────────────────────────────────────────
+function normalizeAnswer(str) {
+  if (!str) return '';
+  return str.toLowerCase().trim().replace(/\s+/g, ' ');
+}
+
+function answersMatch(a, b) {
+  const na = normalizeAnswer(a);
+  const nb = normalizeAnswer(b);
+  if (na === nb) return true;
+  // Simple synonym pairs
+  const synonyms = [
+    ['burger', 'hamburger'],
+    ['biryani', 'biriyani'],
+    ['soda', 'cold drink', 'cold drinks'],
+    ['tv', 'television'],
+    ['films', 'movies', 'film', 'movie'],
+    ['songs', 'music', 'song'],
+    ['dogs', 'dog'],
+    ['cats', 'cat'],
+    ['football', 'soccer'],
+    ['cricket', 'cricket game'],
+  ];
+  for (const group of synonyms) {
+    if (group.includes(na) && group.includes(nb)) return true;
+  }
+  return false;
+}
+
 // ─── MODE CONFIG ─────────────────────────────────────────────────────────────
 function getModeConfig(mode) {
   const configs = {
@@ -99,6 +151,7 @@ function getModeConfig(mode) {
       pointsPerMatch:   0,
       pointsPerPredict: 10,
       label: '⚡ Quick Match',
+      isGuess: false,
     },
     standard: {
       questionCount:    20,
@@ -107,18 +160,18 @@ function getModeConfig(mode) {
       pointsPerMatch:   0,
       pointsPerPredict: 10,
       label: '🎯 Standard',
+      isGuess: false,
     },
-    // CHANGE 2: Blitz revealDuration confirmed 2000ms (was already set but
-    // now also adds pointsPerMatch bonus to reward fast matching)
-    blitz: {
-      questionCount:    20,
-      revealDuration:   2000,
+    guess: {
+      questionCount:    15,
+      revealDuration:   5000,
       lives:            null,
       pointsPerMatch:   5,
       pointsPerPredict: 10,
-      label: '🔥 Blitz Mode',
+      pointsForBeingGuessed: 5,
+      label: '📝 Guess Mode',
+      isGuess: true,
     },
-    // CHANGE 3: Survival — lives:3, higher reward per correct predict
     survival: {
       questionCount:    15,
       revealDuration:   4000,
@@ -126,9 +179,8 @@ function getModeConfig(mode) {
       pointsPerMatch:   0,
       pointsPerPredict: 15,
       label: '💀 Survival',
+      isGuess: false,
     },
-    // CHANGE 4: Ultimate — 50 questions, show detailed end report (handled
-    // in calculateScores and endGame via ultimateReport flag)
     ultimate: {
       questionCount:    50,
       revealDuration:   5000,
@@ -136,6 +188,7 @@ function getModeConfig(mode) {
       pointsPerMatch:   5,
       pointsPerPredict: 10,
       label: '👑 Ultimate Match',
+      isGuess: false,
     },
   };
   return configs[mode] || configs.standard;
@@ -146,33 +199,40 @@ function calculateScores(room) {
   let matchCount = 0;
   const results = [];
   const cfg = room.config;
+  const isGuess = cfg.isGuess;
 
   room.answers.forEach((round, idx) => {
     const q = room.questions[idx];
     const { p1Answer, p1Predict, p2Answer, p2Predict } = round;
 
-    const p1Correct   = p1Predict === p2Answer;
-    const p2Correct   = p2Predict === p1Answer;
-    const answersMatch = p1Answer === p2Answer;
+    const p1Correct    = isGuess ? answersMatch(p1Predict, p2Answer) : (p1Predict === p2Answer);
+    const p2Correct    = isGuess ? answersMatch(p2Predict, p1Answer) : (p2Predict === p1Answer);
+    const ansMatch     = isGuess ? answersMatch(p1Answer, p2Answer) : (p1Answer === p2Answer);
 
-    if (p1Correct)    p1Score += cfg.pointsPerPredict;
-    if (p2Correct)    p2Score += cfg.pointsPerPredict;
-    if (answersMatch) {
+    if (p1Correct)  p1Score += cfg.pointsPerPredict;
+    if (p2Correct)  p2Score += cfg.pointsPerPredict;
+    if (ansMatch) {
       p1Score += cfg.pointsPerMatch;
       p2Score += cfg.pointsPerMatch;
       matchCount++;
     }
+    // Guess Mode: bonus if partner guessed you correctly
+    if (isGuess) {
+      if (p1Correct) p2Score += (cfg.pointsForBeingGuessed || 5); // p2 gets bonus for being guessed
+      if (p2Correct) p1Score += (cfg.pointsForBeingGuessed || 5);
+    }
 
-    results.push({ question: q.q, p1Answer, p2Answer, p1Predict, p2Predict, p1Correct, p2Correct, match: answersMatch });
+    const qText = isGuess ? q : q.q;
+    results.push({ question: qText, p1Answer, p2Answer, p1Predict, p2Predict, p1Correct, p2Correct, match: ansMatch });
   });
 
-  const total          = room.answers.length;
-  const compatibility  = total > 0 ? Math.round((matchCount / total) * 100) : 0;
-  const p1Understanding = total > 0 ? Math.round(room.answers.filter(r => r.p1Predict === r.p2Answer).length / total * 100) : 0;
-  const p2Understanding = total > 0 ? Math.round(room.answers.filter(r => r.p2Predict === r.p1Answer).length / total * 100) : 0;
-  const trust         = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 10 - 5));
-  const communication = Math.min(100, Math.round(compatibility * 0.9 + Math.random() * 15));
-  const humor         = Math.min(100, Math.round(Math.random() * 20 + 75));
+  const total           = room.answers.length;
+  const compatibility   = total > 0 ? Math.round((matchCount / total) * 100) : 0;
+  const p1Understanding = total > 0 ? Math.round(results.filter(r => r.p1Correct).length / total * 100) : 0;
+  const p2Understanding = total > 0 ? Math.round(results.filter(r => r.p2Correct).length / total * 100) : 0;
+  const trust           = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 10 - 5));
+  const communication   = Math.min(100, Math.round(compatibility * 0.9 + Math.random() * 15));
+  const humor           = Math.min(100, Math.round(Math.random() * 20 + 75));
 
   function getTitle(pct) {
     if (pct === 100) return "🧠 Mind Readers";
@@ -184,14 +244,28 @@ function calculateScores(room) {
     return "👀 Do You Even Know Them?";
   }
 
-  // CHANGE 5: Ultimate mode — compute strongest/weakest matches and
-  // prediction accuracy per player for the detailed end report
+  // Guess Mode extras
+  let guessExtras = null;
+  if (isGuess) {
+    const bestMatches = results.filter(r => r.match).slice(0, 5);
+    const diffAnswers = results.filter(r => !r.match).slice(0, 5);
+    const correctPredictions = results.filter(r => r.p1Correct || r.p2Correct).length;
+    guessExtras = {
+      p1Accuracy: p1Understanding,
+      p2Accuracy: p2Understanding,
+      correctPredictions,
+      bestMatches,
+      diffAnswers,
+    };
+  }
+
+  // Ultimate extras
   let ultimateExtras = null;
   if (room.mode === 'ultimate') {
     const strongMatches = results.filter(r => r.match).slice(0, 5);
     const weakMatches   = results.filter(r => !r.match).slice(0, 5);
-    const p1Accuracy    = total > 0 ? Math.round(results.filter(r => r.p1Correct).length / total * 100) : 0;
-    const p2Accuracy    = total > 0 ? Math.round(results.filter(r => r.p2Correct).length / total * 100) : 0;
+    const p1Accuracy    = p1Understanding;
+    const p2Accuracy    = p2Understanding;
     const relationshipScore = Math.min(100, Math.round((compatibility + p1Accuracy + p2Accuracy) / 3));
     ultimateExtras = { strongMatches, weakMatches, p1Accuracy, p2Accuracy, relationshipScore };
   }
@@ -201,29 +275,23 @@ function calculateScores(room) {
     matchCount, total, results,
     title: getTitle(compatibility),
     p1Understanding, p2Understanding,
-    ultimateExtras,
+    ultimateExtras, guessExtras,
   };
 }
 
-// ─── HELPER: destroy room and notify other player ────────────────────────────
+// ─── HELPER: destroy room ─────────────────────────────────────────────────────
 function destroyRoom(code, leavingSocketId, eventName, msg) {
   const room = rooms.get(code);
   if (!room) return;
-
   clearTimeout(room.timer);
   clearTimeout(room.roundTimer);
   room.state = 'done';
-
-  const otherId = room.players.p1.id === leavingSocketId
-    ? room.players.p2?.id
-    : room.players.p1.id;
-
+  const otherId = room.players.p1.id === leavingSocketId ? room.players.p2?.id : room.players.p1.id;
   if (otherId) {
     const otherSocket = io.sockets.sockets.get(otherId);
     if (otherSocket) otherSocket.emit(eventName, { msg });
     socketRoom.delete(otherId);
   }
-
   socketRoom.delete(leavingSocketId);
   rooms.delete(code);
 }
@@ -236,7 +304,9 @@ io.on('connection', (socket) => {
   socket.on('create_room', ({ nickname, mode, relationship }) => {
     const code = generateRoomCode();
     const cfg  = getModeConfig(mode);
-    const questions = shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
+    const questions = cfg.isGuess
+      ? shuffleArray(GUESS_QUESTIONS).slice(0, cfg.questionCount)
+      : shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
 
     const room = {
       code, mode, relationship,
@@ -256,7 +326,6 @@ io.on('connection', (socket) => {
     rooms.set(code, room);
     socketRoom.set(socket.id, code);
     socket.join(code);
-
     socket.emit('room_created', { code, nickname, mode, relationship, questionCount: cfg.questionCount, modeLabel: cfg.label });
     console.log(`[Room] Created: ${code} by ${nickname} mode=${mode}`);
   });
@@ -264,9 +333,9 @@ io.on('connection', (socket) => {
   // ── JOIN ROOM ─────────────────────────────────────────────────────────────
   socket.on('join_room', ({ code, nickname }) => {
     const room = rooms.get(code);
-    if (!room)              { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
-    if (room.state !== 'waiting') { socket.emit('error', { msg: 'Game already started!' });    return; }
-    if (room.players.p2)   { socket.emit('error', { msg: 'Room is full!' });                   return; }
+    if (!room)                   { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
+    if (room.state !== 'waiting'){ socket.emit('error', { msg: 'Game already started!' });           return; }
+    if (room.players.p2)         { socket.emit('error', { msg: 'Room is full!' });                   return; }
 
     room.players.p2 = { id: socket.id, nickname, score: 0, lives: room.config.lives };
     socketRoom.set(socket.id, code);
@@ -281,21 +350,16 @@ io.on('connection', (socket) => {
       questionCount: room.config.questionCount,
       lives: room.config.lives,
     });
-
     setTimeout(() => startGame(code), 2000);
     console.log(`[Room] ${nickname} joined ${code}`);
   });
 
-  // ── QUICK MATCH (now mode-aware) ──────────────────────────────────────────
-  // CHANGE 6: Accept `mode` from client; use modeQueues[mode] instead of
-  // the old single quickQueue so players only match within the same mode.
+  // ── QUICK MATCH (mode-aware) ──────────────────────────────────────────────
   socket.on('quick_match', ({ nickname, mode }) => {
-    // Sanitise: fall back to 'standard' if unknown mode sent
     const safeMode = modeQueues[mode] ? mode : 'standard';
     const queue    = modeQueues[safeMode];
     const cfg      = getModeConfig(safeMode);
 
-    // Prune disconnected sockets from this mode's queue
     for (let i = queue.length - 1; i >= 0; i--) {
       if (!io.sockets.sockets.get(queue[i].id)) queue.splice(i, 1);
     }
@@ -303,7 +367,9 @@ io.on('connection', (socket) => {
     if (queue.length > 0) {
       const partner   = queue.shift();
       const code      = generateRoomCode();
-      const questions = shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
+      const questions = cfg.isGuess
+        ? shuffleArray(GUESS_QUESTIONS).slice(0, cfg.questionCount)
+        : shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
 
       const room = {
         code, mode: safeMode, relationship: '🌍 Strangers',
@@ -331,8 +397,6 @@ io.on('connection', (socket) => {
       setTimeout(() => startGame(code), 2000);
     } else {
       queue.push({ id: socket.id, nickname, mode: safeMode });
-      // CHANGE 7: Tell client which mode they're queued for so the waiting
-      // screen can display it.
       socket.emit('quick_match_waiting', {
         msg:       'Searching for a ' + cfg.label + ' match...',
         mode:      safeMode,
@@ -341,7 +405,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // CHANGE 8: cancel_quick_match must search ALL mode queues, not just one
   socket.on('cancel_quick_match', () => {
     for (const q of Object.values(modeQueues)) {
       const idx = q.findIndex(p => p.id === socket.id);
@@ -349,7 +412,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  // ── SUBMIT ANSWER ─────────────────────────────────────────────────────────
+  // ── SUBMIT ANSWER (standard modes) ───────────────────────────────────────
   socket.on('submit_answer', ({ answer, predict }) => {
     const code = socketRoom.get(socket.id);
     const room = rooms.get(code);
@@ -359,7 +422,6 @@ io.on('connection', (socket) => {
     if (!room.answers[qIdx]) room.answers[qIdx] = {};
 
     const isP1 = room.players.p1.id === socket.id;
-
     if (isP1  && room.answers[qIdx].p1Answer !== undefined) return;
     if (!isP1 && room.answers[qIdx].p2Answer !== undefined) return;
 
@@ -379,9 +441,75 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ── GUESS MODE: Phase 1 — submit typed answer ─────────────────────────────
+  socket.on('guess_submit_answer', ({ answer }) => {
+    const code = socketRoom.get(socket.id);
+    const room = rooms.get(code);
+    if (!room || room.config.mode === 'done') return;
+    if (!room.config.isGuess) return;
+    if (room.state !== 'guess_answer') return;
+
+    const qIdx = room.currentQ;
+    if (!room.answers[qIdx]) room.answers[qIdx] = {};
+
+    const isP1 = room.players.p1.id === socket.id;
+    const cleanAnswer = (answer || '').trim().slice(0, 100);
+
+    if (isP1) {
+      if (room.answers[qIdx].p1Answer !== undefined) return;
+      room.answers[qIdx].p1Answer = cleanAnswer;
+    } else {
+      if (room.answers[qIdx].p2Answer !== undefined) return;
+      room.answers[qIdx].p2Answer = cleanAnswer;
+    }
+
+    socket.to(code).emit('guess_partner_answered');
+
+    const ans = room.answers[qIdx];
+    if (ans.p1Answer !== undefined && ans.p2Answer !== undefined) {
+      // Both locked answers — move to prediction phase
+      room.state = 'guess_predict';
+      io.to(code).emit('guess_predict_phase', {
+        index:   qIdx,
+        total:   room.questions.length,
+        question: room.questions[qIdx],
+        p1Name:  room.players.p1.nickname,
+        p2Name:  room.players.p2.nickname,
+        p1Score: room.players.p1.score,
+        p2Score: room.players.p2.score,
+      });
+    }
+  });
+
+  // ── GUESS MODE: Phase 2 — submit prediction ───────────────────────────────
+  socket.on('guess_submit_predict', ({ predict }) => {
+    const code = socketRoom.get(socket.id);
+    const room = rooms.get(code);
+    if (!room || !room.config.isGuess) return;
+    if (room.state !== 'guess_predict') return;
+
+    const qIdx = room.currentQ;
+    const isP1 = room.players.p1.id === socket.id;
+    const cleanPredict = (predict || '').trim().slice(0, 100);
+
+    if (isP1) {
+      if (room.answers[qIdx].p1Predict !== undefined) return;
+      room.answers[qIdx].p1Predict = cleanPredict;
+    } else {
+      if (room.answers[qIdx].p2Predict !== undefined) return;
+      room.answers[qIdx].p2Predict = cleanPredict;
+    }
+
+    socket.to(code).emit('guess_partner_predicted');
+
+    const ans = room.answers[qIdx];
+    if (ans.p1Predict !== undefined && ans.p2Predict !== undefined) {
+      revealAnswer(code);
+    }
+  });
+
   // ── LEAVE MATCH ───────────────────────────────────────────────────────────
   socket.on('leave_match', () => {
-    console.log('[leave_match] received from', socket.id);
     const code = socketRoom.get(socket.id);
     if (!code) return;
     destroyRoom(code, socket.id, 'match_left', 'Your partner left the match.');
@@ -414,7 +542,6 @@ io.on('connection', (socket) => {
         socketRoom.delete(socket.id);
       }
     }
-    // CHANGE 9: Remove disconnected socket from whichever mode queue it's in
     for (const q of Object.values(modeQueues)) {
       const idx = q.findIndex(p => p.id === socket.id);
       if (idx !== -1) { q.splice(idx, 1); break; }
@@ -433,6 +560,7 @@ function startGame(code) {
     modeLabel:     room.config.label,
     lives:         room.config.lives,
     questionCount: room.config.questionCount,
+    isGuess:       room.config.isGuess || false,
   });
 
   io.to(code).emit('game_countdown', { count: 3 });
@@ -443,7 +571,6 @@ function startGame(code) {
       io.to(code).emit('game_countdown', { count });
     } else {
       clearInterval(interval);
-      room.state = 'question';
       sendQuestion(code);
     }
   }, 1000);
@@ -456,25 +583,42 @@ function sendQuestion(code) {
   const qIdx = room.currentQ;
   if (qIdx >= room.questions.length) { endGame(code); return; }
 
-  const q    = room.questions[qIdx];
-  const opts = shuffleArray(q.opts);
+  const q = room.questions[qIdx];
   room.answers[qIdx] = {};
-  room.state = 'question';
 
-  io.to(code).emit('question', {
-    index:    qIdx,
-    total:    room.questions.length,
-    question: q.q,
-    options:  opts,
-    mode:     room.mode,
-    modeLabel: room.config.label,
-    p1Name:   room.players.p1.nickname,
-    p2Name:   room.players.p2.nickname,
-    p1Score:  room.players.p1.score,
-    p2Score:  room.players.p2.score,
-    p1Lives:  room.players.p1.lives,
-    p2Lives:  room.players.p2.lives,
-  });
+  if (room.config.isGuess) {
+    // Guess Mode: send open-ended question, no options
+    room.state = 'guess_answer';
+    io.to(code).emit('guess_question', {
+      index:    qIdx,
+      total:    room.questions.length,
+      question: q,  // plain string
+      mode:     room.mode,
+      modeLabel: room.config.label,
+      p1Name:   room.players.p1.nickname,
+      p2Name:   room.players.p2.nickname,
+      p1Score:  room.players.p1.score,
+      p2Score:  room.players.p2.score,
+    });
+  } else {
+    // Standard modes: send multiple-choice question
+    const opts = shuffleArray(q.opts);
+    room.state = 'question';
+    io.to(code).emit('question', {
+      index:    qIdx,
+      total:    room.questions.length,
+      question: q.q,
+      options:  opts,
+      mode:     room.mode,
+      modeLabel: room.config.label,
+      p1Name:   room.players.p1.nickname,
+      p2Name:   room.players.p2.nickname,
+      p1Score:  room.players.p1.score,
+      p2Score:  room.players.p2.score,
+      p1Lives:  room.players.p1.lives,
+      p2Lives:  room.players.p2.lives,
+    });
+  }
 }
 
 function revealAnswer(code) {
@@ -488,22 +632,25 @@ function revealAnswer(code) {
   const q    = room.questions[qIdx];
   const cfg  = room.config;
 
-  const p1PredictCorrect = ans.p1Predict === ans.p2Answer;
-  const p2PredictCorrect = ans.p2Predict === ans.p1Answer;
-  const isAnswerMatch    = ans.p1Answer  === ans.p2Answer;
+  const p1PredictCorrect = cfg.isGuess ? answersMatch(ans.p1Predict, ans.p2Answer) : (ans.p1Predict === ans.p2Answer);
+  const p2PredictCorrect = cfg.isGuess ? answersMatch(ans.p2Predict, ans.p1Answer) : (ans.p2Predict === ans.p1Answer);
+  const isAnswerMatch    = cfg.isGuess ? answersMatch(ans.p1Answer, ans.p2Answer)  : (ans.p1Answer === ans.p2Answer);
 
-  // Scoring
   if (p1PredictCorrect) room.players.p1.score += cfg.pointsPerPredict;
   if (p2PredictCorrect) room.players.p2.score += cfg.pointsPerPredict;
   if (isAnswerMatch) {
     room.players.p1.score += cfg.pointsPerMatch;
     room.players.p2.score += cfg.pointsPerMatch;
   }
+  // Guess Mode: bonus for being correctly guessed
+  if (cfg.isGuess) {
+    if (p1PredictCorrect) room.players.p2.score += (cfg.pointsForBeingGuessed || 5);
+    if (p2PredictCorrect) room.players.p1.score += (cfg.pointsForBeingGuessed || 5);
+  }
 
-  // Survival: lose a life on wrong prediction
+  // Survival lives
   let p1Eliminated = false;
   let p2Eliminated = false;
-
   if (cfg.lives !== null) {
     if (!p1PredictCorrect) room.players.p1.lives = Math.max(0, room.players.p1.lives - 1);
     if (!p2PredictCorrect) room.players.p2.lives = Math.max(0, room.players.p2.lives - 1);
@@ -511,9 +658,11 @@ function revealAnswer(code) {
     p2Eliminated = room.players.p2.lives <= 0;
   }
 
+  const qText = cfg.isGuess ? q : q.q;
+
   io.to(code).emit('reveal', {
     index:    qIdx,
-    question: q.q,
+    question: qText,
     p1Answer:  ans.p1Answer,
     p2Answer:  ans.p2Answer,
     p1Predict: ans.p1Predict,
@@ -529,9 +678,9 @@ function revealAnswer(code) {
     match:   isAnswerMatch,
     mode:    room.mode,
     revealDuration: cfg.revealDuration,
+    isGuess: cfg.isGuess || false,
   });
 
-  // CHANGE 10: Survival elimination — end game when any player hits 0 lives
   if (p1Eliminated || p2Eliminated) {
     room.roundTimer = setTimeout(() => {
       if (!rooms.get(code)) return;
@@ -547,7 +696,6 @@ function revealAnswer(code) {
       endGame(code);
       return;
     }
-    room.state = 'question';
     sendQuestion(code);
   }, cfg.revealDuration);
 }
@@ -565,8 +713,8 @@ function endGame(code) {
     mode:   room.mode,
     modeLabel: room.config.label,
     relationship: room.relationship,
-    // CHANGE 11: Pass ultimateExtras to frontend for the detailed Ultimate report
     ultimateExtras: scores.ultimateExtras,
+    guessExtras:    scores.guessExtras,
   });
 
   setTimeout(() => rooms.delete(code), 600000);
@@ -574,13 +722,11 @@ function endGame(code) {
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 app.get('/api/stats', (req, res) => {
-  // CHANGE 12: Report total queue length across ALL mode queues
   const totalQueue = Object.values(modeQueues).reduce((sum, q) => sum + q.length, 0);
   res.json({
     activeRooms:    rooms.size,
     queueLength:    totalQueue,
     totalQuestions: ALL_QUESTIONS.length,
-    // Bonus: per-mode queue sizes for debugging
     queues: Object.fromEntries(Object.entries(modeQueues).map(([k, v]) => [k, v.length])),
   });
 });
