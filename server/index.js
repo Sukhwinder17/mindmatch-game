@@ -263,6 +263,7 @@ io.on('connection', (socket) => {
 
   // ── LEAVE ROOM (Home button) ─────────────────────────────────────────────
   socket.on('leave_room', () => {
+    console.log('LEAVE_ROOM RECEIVED', socket.id);
     const code = socketRoom.get(socket.id);
     if (!code) return;
     const room = rooms.get(code);
