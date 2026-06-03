@@ -124,11 +124,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .q-progress-wrap{flex:1;background:rgba(255,255,255,.08);border-radius:100px;height:8px;overflow:hidden}
 .q-progress-fill{height:100%;background:linear-gradient(90deg,var(--c6),var(--c5));border-radius:100px;transition:width .4s}
 .q-counter{font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--muted);white-space:nowrap}
-.q-scores-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.q-scores-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .score-chip{background:var(--card2);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-family:var(--font-display);font-size:14px;font-weight:800}
 .score-chip.p1{color:var(--c7)}
 .score-chip.p2{color:var(--c5)}
 .score-spacer{flex:1}
+/* ── MODE BANNER (NEW) ── */
+.mode-banner{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;padding:7px 16px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;width:fit-content;margin-left:auto;margin-right:auto}
+.mode-banner.quick{background:rgba(255,228,102,.12);border:1px solid rgba(255,228,102,.3);color:var(--c3)}
+.mode-banner.standard{background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
+.mode-banner.blitz{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3);color:var(--c1);animation:blitzPulse 1s ease-in-out infinite}
+.mode-banner.survival{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:var(--c1)}
+.mode-banner.ultimate{background:rgba(255,228,102,.12);border:1px solid rgba(255,228,102,.35);color:var(--c3)}
+@keyframes blitzPulse{0%,100%{opacity:1}50%{opacity:.6}}
+/* ── LIVES ROW (NEW — Survival) ── */
+.lives-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:8px 14px;background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);border-radius:var(--r2)}
+.lives-player{display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:13px;font-weight:800}
+.lives-hearts{letter-spacing:2px;font-size:16px}
+.lives-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+/* ─── */
 .q-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:28px;margin-bottom:20px;text-align:center}
 .q-number{font-size:11px;font-weight:700;color:var(--c6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .q-text{font-family:var(--font-display);font-size:clamp(18px,4vw,24px);font-weight:800;line-height:1.35;color:var(--text)}
@@ -166,7 +180,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .predict-name{color:var(--muted);min-width:80px;text-align:left}
 .predict-val{color:var(--text);flex:1;text-align:left}
 .predict-icon{font-size:18px}
-/* FIX: Reveal progress bar replaces old next-timer text countdown */
+/* ── Survival lives reveal banner (NEW) ── */
+.survival-lives-row{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
+.slr-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 20px;text-align:center;min-width:120px}
+.slr-name{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.slr-hearts{font-size:20px;letter-spacing:3px}
+.slr-lost{font-size:11px;color:var(--c1);font-weight:700;margin-top:4px}
+/* ─── */
 .reveal-progress-wrap{background:rgba(255,255,255,.06);border-radius:100px;height:6px;overflow:hidden;margin-top:16px}
 .reveal-progress-fill{height:100%;background:linear-gradient(90deg,var(--c6),var(--c5));border-radius:100px;width:100%;transition:width 5s linear}
 .next-timer{font-size:13px;color:var(--dim);margin-top:10px}
@@ -212,6 +232,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .ri-a.match{background:rgba(105,219,124,.15);color:var(--c4)}
 .ri-a.nomatch{background:rgba(255,107,107,.12);color:var(--c1)}
 .go-actions{display:flex;flex-direction:column;gap:12px}
+/* ── MODE TAG on game-over ── */
+.go-mode-tag{display:inline-flex;align-items:center;gap:6px;margin:0 auto 20px;padding:6px 18px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
 /* ── JOIN ── */
 #screen-join{padding-top:56px}
 .join-wrap{width:100%;max-width:440px;padding:40px 24px 60px;text-align:center}
@@ -219,33 +241,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .code-digit{width:52px;height:64px;text-align:center;font-family:var(--font-display);font-size:28px;font-weight:900;background:var(--card2);border:2px solid var(--border);border-radius:var(--r2);color:var(--text);outline:none;transition:all .2s}
 .code-digit:focus{border-color:var(--c6);box-shadow:0 0 0 4px rgba(204,93,232,.15)}
 /* ── LEAVE CONFIRM MODAL ── */
-#leave-confirm-modal{
-  display:none;position:fixed;inset:0;z-index:10000;
-  background:rgba(0,0,0,.8);backdrop-filter:blur(12px);
-  align-items:center;justify-content:center;padding:24px;
-}
+#leave-confirm-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px}
 #leave-confirm-modal.show{display:flex;animation:fadeIn .2s ease}
-.leave-confirm-box{
-  background:var(--card);border:1px solid rgba(255,107,107,.3);
-  border-radius:var(--r);padding:36px 28px;max-width:360px;width:100%;
-  text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.6);
-}
+.leave-confirm-box{background:var(--card);border:1px solid rgba(255,107,107,.3);border-radius:var(--r);padding:36px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.6)}
 .leave-confirm-icon{font-size:48px;margin-bottom:16px}
 .leave-confirm-title{font-family:var(--font-display);font-size:22px;font-weight:900;margin-bottom:10px;color:var(--text)}
 .leave-confirm-desc{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:28px}
 .leave-confirm-actions{display:flex;flex-direction:column;gap:12px}
 /* ── MATCH ENDED MODAL ── */
-#match-ended-modal{
-  display:none;position:fixed;inset:0;z-index:10000;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(14px);
-  align-items:center;justify-content:center;padding:24px;
-}
+#match-ended-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);align-items:center;justify-content:center;padding:24px}
 #match-ended-modal.show{display:flex;animation:fadeIn .25s ease}
-.match-ended-box{
-  background:var(--card);border:1px solid rgba(255,107,107,.35);
-  border-radius:var(--r);padding:40px 28px;max-width:360px;width:100%;
-  text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.7);
-}
+.match-ended-box{background:var(--card);border:1px solid rgba(255,107,107,.35);border-radius:var(--r);padding:40px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.7)}
 .match-ended-icon{font-size:56px;margin-bottom:16px}
 .match-ended-title{font-family:var(--font-display);font-size:26px;font-weight:900;margin-bottom:10px;color:var(--text)}
 .match-ended-desc{color:var(--muted);font-size:15px;line-height:1.65;margin-bottom:8px}
@@ -265,7 +271,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .fade-in{animation:fadeIn .4s ease forwards}
 .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--c6);border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* ── CONFETTI ── */
 .confetti-piece{position:fixed;width:10px;height:10px;top:-20px;z-index:999;pointer-events:none;border-radius:2px;animation:confettiFall linear forwards}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 @media(max-width:600px){
@@ -276,6 +281,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   .rel-grid{grid-template-columns:repeat(4,1fr)}
   .mode-cards{grid-template-columns:1fr 1fr}
   .players-score{flex-direction:column}
+  .survival-lives-row{flex-direction:column}
 }
 </style>
 </head>
@@ -301,9 +307,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   <div class="leave-confirm-box">
     <div class="leave-confirm-icon">🚪</div>
     <div class="leave-confirm-title">Leave the Match?</div>
-    <div class="leave-confirm-desc">
-      Are you sure? Your partner will be notified and the match will end immediately for both players.
-    </div>
+    <div class="leave-confirm-desc">Are you sure? Your partner will be notified and the match will end immediately for both players.</div>
     <div class="leave-confirm-actions">
       <button class="btn btn-danger btn-full" onclick="confirmLeave()">🚪 Yes, Leave Match</button>
       <button class="btn btn-ghost btn-full" onclick="closeLeaveConfirm()">✕ Cancel — Stay in Game</button>
@@ -311,16 +315,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   </div>
 </div>
 
-<!-- MATCH ENDED MODAL (shown to the remaining player) -->
+<!-- MATCH ENDED MODAL -->
 <div id="match-ended-modal">
   <div class="match-ended-box">
     <div class="match-ended-icon">😔</div>
     <div class="match-ended-title">Match Ended</div>
     <div class="match-ended-desc" id="match-ended-desc">Your partner left the match.</div>
     <div class="match-ended-countdown" id="match-ended-countdown-text">Returning to home in 3s...</div>
-    <div class="match-ended-bar">
-      <div class="match-ended-bar-fill" id="match-ended-bar-fill"></div>
-    </div>
+    <div class="match-ended-bar"><div class="match-ended-bar-fill" id="match-ended-bar-fill"></div></div>
     <button class="btn btn-ghost btn-full" onclick="dismissMatchEnded()">🏠 Return to Home</button>
   </div>
 </div>
@@ -361,12 +363,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     </div>
     <div class="mode-card" data-mode="blitz" onclick="selectMode(this)">
       <div class="mode-icon">🔥</div><div class="mode-name">Blitz Mode</div>
-      <div class="mode-desc">20 questions, fast-paced. Gut feeling only. No thinking!</div>
+      <div class="mode-desc">20 questions, 2s reveal. Gut feeling only — no thinking!</div>
       <div class="mode-badge">~5 min</div>
     </div>
     <div class="mode-card" data-mode="survival" onclick="selectMode(this)">
       <div class="mode-icon">💀</div><div class="mode-name">Survival</div>
-      <div class="mode-desc">15 questions. How many can you match in a row?</div>
+      <div class="mode-desc">15 questions. 3 lives each — wrong prediction costs a life!</div>
       <div class="mode-badge">~6 min</div>
     </div>
     <div class="mode-card" data-mode="ultimate" onclick="selectMode(this)">
@@ -398,8 +400,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
         <select class="input" id="create-mode">
           <option value="quick">⚡ Quick Match (5Q)</option>
           <option value="standard" selected>🎯 Standard (20Q)</option>
-          <option value="blitz">🔥 Blitz Mode (20Q)</option>
-          <option value="survival">💀 Survival (15Q)</option>
+          <option value="blitz">🔥 Blitz Mode (20Q, 2s reveal)</option>
+          <option value="survival">💀 Survival (15Q, 3 lives)</option>
           <option value="ultimate">👑 Ultimate Match (50Q)</option>
         </select>
       </div>
@@ -506,12 +508,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     <div style="font-size:64px;margin-bottom:20px;animation:blobFloat 2s ease-in-out infinite">🔍</div>
     <div class="screen-title mb-16">Finding Your Match...</div>
     <p class="text-muted mb-24">We're searching for someone online to play with you right now</p>
-    <div class="waiting-animation" style="justify-content:center">
-      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-    </div>
-    <div style="margin-top:40px">
-      <button class="btn btn-ghost" onclick="cancelQuickMatch()">✕ Cancel Search</button>
-    </div>
+    <div class="waiting-animation" style="justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div style="margin-top:40px"><button class="btn btn-ghost" onclick="cancelQuickMatch()">✕ Cancel Search</button></div>
   </div>
 </div>
 
@@ -520,6 +518,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   <div class="countdown-wrap">
     <div class="countdown-number" id="countdown-num">3</div>
     <div class="countdown-label" id="countdown-label">Get Ready!</div>
+    <!-- Mode label shown during countdown -->
+    <div id="cd-mode-label" style="margin-top:16px;font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--muted)"></div>
     <div class="players-preview">
       <div class="player-chip">
         <div class="pc-emoji">😎</div>
@@ -538,9 +538,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 <div class="screen" id="screen-question">
   <div class="question-wrap">
     <div class="q-topbar">
-      <div class="q-progress-wrap">
-        <div class="q-progress-fill" id="q-progress" style="width:0%"></div>
-      </div>
+      <div class="q-progress-wrap"><div class="q-progress-fill" id="q-progress" style="width:0%"></div></div>
       <div class="q-counter" id="q-counter">1 / 20</div>
     </div>
     <div class="q-scores-bar">
@@ -548,34 +546,28 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div class="score-spacer"></div>
       <div class="score-chip p2" id="q-score-p2">🤩 Friend: 0</div>
     </div>
+    <!-- Mode banner injected here by JS -->
+    <div id="q-mode-banner"></div>
+    <!-- Lives row injected here by JS (Survival only) -->
+    <div id="q-lives-row"></div>
     <div class="q-card">
       <div class="q-number" id="q-num-label">Question 1</div>
       <div class="q-text" id="q-text">Loading question...</div>
     </div>
     <div class="answer-section">
-      <div class="section-label">
-        🙋 Your Answer
-        <span class="badge">What YOU pick for yourself</span>
-      </div>
+      <div class="section-label">🙋 Your Answer <span class="badge">What YOU pick for yourself</span></div>
       <div class="options-grid" id="answer-opts"></div>
     </div>
     <div class="answer-section" id="predict-section">
-      <div class="section-label">
-        🔮 Predict Your Partner
-        <span class="badge" style="background:rgba(77,171,247,.2);color:var(--c5)">What THEY will pick</span>
-      </div>
+      <div class="section-label">🔮 Predict Your Partner <span class="badge" style="background:rgba(77,171,247,.2);color:var(--c5)">What THEY will pick</span></div>
       <div class="options-grid" id="predict-opts"></div>
     </div>
     <div id="q-waiting" class="waiting-msg hidden">
       ✅ Answers locked! Waiting for partner...
-      <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      </div>
+      <div style="margin-top:8px;display:flex;gap:6px;justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     </div>
     <div id="q-submit-btn-wrap">
-      <button class="btn btn-primary btn-full" id="q-submit-btn" onclick="submitAnswer()" disabled>
-        🔒 Lock In Answers
-      </button>
+      <button class="btn btn-primary btn-full" id="q-submit-btn" onclick="submitAnswer()" disabled>🔒 Lock In Answers</button>
       <p style="text-align:center;font-size:12px;color:var(--dim);margin-top:8px">Select both your answer and your prediction to submit</p>
     </div>
   </div>
@@ -607,7 +599,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
         <span class="predict-icon" id="p2-predict-icon">—</span>
       </div>
     </div>
-    <!-- FIX: Progress bar replaces text countdown for cleaner UX -->
+    <!-- Survival lives update (shown only in survival mode) -->
+    <div id="reveal-survival-lives" class="hidden survival-lives-row"></div>
     <div class="reveal-progress-wrap">
       <div class="reveal-progress-fill" id="reveal-progress-fill"></div>
     </div>
@@ -620,6 +613,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   <div class="go-wrap">
     <div class="go-title" id="go-result-title">✨ Soul Readers</div>
     <div class="go-subtitle" id="go-names">You + Friend</div>
+    <div style="text-align:center"><div class="go-mode-tag" id="go-mode-tag">🎯 Standard</div></div>
     <div class="compat-ring">
       <svg class="compat-svg" viewBox="0 0 160 160">
         <defs>
@@ -644,10 +638,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div style="font-size:14px;color:var(--muted)" id="go-match-count">17 / 20 questions matched</div>
     </div>
     <div class="ai-report">
-      <div class="air-header">
-        <div class="air-icon">🤖</div>
-        <div class="air-title">AI Compatibility Report</div>
-      </div>
+      <div class="air-header"><div class="air-icon">🤖</div><div class="air-title">AI Compatibility Report</div></div>
       <div class="air-text" id="go-ai-report">Generating your report...</div>
     </div>
     <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px">🎥 Reaction Recap</div>
@@ -675,7 +666,8 @@ const state = {
   socket: null,
   nickname: '',
   roomCode: '',
-  mode: 'quick',
+  mode: 'quick',          // selected mode
+  modeLabel: '⚡ Quick Match',
   relationship: '❤️ Couple',
   isP1: false,
   p1Name: '',
@@ -685,9 +677,20 @@ const state = {
   answerLocked: false,
   gameData: null,
   inActiveMatch: false,
+  // Survival lives (updated from server events)
+  p1Lives: null,
+  p2Lives: null,
 };
 
 const BACKEND = 'https://mindmatch-game.onrender.com';
+
+// ─── Mode helpers ─────────────────────────────────────
+function livesHearts(lives, max) {
+  if (lives === null || lives === undefined) return '';
+  var h = '';
+  for (var i = 0; i < max; i++) h += i < lives ? '❤️' : '🖤';
+  return h;
+}
 
 // ═══════════════════════════════════════════════════════
 //  MATCH SCREENS SET
@@ -703,57 +706,38 @@ function setMatchNavState(inMatch) {
 // ═══════════════════════════════════════════════════════
 //  LEAVE MATCH FLOW
 // ═══════════════════════════════════════════════════════
-function showLeaveConfirm() {
-  document.getElementById('leave-confirm-modal').classList.add('show');
-}
-
-function closeLeaveConfirm() {
-  document.getElementById('leave-confirm-modal').classList.remove('show');
-}
-
+function showLeaveConfirm() { document.getElementById('leave-confirm-modal').classList.add('show'); }
+function closeLeaveConfirm() { document.getElementById('leave-confirm-modal').classList.remove('show'); }
 function confirmLeave() {
   closeLeaveConfirm();
-  // FIX: emit 'leave_match' — server now handles this specifically
-  if (state.socket && state.socket.connected) {
-    state.socket.emit('leave_match');
-  }
+  if (state.socket && state.socket.connected) state.socket.emit('leave_match');
   forceHome();
 }
 
 // ═══════════════════════════════════════════════════════
-//  MATCH ENDED MODAL (shown to remaining player)
+//  MATCH ENDED MODAL
 // ═══════════════════════════════════════════════════════
-let _matchEndedTimer = null;
-
+var _matchEndedTimer = null;
 function showMatchEndedModal(msg) {
-  const modal = document.getElementById('match-ended-modal');
-  const countdownText = document.getElementById('match-ended-countdown-text');
-  const barFill = document.getElementById('match-ended-bar-fill');
-  const descEl = document.getElementById('match-ended-desc');
-
+  var modal = document.getElementById('match-ended-modal');
+  var countdownText = document.getElementById('match-ended-countdown-text');
+  var barFill = document.getElementById('match-ended-bar-fill');
+  var descEl = document.getElementById('match-ended-desc');
   descEl.textContent = msg || 'Your partner left the match.';
   modal.classList.add('show');
-
-  // Animate bar from 100% → 0% over 3s
   barFill.style.transition = 'none';
   barFill.style.width = '100%';
-  barFill.getBoundingClientRect(); // force reflow
+  barFill.getBoundingClientRect();
   barFill.style.transition = 'width 3s linear';
   barFill.style.width = '0%';
-
-  let secs = 3;
+  var secs = 3;
   countdownText.textContent = 'Returning to home in ' + secs + 's...';
   _matchEndedTimer = setInterval(function() {
     secs--;
-    if (secs > 0) {
-      countdownText.textContent = 'Returning to home in ' + secs + 's...';
-    } else {
-      clearInterval(_matchEndedTimer);
-      dismissMatchEnded();
-    }
+    if (secs > 0) { countdownText.textContent = 'Returning to home in ' + secs + 's...'; }
+    else { clearInterval(_matchEndedTimer); dismissMatchEnded(); }
   }, 1000);
 }
-
 function dismissMatchEnded() {
   clearInterval(_matchEndedTimer);
   document.getElementById('match-ended-modal').classList.remove('show');
@@ -767,25 +751,18 @@ function initSocket() {
   if (state.socket && state.socket.connected) return;
   state.socket = io(BACKEND, { transports: ['websocket', 'polling'] });
 
-  state.socket.on('connect', function() {
-    fetchStats();
-  });
-
-  state.socket.on('disconnect', function() {
-    toast('Disconnected from server', 'error');
-  });
-
-  state.socket.on('error', function(data) {
-    toast(data.msg, 'error');
-  });
+  state.socket.on('connect', function() { fetchStats(); });
+  state.socket.on('disconnect', function() { toast('Disconnected from server', 'error'); });
+  state.socket.on('error', function(data) { toast(data.msg, 'error'); });
 
   state.socket.on('room_created', function(data) {
     state.roomCode = data.code;
     state.isP1 = true;
+    state.modeLabel = data.modeLabel || data.mode;
     var inviteUrl = buildInviteUrl(data.code);
     document.getElementById('lobby-code').textContent = data.code;
     document.getElementById('lobby-invite-link').textContent = inviteUrl;
-    document.getElementById('lobby-mode').textContent = data.mode;
+    document.getElementById('lobby-mode').textContent = data.modeLabel || data.mode;
     document.getElementById('lobby-rel').textContent = data.relationship;
     document.getElementById('nav-room-code').classList.remove('hidden');
     showScreen('screen-lobby');
@@ -794,13 +771,27 @@ function initSocket() {
   state.socket.on('partner_joined', function(data) {
     state.p1Name = data.p1;
     state.p2Name = data.p2;
+    state.modeLabel = data.modeLabel || data.mode;
+    // Store initial lives
+    state.p1Lives = data.lives;
+    state.p2Lives = data.lives;
     var partnerName = state.isP1 ? data.p2 : data.p1;
     document.getElementById('lobby-partner-name').textContent = partnerName + ' joined!';
     document.getElementById('lobby-waiting').style.display = 'none';
     document.getElementById('lobby-joined').classList.add('show');
     document.getElementById('cd-p1-name').textContent = data.p1;
     document.getElementById('cd-p2-name').textContent = data.p2;
+    // Show mode on countdown screen
+    document.getElementById('cd-mode-label').textContent = data.modeLabel || data.mode;
     toast(partnerName + ' joined the room! 🎉', 'success');
+  });
+
+  // NEW: receive full mode config at game start
+  state.socket.on('game_start_config', function(data) {
+    state.mode = data.mode;
+    state.modeLabel = data.modeLabel;
+    state.p1Lives = data.lives;
+    state.p2Lives = data.lives;
   });
 
   state.socket.on('game_countdown', function(data) {
@@ -826,9 +817,7 @@ function initSocket() {
 
   state.socket.on('partner_answered', function() {
     var waiting = document.getElementById('q-waiting');
-    if (state.answerLocked && waiting) {
-      waiting.innerHTML = '✅ Partner answered too! Revealing...';
-    }
+    if (state.answerLocked && waiting) waiting.innerHTML = '✅ Partner answered too! Revealing...';
   });
 
   state.socket.on('reveal', function(data) {
@@ -844,28 +833,20 @@ function initSocket() {
     renderGameOver(data);
   });
 
-  // FIX: 'match_left' is the correct event name emitted by the patched server.
-  // Old code listened for 'match_left' but server emitted 'partner_left_permanently' — mismatch.
-  // Now both sides use 'match_left' consistently.
   state.socket.on('match_left', function(data) {
-    console.log('[match_left] partner left');
     setMatchNavState(false);
     showMatchEndedModal((data && data.msg) || 'Your partner left the match.');
   });
-
-  // Keep legacy handler as fallback for old server versions during deploy transition
   state.socket.on('partner_left_permanently', function(data) {
     setMatchNavState(false);
     showMatchEndedModal((data && data.msg) || 'Your partner left the match.');
   });
-
   state.socket.on('partner_disconnected', function(data) {
     setMatchNavState(false);
     showMatchEndedModal((data && data.msg) || 'Your partner disconnected.');
   });
 }
 
-// ─────────────────────────────────────────────────────
 function forceHome() {
   clearInterval(_matchEndedTimer);
   document.getElementById('match-ended-modal').classList.remove('show');
@@ -874,6 +855,8 @@ function forceHome() {
   state.currentPredict = null;
   state.answerLocked   = false;
   state.roomCode       = '';
+  state.p1Lives = null;
+  state.p2Lives = null;
   setMatchNavState(false);
   document.getElementById('nav-room-code').classList.add('hidden');
   showScreen('screen-home');
@@ -887,15 +870,11 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
-  if (!MATCH_SCREENS.has(id)) {
-    setMatchNavState(false);
-  }
+  if (!MATCH_SCREENS.has(id)) setMatchNavState(false);
 }
 
 function goHome() {
-  if (state.socket && state.socket.connected && state.roomCode) {
-    state.socket.emit('leave_room');
-  }
+  if (state.socket && state.socket.connected && state.roomCode) state.socket.emit('leave_room');
   forceHome();
 }
 
@@ -906,10 +885,12 @@ function switchTab(tab) {
   document.getElementById('setup-tab-join').classList.toggle('active',   tab === 'join');
 }
 
+// ── selectMode: sync home card + setup dropdown + state.mode ──────────────
 function selectMode(el) {
   document.querySelectorAll('.mode-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
   state.mode = el.dataset.mode;
+  // Sync the create-room dropdown if on setup screen
   var sel = document.getElementById('create-mode');
   if (sel) sel.value = state.mode;
 }
@@ -972,25 +953,17 @@ function cancelQuickMatch() {
 // ═══════════════════════════════════════════════════════
 //  INVITE LINKS & SHARE
 // ═══════════════════════════════════════════════════════
-function buildInviteUrl(code) {
-  return window.location.origin + '/join/' + code;
-}
-
+function buildInviteUrl(code) { return window.location.origin + '/join/' + code; }
 function copyRoomCode() {
-  var url = buildInviteUrl(state.roomCode);
-  navigator.clipboard.writeText(url).then(function() { toast('Invite link copied! 🔗', 'success'); });
+  navigator.clipboard.writeText(buildInviteUrl(state.roomCode))
+    .then(function() { toast('Invite link copied! 🔗', 'success'); });
 }
-
 function shareRoom() {
   var url = buildInviteUrl(state.roomCode);
   var text = '💕 Join my MindMatch game!\n\n' + url + '\n\nTap the link to join instantly!';
-  if (navigator.share) {
-    navigator.share({ title: 'MindMatch Invite', text: text, url: url });
-  } else {
-    navigator.clipboard.writeText(text).then(function() { toast('Invite copied! 📋', 'success'); });
-  }
+  if (navigator.share) { navigator.share({ title: 'MindMatch Invite', text: text, url: url }); }
+  else { navigator.clipboard.writeText(text).then(function() { toast('Invite copied! 📋', 'success'); }); }
 }
-
 function shareRoomWhatsApp() {
   var url = buildInviteUrl(state.roomCode);
   var text = '💕 Join my MindMatch game!\n\n' + url + '\n\nTap the link to join instantly — no code needed! 🧠❤️';
@@ -998,12 +971,57 @@ function shareRoomWhatsApp() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  QUESTION
+//  QUESTION RENDER
 // ═══════════════════════════════════════════════════════
+function renderModeBanner(mode) {
+  var labels = {
+    quick:    '⚡ Quick Match',
+    standard: '🎯 Standard',
+    blitz:    '🔥 Blitz Mode',
+    survival: '💀 Survival',
+    ultimate: '👑 Ultimate',
+  };
+  var container = document.getElementById('q-mode-banner');
+  container.innerHTML = '<div class="mode-banner ' + mode + '">' + (labels[mode] || mode) + '</div>';
+}
+
+function renderLivesRow(data) {
+  var container = document.getElementById('q-lives-row');
+  var isSurvival = data.mode === 'survival';
+  if (!isSurvival) { container.innerHTML = ''; return; }
+
+  var maxLives = 3;
+  var myLives    = state.isP1 ? data.p1Lives : data.p2Lives;
+  var theirLives = state.isP1 ? data.p2Lives : data.p1Lives;
+  var theirName  = state.isP1 ? data.p2Name  : data.p1Name;
+
+  container.innerHTML =
+    '<div class="lives-row">'
+    + '<div class="lives-player">'
+    +   '<div>'
+    +     '<div class="lives-label">Your Lives</div>'
+    +     '<div class="lives-hearts">' + livesHearts(myLives, maxLives) + '</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="lives-player">'
+    +   '<div style="text-align:right">'
+    +     '<div class="lives-label">' + (theirName || 'Partner') + '\'s Lives</div>'
+    +     '<div class="lives-hearts">' + livesHearts(theirLives, maxLives) + '</div>'
+    +   '</div>'
+    + '</div>'
+    + '</div>';
+}
+
 function renderQuestion(data) {
   state.currentAnswer  = null;
   state.currentPredict = null;
   state.answerLocked   = false;
+
+  // Update cached lives
+  if (data.mode === 'survival') {
+    state.p1Lives = data.p1Lives;
+    state.p2Lives = data.p2Lives;
+  }
 
   var pct = (data.index / data.total) * 100;
   document.getElementById('q-progress').style.width = pct + '%';
@@ -1016,6 +1034,10 @@ function renderQuestion(data) {
   var theirName  = state.isP1 ? data.p2Name : data.p1Name;
   document.getElementById('q-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
   document.getElementById('q-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
+
+  // Mode-specific UI
+  renderModeBanner(data.mode || state.mode);
+  renderLivesRow(data);
 
   function buildOpts(containerId, selectedClass, onSelect) {
     var container = document.getElementById(containerId);
@@ -1048,22 +1070,24 @@ function checkBothSelected() {
 
 function submitAnswer() {
   if (!state.currentAnswer || !state.currentPredict) return;
-  // FIX: Prevent double submit
   if (state.answerLocked) return;
   state.answerLocked = true;
   document.querySelectorAll('.opt-btn').forEach(function(b) { b.disabled = true; });
   document.getElementById('q-submit-btn-wrap').style.display = 'none';
   document.getElementById('q-waiting').classList.remove('hidden');
-  state.socket.emit('submit_answer', {
-    answer:  state.currentAnswer,
-    predict: state.currentPredict,
-  });
+  state.socket.emit('submit_answer', { answer: state.currentAnswer, predict: state.currentPredict });
 }
 
 // ═══════════════════════════════════════════════════════
-//  REVEAL
+//  REVEAL RENDER
 // ═══════════════════════════════════════════════════════
 function renderReveal(data) {
+  // Update lives from server
+  if (data.mode === 'survival') {
+    state.p1Lives = data.p1Lives;
+    state.p2Lives = data.p2Lives;
+  }
+
   document.getElementById('reveal-q-text').textContent = data.question;
 
   var isMatch = data.match;
@@ -1071,7 +1095,6 @@ function renderReveal(data) {
   document.getElementById('reveal-nomatch-banner').classList.toggle('hidden', isMatch);
   if (isMatch) launchConfetti();
 
-  // Answer cards
   document.getElementById('reveal-cards').innerHTML =
     '<div class="reveal-card ' + (isMatch ? 'match' : 'nomatch') + '" style="animation-delay:.1s">'
     + '<div class="rc-player">' + data.p1Name + '</div>'
@@ -1084,30 +1107,62 @@ function renderReveal(data) {
     + '<div style="font-size:11px;color:var(--muted);margin-top:4px">Their answer</div>'
     + '</div>';
 
-  // Predictions
+  // Predictions — show bonus points per mode
+  var ppLabel = data.mode === 'survival' ? '+15' : '+10';
   document.getElementById('p1-predict-name').textContent = data.p1Name + ' predicted:';
   document.getElementById('p1-predict-val').textContent  = data.p1Predict;
-  document.getElementById('p1-predict-icon').textContent = data.p1PredictCorrect ? '✅ +10' : '❌';
-
+  document.getElementById('p1-predict-icon').textContent = data.p1PredictCorrect ? '✅ ' + ppLabel : '❌';
   document.getElementById('p2-predict-name').textContent = data.p2Name + ' predicted:';
   document.getElementById('p2-predict-val').textContent  = data.p2Predict;
-  document.getElementById('p2-predict-icon').textContent = data.p2PredictCorrect ? '✅ +10' : '❌';
+  document.getElementById('p2-predict-icon').textContent = data.p2PredictCorrect ? '✅ ' + ppLabel : '❌';
 
-  // FIX: Progress bar countdown (5s) + text ticker
+  // Survival lives update row
+  var survivalDiv = document.getElementById('reveal-survival-lives');
+  if (data.mode === 'survival') {
+    var maxLives = 3;
+    var p1Lost = !data.p1PredictCorrect;
+    var p2Lost = !data.p2PredictCorrect;
+    survivalDiv.classList.remove('hidden');
+    survivalDiv.innerHTML =
+      '<div class="slr-card">'
+      + '<div class="slr-name">' + data.p1Name + '</div>'
+      + '<div class="slr-hearts">' + livesHearts(data.p1Lives, maxLives) + '</div>'
+      + (p1Lost ? '<div class="slr-lost">-1 ❤️</div>' : '')
+      + '</div>'
+      + '<div class="slr-card">'
+      + '<div class="slr-name">' + data.p2Name + '</div>'
+      + '<div class="slr-hearts">' + livesHearts(data.p2Lives, maxLives) + '</div>'
+      + (p2Lost ? '<div class="slr-lost">-1 ❤️</div>' : '')
+      + '</div>';
+  } else {
+    survivalDiv.classList.add('hidden');
+    survivalDiv.innerHTML = '';
+  }
+
+  // ── Progress bar uses revealDuration from server ────────────────────────
+  var revealMs  = data.revealDuration || 5000;
+  var revealSec = Math.round(revealMs / 1000);
+
   var barFill = document.getElementById('reveal-progress-fill');
   var nextEl  = document.getElementById('reveal-next');
+
   barFill.style.transition = 'none';
   barFill.style.width = '100%';
   barFill.getBoundingClientRect();
-  barFill.style.transition = 'width 5s linear';
+  barFill.style.transition = 'width ' + (revealMs / 1000) + 's linear';
   barFill.style.width = '0%';
 
-  var secs = 5;
-  nextEl.textContent = 'Next question in ' + secs + 's...';
+  var secs = revealSec;
+  nextEl.textContent = data.mode === 'blitz'
+    ? '⚡ Blitz — next in ' + secs + 's!'
+    : 'Next question in ' + secs + 's...';
+
   var ni = setInterval(function() {
     secs--;
     if (secs > 0) {
-      nextEl.textContent = 'Next question in ' + secs + 's...';
+      nextEl.textContent = data.mode === 'blitz'
+        ? '⚡ Blitz — next in ' + secs + 's!'
+        : 'Next question in ' + secs + 's...';
     } else {
       nextEl.textContent = 'Loading next question...';
       clearInterval(ni);
@@ -1116,7 +1171,7 @@ function renderReveal(data) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  GAME OVER
+//  GAME OVER RENDER
 // ═══════════════════════════════════════════════════════
 var AI_REPORTS = [
   function(d) {
@@ -1133,6 +1188,7 @@ var AI_REPORTS = [
 function renderGameOver(data) {
   document.getElementById('go-result-title').textContent = data.title;
   document.getElementById('go-names').textContent = data.p1Name + ' + ' + data.p2Name;
+  document.getElementById('go-mode-tag').textContent = data.modeLabel || state.modeLabel || '🎯 Standard';
 
   var circumference = 2 * Math.PI * 68;
   var fill = document.getElementById('compat-ring-fill');
@@ -1192,7 +1248,7 @@ function renderGameOver(data) {
 function getShareText() {
   var d = state.gameData;
   if (!d) return '';
-  return '🧠❤️ MindMatch Result\n' + d.p1Name + ' + ' + d.p2Name + '\nCompatibility: ' + d.compatibility + '%\n' + d.title + '\n\nPlay at: ' + window.location.origin;
+  return '🧠❤️ MindMatch Result\n' + d.p1Name + ' + ' + d.p2Name + '\nCompatibility: ' + d.compatibility + '%\n' + d.title + '\nMode: ' + (d.modeLabel || '') + '\n\nPlay at: ' + window.location.origin;
 }
 function shareWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(getShareText())); }
 function shareTwitter()  { window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(getShareText())); }
@@ -1290,8 +1346,13 @@ window.addEventListener('load', function() {
   fetchStats();
   setInterval(fetchStats, 10000);
 
+  // Sync mode dropdown → state.mode
   document.getElementById('create-mode').addEventListener('change', function(e) {
     state.mode = e.target.value;
+    // Also highlight the matching mode card on home screen
+    document.querySelectorAll('.mode-card').forEach(function(c) {
+      c.classList.toggle('selected', c.dataset.mode === state.mode);
+    });
   });
 
   // Handle invite link auto-join
@@ -1304,9 +1365,7 @@ window.addEventListener('load', function() {
     showScreen('screen-setup');
     document.getElementById('setup-tab-join').click();
     toast('Room ' + joinCode + ' — enter your name to join! 🎉', 'success');
-    if (window.history && window.history.replaceState) {
-      window.history.replaceState({}, '', '/');
-    }
+    if (window.history && window.history.replaceState) window.history.replaceState({}, '', '/');
   }
 });
 </script>
