@@ -2,7 +2,6 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +15,10 @@ app.use(express.static(path.join(__dirname, '../public')));
 const rooms = new Map();
 const quickQueue = [];
 const socketRoom = new Map();
+
+// ─── PLAYER PROFILES (in-memory, keyed by googleId or nickname+session) ──────
+// For real persistence you'd use a DB; here we store in memory per session
+const playerProfiles = new Map(); // googleId -> { nickname, avatar, totalGames, totalScore, bestCompatibility, history[] }
 
 const QUESTIONS = {
   favorites: [
@@ -81,11 +84,11 @@ function generateRoomCode() {
 
 function getModeConfig(mode) {
   const configs = {
-    quick:    { questionCount: 5,  timerSeconds: 10, label: 'Quick Match' },
-    standard: { questionCount: 20, timerSeconds: 10, label: 'Standard' },
-    ultimate: { questionCount: 50, timerSeconds: 15, label: 'Ultimate Match' },
-    blitz:    { questionCount: 20, timerSeconds: 3,  label: 'Blitz ⚡' },
-    survival: { questionCount: 15, timerSeconds: 15, label: 'Survival Mode', survival: true },
+    quick:    { questionCount: 5,  timerSeconds: 0, label: 'Quick Match' },
+    standard: { questionCount: 20, timerSeconds: 0, label: 'Standard' },
+    ultimate: { questionCount: 50, timerSeconds: 0, label: 'Ultimate Match' },
+    blitz:    { questionCount: 20, timerSeconds: 0, label: 'Blitz ⚡' },
+    survival: { questionCount: 15, timerSeconds: 0, label: 'Survival Mode', survival: true },
   };
   return configs[mode] || configs.standard;
 }
@@ -102,14 +105,22 @@ function calculateScores(room) {
     const p2Answer  = round.p2Answer;
     const p2Predict = round.p2Predict;
 
+    // BUG FIX: p1 scores points when their PREDICTION of p2's answer is correct
     const p1Correct = p1Predict === p2Answer;
+    // p2 scores points when their PREDICTION of p1's answer is correct
     const p2Correct = p2Predict === p1Answer;
 
-    if (p1Correct) { p1Score += 10; if (round.p1Time < 2) p1Score += 5; else if (round.p1Time < 4) p1Score += 2; }
-    if (p2Correct) { p2Score += 10; if (round.p2Time < 2) p2Score += 5; else if (round.p2Time < 4) p2Score += 2; }
-    if (p1Correct && p2Correct) matchCount++;
+    if (p1Correct) { p1Score += 10; }
+    if (p2Correct) { p2Score += 10; }
+    if (p1Answer === p2Answer) matchCount++; // "match" = both gave same answer
 
-    results.push({ question: q.q, p1Answer, p2Answer, p1Predict, p2Predict, p1Correct, p2Correct, match: p1Correct && p2Correct });
+    results.push({
+      question: q.q,
+      p1Answer, p2Answer,
+      p1Predict, p2Predict,
+      p1Correct, p2Correct,
+      match: p1Answer === p2Answer
+    });
   });
 
   const total = room.questions.length;
@@ -138,7 +149,34 @@ function calculateScores(room) {
 io.on('connection', (socket) => {
   console.log(`[+] Connected: ${socket.id}`);
 
-  socket.on('create_room', ({ nickname, mode, relationship }) => {
+  // ── PROFILE ──────────────────────────────────────────────────────────────
+  socket.on('save_profile', ({ googleId, nickname, avatar, email }) => {
+    if (!googleId) return;
+    if (!playerProfiles.has(googleId)) {
+      playerProfiles.set(googleId, {
+        googleId, nickname, avatar, email,
+        totalGames: 0, totalScore: 0,
+        bestCompatibility: 0,
+        totalMatches: 0,
+        history: []
+      });
+    } else {
+      // Update display info
+      const p = playerProfiles.get(googleId);
+      p.nickname = nickname;
+      p.avatar = avatar;
+    }
+    socket.emit('profile_loaded', playerProfiles.get(googleId));
+  });
+
+  socket.on('get_profile', ({ googleId }) => {
+    if (!googleId) return;
+    const p = playerProfiles.get(googleId);
+    if (p) socket.emit('profile_loaded', p);
+  });
+
+  // ── ROOM CREATE/JOIN ─────────────────────────────────────────────────────
+  socket.on('create_room', ({ nickname, mode, relationship, googleId }) => {
     const code = generateRoomCode();
     const cfg  = getModeConfig(mode);
     const questions = shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
@@ -147,7 +185,10 @@ io.on('connection', (socket) => {
       code, mode, relationship,
       config: cfg,
       questions,
-      players: { p1: { id: socket.id, nickname, score: 0, ready: false }, p2: null },
+      players: {
+        p1: { id: socket.id, nickname, score: 0, ready: false, googleId: googleId || null },
+        p2: null
+      },
       state: 'waiting',
       currentQ: 0,
       answers: [],
@@ -163,13 +204,13 @@ io.on('connection', (socket) => {
     console.log(`[Room] Created: ${code} by ${nickname}`);
   });
 
-  socket.on('join_room', ({ code, nickname }) => {
+  socket.on('join_room', ({ code, nickname, googleId }) => {
     const room = rooms.get(code);
     if (!room) { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
     if (room.state !== 'waiting') { socket.emit('error', { msg: 'Game already started!' }); return; }
     if (room.players.p2) { socket.emit('error', { msg: 'Room is full!' }); return; }
 
-    room.players.p2 = { id: socket.id, nickname, score: 0, ready: false };
+    room.players.p2 = { id: socket.id, nickname, score: 0, ready: false, googleId: googleId || null };
     socketRoom.set(socket.id, code);
     socket.join(code);
 
@@ -185,7 +226,7 @@ io.on('connection', (socket) => {
     console.log(`[Room] ${nickname} joined ${code}`);
   });
 
-  socket.on('quick_match', ({ nickname }) => {
+  socket.on('quick_match', ({ nickname, googleId }) => {
     for (let i = quickQueue.length - 1; i >= 0; i--) {
       if (!io.sockets.sockets.get(quickQueue[i].id)) quickQueue.splice(i, 1);
     }
@@ -199,7 +240,10 @@ io.on('connection', (socket) => {
       const room = {
         code, mode: 'standard', relationship: '🌍 Strangers',
         config: cfg, questions,
-        players: { p1: { id: partner.id, nickname: partner.nickname, score: 0, ready: false }, p2: { id: socket.id, nickname, score: 0, ready: false } },
+        players: {
+          p1: { id: partner.id, nickname: partner.nickname, score: 0, ready: false, googleId: partner.googleId || null },
+          p2: { id: socket.id, nickname, score: 0, ready: false, googleId: googleId || null }
+        },
         state: 'waiting', currentQ: 0, answers: [], timer: null, roundTimer: null,
       };
 
@@ -218,7 +262,7 @@ io.on('connection', (socket) => {
       });
       setTimeout(() => startGame(code), 2000);
     } else {
-      quickQueue.push({ id: socket.id, nickname });
+      quickQueue.push({ id: socket.id, nickname, googleId: googleId || null });
       socket.emit('quick_match_waiting', { msg: 'Searching for a match...' });
     }
   });
@@ -240,59 +284,71 @@ io.on('connection', (socket) => {
     if (isP1) {
       room.answers[qIdx].p1Answer  = answer;
       room.answers[qIdx].p1Predict = predict;
-      room.answers[qIdx].p1Time    = time;
+      room.answers[qIdx].p1Time    = time || 0;
     } else {
       room.answers[qIdx].p2Answer  = answer;
       room.answers[qIdx].p2Predict = predict;
-      room.answers[qIdx].p2Time    = time;
+      room.answers[qIdx].p2Time    = time || 0;
     }
 
+    // Notify the other player their partner has answered
     socket.to(code).emit('partner_answered');
 
     const ans = room.answers[qIdx];
+    // BUG FIX: Only reveal when BOTH players have answered (no timer fallback)
     if (ans.p1Answer !== undefined && ans.p2Answer !== undefined) {
       revealAnswer(code);
     }
   });
 
-  // ── LEAVE ROOM (Home button) ─────────────────────────────────────────────
+  // ── LEAVE ROOM ───────────────────────────────────────────────────────────
+  // BUG FIX: The original code emitted partner_left_permanently via io.to(code)
+  // but hoisting issues in the frontend meant forceHome was undefined when the
+  // handler fired. We also ensure the emit happens BEFORE any cleanup.
   socket.on('leave_room', () => {
-    console.log('LEAVE_ROOM RECEIVED', socket.id);
+    console.log('[leave_room] received from', socket.id);
 
     const code = socketRoom.get(socket.id);
-    console.log('LEAVE_ROOM code:', code);
     if (!code) return;
 
     const room = rooms.get(code);
-    console.log('LEAVE_ROOM room exists:', !!room);
 
     if (room) {
-      // 1. Stop all timers first
+      // Stop all timers first
       clearTimeout(room.timer);
       clearTimeout(room.roundTimer);
+      room.state = 'done';
 
-      // 2. Grab other player id BEFORE deleting anything
+      // Find the OTHER player's socket id BEFORE any cleanup
       const otherId = room.players.p1.id === socket.id
         ? room.players.p2?.id
         : room.players.p1.id;
-      console.log('LEAVE_ROOM otherId:', otherId);
 
-      // 3. Emit via io.to (server-side broadcast, not socket.to)
-      //    This does NOT depend on sender socket membership state
-      io.to(code).emit('partner_left_permanently', { msg: 'Your partner left the game.' });
-      console.log('LEAVE_ROOM emitted partner_left_permanently to room', code);
+      console.log('[leave_room] notifying other player:', otherId);
 
-      // 4. Clean up other player AFTER emit is queued
+      // Emit to the ROOM (both players currently in it) before anyone leaves
+      // Use a targeted emit to the other socket directly for reliability
+      if (otherId) {
+        const otherSocket = io.sockets.sockets.get(otherId);
+        if (otherSocket) {
+          otherSocket.emit('partner_left_permanently', { msg: 'Your partner left the game.' });
+          console.log('[leave_room] emitted partner_left_permanently directly to', otherId);
+        }
+        // Also broadcast to room as fallback
+        io.to(code).emit('partner_left_permanently', { msg: 'Your partner left the game.' });
+      }
+
+      // Clean up other player mapping AFTER emit
       if (otherId) socketRoom.delete(otherId);
     }
 
-    // 5. Clean up leaving player
+    // Clean up leaving player
     socketRoom.delete(socket.id);
     socket.leave(code);
 
-    // 6. Delete room last
+    // Delete room
     rooms.delete(code);
-    console.log('LEAVE_ROOM cleanup done for room', code);
+    console.log('[leave_room] cleanup done for room', code);
   });
 
   socket.on('disconnect', () => {
@@ -303,7 +359,21 @@ io.on('connection', (socket) => {
       if (room && room.state !== 'done') {
         clearTimeout(room.timer);
         clearTimeout(room.roundTimer);
+
+        // Find other player and notify
+        const otherId = room.players.p1.id === socket.id
+          ? room.players.p2?.id
+          : room.players.p1.id;
+
+        if (otherId) {
+          const otherSocket = io.sockets.sockets.get(otherId);
+          if (otherSocket) {
+            otherSocket.emit('partner_disconnected', { msg: 'Your partner disconnected. Game ended.' });
+          }
+        }
+
         io.to(code).emit('partner_disconnected', { msg: 'Your partner disconnected. Game ended.' });
+        room.state = 'done';
         rooms.delete(code);
       }
       socketRoom.delete(socket.id);
@@ -349,41 +419,54 @@ function sendQuestion(code) {
     total: room.questions.length,
     question: q.q,
     options: opts,
-    timer: null,
+    timer: null, // NO TIMER — round ends only when both players answer
     p1Name: room.players.p1.nickname,
     p2Name: room.players.p2.nickname,
+    p1Score: room.players.p1.score,
+    p2Score: room.players.p2.score,
   });
 }
 
 function revealAnswer(code) {
   const room = rooms.get(code);
   if (!room) return;
+
+  // Guard: only reveal once per question
+  if (room.state === 'reveal') return;
   room.state = 'reveal';
 
-  const qIdx  = room.currentQ;
-  const ans   = room.answers[qIdx];
-  const q     = room.questions[qIdx];
-  const isMatch = ans.p1Answer === ans.p2Answer;
+  const qIdx = room.currentQ;
+  const ans  = room.answers[qIdx];
+  const q    = room.questions[qIdx];
 
-  if (ans.p1Predict === ans.p2Answer) room.players.p1.score += 10;
-  if (ans.p2Predict === ans.p1Answer) room.players.p2.score += 10;
+  // BUG FIX: Correctly determine if predictions were right
+  const p1PredictCorrect = ans.p1Predict === ans.p2Answer;
+  const p2PredictCorrect = ans.p2Predict === ans.p1Answer;
+  const isAnswerMatch    = ans.p1Answer === ans.p2Answer;
+
+  // Update live scores
+  if (p1PredictCorrect) room.players.p1.score += 10;
+  if (p2PredictCorrect) room.players.p2.score += 10;
 
   io.to(code).emit('reveal', {
-    index: qIdx,
+    index:    qIdx,
     question: q.q,
     p1Answer:  ans.p1Answer,
     p2Answer:  ans.p2Answer,
     p1Predict: ans.p1Predict,
     p2Predict: ans.p2Predict,
+    p1PredictCorrect,
+    p2PredictCorrect,
     p1Name: room.players.p1.nickname,
     p2Name: room.players.p2.nickname,
     p1Score: room.players.p1.score,
     p2Score: room.players.p2.score,
-    match: isMatch,
-    nextIn: 3,
+    match:   isAnswerMatch, // both gave the same answer
+    nextIn:  5,  // FIX: 5 second reveal window matches the setTimeout below
   });
 
-  setTimeout(() => {
+  // BUG FIX: 5000ms delay so the reveal stays visible for the full 5 seconds
+  room.roundTimer = setTimeout(() => {
     room.currentQ++;
     if (room.currentQ >= room.questions.length) {
       endGame(code);
@@ -399,19 +482,52 @@ function endGame(code) {
   if (!room) return;
   room.state = 'done';
   const scores = calculateScores(room);
+
   io.to(code).emit('game_over', {
     ...scores,
     p1Name: room.players.p1.nickname,
     p2Name: room.players.p2.nickname,
+    p1GoogleId: room.players.p1.googleId,
+    p2GoogleId: room.players.p2.googleId,
     mode: room.mode,
     relationship: room.relationship,
   });
+
+  // Update profiles if players are signed in
+  const updateProfile = (googleId, score, compat) => {
+    if (!googleId) return;
+    const p = playerProfiles.get(googleId);
+    if (!p) return;
+    p.totalGames++;
+    p.totalScore += score;
+    if (compat > p.bestCompatibility) p.bestCompatibility = compat;
+    p.totalMatches += scores.matchCount;
+    p.history.unshift({
+      date: new Date().toISOString(),
+      mode: room.mode,
+      relationship: room.relationship,
+      compatibility: scores.compatibility,
+      score,
+      title: scores.title,
+    });
+    if (p.history.length > 20) p.history = p.history.slice(0, 20);
+  };
+
+  updateProfile(room.players.p1.googleId, scores.p1Score, scores.compatibility);
+  updateProfile(room.players.p2?.googleId, scores.p2Score, scores.compatibility);
+
   setTimeout(() => rooms.delete(code), 600000);
 }
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 app.get('/api/stats', (req, res) => {
-  res.json({ activeRooms: rooms.size, queueLength: quickQueue.length });
+  res.json({ activeRooms: rooms.size, queueLength: quickQueue.length, totalQuestions: ALL_QUESTIONS.length });
+});
+
+app.get('/api/profile/:googleId', (req, res) => {
+  const p = playerProfiles.get(req.params.googleId);
+  if (!p) return res.status(404).json({ error: 'Profile not found' });
+  res.json(p);
 });
 
 app.get('*', (req, res) => {
