@@ -710,12 +710,10 @@ function initSocket() {
   });
 
   state.socket.on('partner_left_permanently', ({ msg }) => {
-    hideDisconnectModal();
-    clearInterval(state.reconnectCountdown);
-    toast(msg || 'Partner left the game.', 'error');
-    alert(msg || 'Your partner left the game.');
-    forceHome();
-  });
+  console.log('PARTNER LEFT EVENT RECEIVED');
+  alert(msg || 'Your partner left the game.');
+  forceHome();
+});
 
   function forceHome() {
   hideDisconnectModal();
