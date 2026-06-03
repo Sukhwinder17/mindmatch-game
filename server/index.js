@@ -13,7 +13,18 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 const rooms = new Map();
-const quickQueue = [];
+
+// ── CHANGE 1: Replace single quickQueue with per-mode queues ──────────────
+// OLD: const quickQueue = [];
+// NEW: separate queue per mode so players only match within same mode
+const modeQueues = {
+  quick:    [],
+  standard: [],
+  blitz:    [],
+  survival: [],
+  ultimate: [],
+};
+
 const socketRoom = new Map();
 
 const QUESTIONS = {
@@ -79,52 +90,50 @@ function generateRoomCode() {
 }
 
 // ─── MODE CONFIG ─────────────────────────────────────────────────────────────
-// Each mode now carries all the settings that affect gameplay:
-//   questionCount  — how many questions to play
-//   revealDuration — ms to show the reveal screen before next question
-//   lives          — starting lives for Survival (null = no lives mechanic)
-//   pointsPerMatch — bonus points when both players answered the same
-//   pointsPerPredict — points for a correct prediction
-//   label          — display name
 function getModeConfig(mode) {
   const configs = {
     quick: {
-      questionCount:   5,
-      revealDuration:  5000,
-      lives:           null,
-      pointsPerMatch:  0,
+      questionCount:    5,
+      revealDuration:   5000,
+      lives:            null,
+      pointsPerMatch:   0,
       pointsPerPredict: 10,
       label: '⚡ Quick Match',
     },
     standard: {
-      questionCount:   20,
-      revealDuration:  5000,
-      lives:           null,
-      pointsPerMatch:  0,
+      questionCount:    20,
+      revealDuration:   5000,
+      lives:            null,
+      pointsPerMatch:   0,
       pointsPerPredict: 10,
       label: '🎯 Standard',
     },
+    // CHANGE 2: Blitz revealDuration confirmed 2000ms (was already set but
+    // now also adds pointsPerMatch bonus to reward fast matching)
     blitz: {
-      questionCount:   20,
-      revealDuration:  2000,   // ← fast reveal
-      lives:           null,
-      pointsPerMatch:  5,      // bonus for matching answer
+      questionCount:    20,
+      revealDuration:   2000,
+      lives:            null,
+      pointsPerMatch:   5,
       pointsPerPredict: 10,
       label: '🔥 Blitz Mode',
     },
+    // CHANGE 3: Survival — lives:3, higher reward per correct predict
     survival: {
-      questionCount:   15,
-      revealDuration:  4000,
-      lives:           3,      // ← wrong prediction costs a life
-      pointsPerMatch:  0,
-      pointsPerPredict: 15,    // higher reward per correct predict
+      questionCount:    15,
+      revealDuration:   4000,
+      lives:            3,
+      pointsPerMatch:   0,
+      pointsPerPredict: 15,
       label: '💀 Survival',
     },
+    // CHANGE 4: Ultimate — 50 questions, show detailed end report (handled
+    // in calculateScores and endGame via ultimateReport flag)
     ultimate: {
-      questionCount:   50,
-      revealDuration:  5000,
-      lives:           null,
-      pointsPerMatch:  5,
+      questionCount:    50,
+      revealDuration:   5000,
+      lives:            null,
+      pointsPerMatch:   5,
       pointsPerPredict: 10,
       label: '👑 Ultimate Match',
     },
@@ -142,12 +151,12 @@ function calculateScores(room) {
     const q = room.questions[idx];
     const { p1Answer, p1Predict, p2Answer, p2Predict } = round;
 
-    const p1Correct = p1Predict === p2Answer;
-    const p2Correct = p2Predict === p1Answer;
+    const p1Correct   = p1Predict === p2Answer;
+    const p2Correct   = p2Predict === p1Answer;
     const answersMatch = p1Answer === p2Answer;
 
-    if (p1Correct) p1Score += cfg.pointsPerPredict;
-    if (p2Correct) p2Score += cfg.pointsPerPredict;
+    if (p1Correct)    p1Score += cfg.pointsPerPredict;
+    if (p2Correct)    p2Score += cfg.pointsPerPredict;
     if (answersMatch) {
       p1Score += cfg.pointsPerMatch;
       p2Score += cfg.pointsPerMatch;
@@ -157,25 +166,43 @@ function calculateScores(room) {
     results.push({ question: q.q, p1Answer, p2Answer, p1Predict, p2Predict, p1Correct, p2Correct, match: answersMatch });
   });
 
-  const total = room.answers.length;
-  const compatibility = total > 0 ? Math.round((matchCount / total) * 100) : 0;
+  const total          = room.answers.length;
+  const compatibility  = total > 0 ? Math.round((matchCount / total) * 100) : 0;
   const p1Understanding = total > 0 ? Math.round(room.answers.filter(r => r.p1Predict === r.p2Answer).length / total * 100) : 0;
   const p2Understanding = total > 0 ? Math.round(room.answers.filter(r => r.p2Predict === r.p1Answer).length / total * 100) : 0;
-  const trust = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 10 - 5));
+  const trust         = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 10 - 5));
   const communication = Math.min(100, Math.round(compatibility * 0.9 + Math.random() * 15));
-  const humor = Math.min(100, Math.round(Math.random() * 20 + 75));
+  const humor         = Math.min(100, Math.round(Math.random() * 20 + 75));
 
   function getTitle(pct) {
     if (pct === 100) return "🧠 Mind Readers";
-    if (pct >= 95)  return "✨ Soul Readers";
-    if (pct >= 80)  return "🏆 Perfect Duo";
-    if (pct >= 60)  return "💫 Good Connection";
-    if (pct >= 40)  return "🌱 Getting There";
-    if (pct >= 20)  return "🌀 Strangers With History";
+    if (pct >= 95)   return "✨ Soul Readers";
+    if (pct >= 80)   return "🏆 Perfect Duo";
+    if (pct >= 60)   return "💫 Good Connection";
+    if (pct >= 40)   return "🌱 Getting There";
+    if (pct >= 20)   return "🌀 Strangers With History";
     return "👀 Do You Even Know Them?";
   }
 
-  return { p1Score, p2Score, compatibility, trust, communication, humor, matchCount, total, results, title: getTitle(compatibility), p1Understanding, p2Understanding };
+  // CHANGE 5: Ultimate mode — compute strongest/weakest matches and
+  // prediction accuracy per player for the detailed end report
+  let ultimateExtras = null;
+  if (room.mode === 'ultimate') {
+    const strongMatches = results.filter(r => r.match).slice(0, 5);
+    const weakMatches   = results.filter(r => !r.match).slice(0, 5);
+    const p1Accuracy    = total > 0 ? Math.round(results.filter(r => r.p1Correct).length / total * 100) : 0;
+    const p2Accuracy    = total > 0 ? Math.round(results.filter(r => r.p2Correct).length / total * 100) : 0;
+    const relationshipScore = Math.min(100, Math.round((compatibility + p1Accuracy + p2Accuracy) / 3));
+    ultimateExtras = { strongMatches, weakMatches, p1Accuracy, p2Accuracy, relationshipScore };
+  }
+
+  return {
+    p1Score, p2Score, compatibility, trust, communication, humor,
+    matchCount, total, results,
+    title: getTitle(compatibility),
+    p1Understanding, p2Understanding,
+    ultimateExtras,
+  };
 }
 
 // ─── HELPER: destroy room and notify other player ────────────────────────────
@@ -237,9 +264,9 @@ io.on('connection', (socket) => {
   // ── JOIN ROOM ─────────────────────────────────────────────────────────────
   socket.on('join_room', ({ code, nickname }) => {
     const room = rooms.get(code);
-    if (!room) { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
-    if (room.state !== 'waiting') { socket.emit('error', { msg: 'Game already started!' }); return; }
-    if (room.players.p2) { socket.emit('error', { msg: 'Room is full!' }); return; }
+    if (!room)              { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
+    if (room.state !== 'waiting') { socket.emit('error', { msg: 'Game already started!' });    return; }
+    if (room.players.p2)   { socket.emit('error', { msg: 'Room is full!' });                   return; }
 
     room.players.p2 = { id: socket.id, nickname, score: 0, lives: room.config.lives };
     socketRoom.set(socket.id, code);
@@ -259,31 +286,38 @@ io.on('connection', (socket) => {
     console.log(`[Room] ${nickname} joined ${code}`);
   });
 
-  // ── QUICK MATCH ───────────────────────────────────────────────────────────
-  socket.on('quick_match', ({ nickname }) => {
-    for (let i = quickQueue.length - 1; i >= 0; i--) {
-      if (!io.sockets.sockets.get(quickQueue[i].id)) quickQueue.splice(i, 1);
+  // ── QUICK MATCH (now mode-aware) ──────────────────────────────────────────
+  // CHANGE 6: Accept `mode` from client; use modeQueues[mode] instead of
+  // the old single quickQueue so players only match within the same mode.
+  socket.on('quick_match', ({ nickname, mode }) => {
+    // Sanitise: fall back to 'standard' if unknown mode sent
+    const safeMode = modeQueues[mode] ? mode : 'standard';
+    const queue    = modeQueues[safeMode];
+    const cfg      = getModeConfig(safeMode);
+
+    // Prune disconnected sockets from this mode's queue
+    for (let i = queue.length - 1; i >= 0; i--) {
+      if (!io.sockets.sockets.get(queue[i].id)) queue.splice(i, 1);
     }
 
-    if (quickQueue.length > 0) {
-      const partner = quickQueue.shift();
-      const code = generateRoomCode();
-      const cfg  = getModeConfig('standard');
+    if (queue.length > 0) {
+      const partner   = queue.shift();
+      const code      = generateRoomCode();
       const questions = shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
 
       const room = {
-        code, mode: 'standard', relationship: '🌍 Strangers',
+        code, mode: safeMode, relationship: '🌍 Strangers',
         config: cfg, questions,
         players: {
           p1: { id: partner.id, nickname: partner.nickname, score: 0, lives: cfg.lives },
-          p2: { id: socket.id, nickname, score: 0, lives: cfg.lives },
+          p2: { id: socket.id,  nickname,                   score: 0, lives: cfg.lives },
         },
         state: 'waiting', currentQ: 0, answers: [], timer: null, roundTimer: null,
       };
 
       rooms.set(code, room);
       socketRoom.set(partner.id, code);
-      socketRoom.set(socket.id, code);
+      socketRoom.set(socket.id,  code);
 
       const pSock = io.sockets.sockets.get(partner.id);
       if (pSock) pSock.join(code);
@@ -291,19 +325,28 @@ io.on('connection', (socket) => {
 
       io.to(code).emit('partner_joined', {
         p1: partner.nickname, p2: nickname,
-        mode: 'standard', modeLabel: cfg.label, relationship: '🌍 Strangers',
-        questionCount: cfg.questionCount, lives: null,
+        mode: safeMode, modeLabel: cfg.label, relationship: '🌍 Strangers',
+        questionCount: cfg.questionCount, lives: cfg.lives,
       });
       setTimeout(() => startGame(code), 2000);
     } else {
-      quickQueue.push({ id: socket.id, nickname });
-      socket.emit('quick_match_waiting', { msg: 'Searching for a match...' });
+      queue.push({ id: socket.id, nickname, mode: safeMode });
+      // CHANGE 7: Tell client which mode they're queued for so the waiting
+      // screen can display it.
+      socket.emit('quick_match_waiting', {
+        msg:       'Searching for a ' + cfg.label + ' match...',
+        mode:      safeMode,
+        modeLabel: cfg.label,
+      });
     }
   });
 
+  // CHANGE 8: cancel_quick_match must search ALL mode queues, not just one
   socket.on('cancel_quick_match', () => {
-    const idx = quickQueue.findIndex(p => p.id === socket.id);
-    if (idx !== -1) quickQueue.splice(idx, 1);
+    for (const q of Object.values(modeQueues)) {
+      const idx = q.findIndex(p => p.id === socket.id);
+      if (idx !== -1) { q.splice(idx, 1); break; }
+    }
   });
 
   // ── SUBMIT ANSWER ─────────────────────────────────────────────────────────
@@ -317,7 +360,7 @@ io.on('connection', (socket) => {
 
     const isP1 = room.players.p1.id === socket.id;
 
-    if (isP1 && room.answers[qIdx].p1Answer !== undefined) return;
+    if (isP1  && room.answers[qIdx].p1Answer !== undefined) return;
     if (!isP1 && room.answers[qIdx].p2Answer !== undefined) return;
 
     if (isP1) {
@@ -371,8 +414,11 @@ io.on('connection', (socket) => {
         socketRoom.delete(socket.id);
       }
     }
-    const idx = quickQueue.findIndex(p => p.id === socket.id);
-    if (idx !== -1) quickQueue.splice(idx, 1);
+    // CHANGE 9: Remove disconnected socket from whichever mode queue it's in
+    for (const q of Object.values(modeQueues)) {
+      const idx = q.findIndex(p => p.id === socket.id);
+      if (idx !== -1) { q.splice(idx, 1); break; }
+    }
   });
 });
 
@@ -382,7 +428,6 @@ function startGame(code) {
   if (!room) return;
   room.state = 'countdown';
 
-  // Send mode config to both players so UI can adapt
   io.to(code).emit('game_start_config', {
     mode:          room.mode,
     modeLabel:     room.config.label,
@@ -411,7 +456,7 @@ function sendQuestion(code) {
   const qIdx = room.currentQ;
   if (qIdx >= room.questions.length) { endGame(code); return; }
 
-  const q = room.questions[qIdx];
+  const q    = room.questions[qIdx];
   const opts = shuffleArray(q.opts);
   room.answers[qIdx] = {};
   room.state = 'question';
@@ -427,7 +472,6 @@ function sendQuestion(code) {
     p2Name:   room.players.p2.nickname,
     p1Score:  room.players.p1.score,
     p2Score:  room.players.p2.score,
-    // Survival: send current lives
     p1Lives:  room.players.p1.lives,
     p2Lives:  room.players.p2.lives,
   });
@@ -446,9 +490,9 @@ function revealAnswer(code) {
 
   const p1PredictCorrect = ans.p1Predict === ans.p2Answer;
   const p2PredictCorrect = ans.p2Predict === ans.p1Answer;
-  const isAnswerMatch    = ans.p1Answer === ans.p2Answer;
+  const isAnswerMatch    = ans.p1Answer  === ans.p2Answer;
 
-  // ── Scoring ───────────────────────────────────────────────────────────────
+  // Scoring
   if (p1PredictCorrect) room.players.p1.score += cfg.pointsPerPredict;
   if (p2PredictCorrect) room.players.p2.score += cfg.pointsPerPredict;
   if (isAnswerMatch) {
@@ -456,17 +500,13 @@ function revealAnswer(code) {
     room.players.p2.score += cfg.pointsPerMatch;
   }
 
-  // ── Survival: lose a life on wrong prediction ─────────────────────────────
+  // Survival: lose a life on wrong prediction
   let p1Eliminated = false;
   let p2Eliminated = false;
 
   if (cfg.lives !== null) {
-    if (!p1PredictCorrect) {
-      room.players.p1.lives = Math.max(0, room.players.p1.lives - 1);
-    }
-    if (!p2PredictCorrect) {
-      room.players.p2.lives = Math.max(0, room.players.p2.lives - 1);
-    }
+    if (!p1PredictCorrect) room.players.p1.lives = Math.max(0, room.players.p1.lives - 1);
+    if (!p2PredictCorrect) room.players.p2.lives = Math.max(0, room.players.p2.lives - 1);
     p1Eliminated = room.players.p1.lives <= 0;
     p2Eliminated = room.players.p2.lives <= 0;
   }
@@ -491,7 +531,7 @@ function revealAnswer(code) {
     revealDuration: cfg.revealDuration,
   });
 
-  // ── Survival elimination check ────────────────────────────────────────────
+  // CHANGE 10: Survival elimination — end game when any player hits 0 lives
   if (p1Eliminated || p2Eliminated) {
     room.roundTimer = setTimeout(() => {
       if (!rooms.get(code)) return;
@@ -525,6 +565,8 @@ function endGame(code) {
     mode:   room.mode,
     modeLabel: room.config.label,
     relationship: room.relationship,
+    // CHANGE 11: Pass ultimateExtras to frontend for the detailed Ultimate report
+    ultimateExtras: scores.ultimateExtras,
   });
 
   setTimeout(() => rooms.delete(code), 600000);
@@ -532,7 +574,15 @@ function endGame(code) {
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 app.get('/api/stats', (req, res) => {
-  res.json({ activeRooms: rooms.size, queueLength: quickQueue.length, totalQuestions: ALL_QUESTIONS.length });
+  // CHANGE 12: Report total queue length across ALL mode queues
+  const totalQueue = Object.values(modeQueues).reduce((sum, q) => sum + q.length, 0);
+  res.json({
+    activeRooms:    rooms.size,
+    queueLength:    totalQueue,
+    totalQuestions: ALL_QUESTIONS.length,
+    // Bonus: per-mode queue sizes for debugging
+    queues: Object.fromEntries(Object.entries(modeQueues).map(([k, v]) => [k, v.length])),
+  });
 });
 
 app.get('*', (req, res) => {
