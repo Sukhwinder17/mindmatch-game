@@ -713,8 +713,22 @@ function initSocket() {
     hideDisconnectModal();
     clearInterval(state.reconnectCountdown);
     toast(msg || 'Partner left the game.', 'error');
-    setTimeout(goHome, 2500);
+    alert(msg || 'Your partner left the game.');
+    forceHome();
   });
+
+  function forceHome() {
+  hideDisconnectModal();
+
+  state.currentAnswer = null;
+  state.currentPredict = null;
+  state.answerLocked = false;
+  state.roomCode = '';
+
+  document.getElementById('nav-room-code').style.display = 'none';
+
+  showScreen('screen-home');
+}
 
   state.socket.on('reconnect_success', (data) => {
     state.roomCode = data.roomCode;
