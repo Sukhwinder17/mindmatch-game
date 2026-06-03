@@ -35,6 +35,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .nav-actions{display:flex;gap:8px;align-items:center}
 .nav-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);font-family:var(--font-body);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;transition:all .2s}
 .nav-btn:hover{background:rgba(255,255,255,.12);color:var(--text)}
+/* ── LEAVE MATCH BUTTON ── */
+.nav-leave-btn{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ff6b6b;font-family:var(--font-body);font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .2s;display:none}
+.nav-leave-btn:hover{background:rgba(255,107,107,.25);border-color:rgba(255,107,107,.6);color:#ff8585}
 /* Avatar button */
 .nav-avatar{width:34px;height:34px;border-radius:50%;border:2px solid var(--c6);cursor:pointer;object-fit:cover;transition:all .2s}
 .nav-avatar:hover{border-color:var(--c7);transform:scale(1.05)}
@@ -53,6 +56,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .btn-outline{background:transparent;border:2px solid var(--border);color:var(--muted)}
 .btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted)}
 .btn-ghost:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.btn-danger{background:linear-gradient(135deg,#ff6b6b,#e03131);color:#fff;box-shadow:0 4px 20px rgba(255,107,107,.35)}
+.btn-danger:hover{box-shadow:0 6px 28px rgba(255,107,107,.5);transform:translateY(-1px)}
 .btn-lg{padding:16px 36px;font-size:17px;border-radius:16px}
 .btn-sm{padding:9px 18px;font-size:13px;border-radius:10px}
 .btn-full{width:100%}
@@ -264,6 +269,67 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 /* ── CONFETTI ── */
 .confetti-piece{position:fixed;width:10px;height:10px;top:-20px;z-index:999;pointer-events:none;border-radius:2px;animation:confettiFall linear forwards}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ════════════════════════════════════════
+   LEAVE MATCH — CONFIRMATION MODAL
+════════════════════════════════════════ */
+#leave-confirm-modal{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,.8);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:24px;
+}
+#leave-confirm-modal.show{display:flex;animation:fadeIn .2s ease}
+.leave-confirm-box{
+  background:var(--card);border:1px solid rgba(255,107,107,.3);
+  border-radius:var(--r);padding:36px 28px;max-width:360px;width:100%;
+  text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.6);
+}
+.leave-confirm-icon{font-size:48px;margin-bottom:16px}
+.leave-confirm-title{
+  font-family:var(--font-display);font-size:22px;font-weight:900;
+  margin-bottom:10px;color:var(--text)
+}
+.leave-confirm-desc{
+  color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:28px
+}
+.leave-confirm-actions{display:flex;flex-direction:column;gap:12px}
+
+/* ════════════════════════════════════════
+   MATCH ENDED — INFO MODAL
+════════════════════════════════════════ */
+#match-ended-modal{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(14px);
+  align-items:center;justify-content:center;padding:24px;
+}
+#match-ended-modal.show{display:flex;animation:fadeIn .25s ease}
+.match-ended-box{
+  background:var(--card);border:1px solid rgba(255,107,107,.35);
+  border-radius:var(--r);padding:40px 28px;max-width:360px;width:100%;
+  text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.7);
+}
+.match-ended-icon{font-size:56px;margin-bottom:16px}
+.match-ended-title{
+  font-family:var(--font-display);font-size:26px;font-weight:900;
+  margin-bottom:10px;color:var(--text)
+}
+.match-ended-desc{
+  color:var(--muted);font-size:15px;line-height:1.65;margin-bottom:8px
+}
+.match-ended-countdown{
+  font-family:var(--font-display);font-size:13px;font-weight:700;
+  color:var(--dim);margin-bottom:28px
+}
+.match-ended-bar{
+  height:4px;background:rgba(255,255,255,.08);border-radius:100px;
+  overflow:hidden;margin-bottom:24px
+}
+.match-ended-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));
+  border-radius:100px;width:100%;
+  transition:width 3s linear;
+}
+
 /* ── UTILS ── */
 .hidden{display:none!important}
 .flex{display:flex}.flex-center{display:flex;align-items:center;justify-content:center}
@@ -298,7 +364,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 <nav>
   <div class="brand" onclick="goHome()">🧠❤️ MindMatch</div>
   <div class="nav-actions">
-    <button class="nav-btn" onclick="goHome()">🏠 Home</button>
+    <!-- Home button — hidden during active match -->
+    <button class="nav-btn" id="nav-home-btn" onclick="goHome()">🏠 Home</button>
+    <!-- Leave Match button — shown during active match -->
+    <button class="nav-leave-btn" id="nav-leave-btn" onclick="showLeaveConfirm()">🚪 Leave Match</button>
     <button class="nav-btn hidden" id="nav-room-code" onclick="copyRoomCode()">Copy Link</button>
     <!-- Profile / Sign-in -->
     <span id="nav-auth-area">
@@ -308,6 +377,39 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 </nav>
 
 <div id="toast-container"></div>
+
+<!-- ════════════════════════════════════════
+     LEAVE MATCH — CONFIRMATION MODAL
+════════════════════════════════════════ -->
+<div id="leave-confirm-modal">
+  <div class="leave-confirm-box">
+    <div class="leave-confirm-icon">🚪</div>
+    <div class="leave-confirm-title">Leave the Match?</div>
+    <div class="leave-confirm-desc">
+      Are you sure you want to leave? Your partner will be notified and the match will end immediately for both players.
+    </div>
+    <div class="leave-confirm-actions">
+      <button class="btn btn-danger btn-full" onclick="confirmLeave()">🚪 Leave Match</button>
+      <button class="btn btn-ghost btn-full" onclick="closeLeaveConfirm()">✕ Cancel — Stay in Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MATCH ENDED — INFO MODAL (for remaining player)
+════════════════════════════════════════ -->
+<div id="match-ended-modal">
+  <div class="match-ended-box">
+    <div class="match-ended-icon">😔</div>
+    <div class="match-ended-title">Match Ended</div>
+    <div class="match-ended-desc">Your partner left the match.</div>
+    <div class="match-ended-countdown" id="match-ended-countdown-text">Returning to dashboard in 3s...</div>
+    <div class="match-ended-bar">
+      <div class="match-ended-bar-fill" id="match-ended-bar-fill"></div>
+    </div>
+    <button class="btn btn-ghost btn-full" onclick="dismissMatchEnded()">🏠 Return to Dashboard</button>
+  </div>
+</div>
 
 <!-- GOOGLE SIGN-IN MODAL -->
 <div class="signin-modal" id="signin-modal">
@@ -591,7 +693,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div style="color:var(--c1);font-size:13px;margin-top:4px">You went different ways this round</div>
     </div>
     <div class="reveal-cards" id="reveal-cards"></div>
-    <!-- BUG FIX: Proper prediction display with correct/incorrect per player -->
     <div class="predict-row">
       <div class="predict-row-title">🔮 Predictions</div>
       <div class="predict-item" id="p1-predict-row">
@@ -701,17 +802,88 @@ const state = {
   currentPredict: null,
   answerLocked: false,
   gameData: null,
-  // Google / profile
-  googleUser: null,  // { id, name, email, picture }
-  profile: null,     // from server
+  inActiveMatch: false,   // ← NEW: tracks if we're mid-game
+  googleUser: null,
+  profile: null,
 };
 
 const BACKEND = 'https://mindmatch-game.onrender.com';
 
 // ═══════════════════════════════════════════════════════
+//  ACTIVE MATCH NAV TOGGLE
+//  Screens that count as "active match" — show Leave btn, hide Home btn
+// ═══════════════════════════════════════════════════════
+const MATCH_SCREENS = new Set(['screen-countdown','screen-question','screen-reveal']);
+
+function setMatchNavState(inMatch) {
+  state.inActiveMatch = inMatch;
+  document.getElementById('nav-home-btn').style.display  = inMatch ? 'none' : '';
+  document.getElementById('nav-leave-btn').style.display = inMatch ? '' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════
+//  LEAVE MATCH — CONFIRMATION FLOW
+// ═══════════════════════════════════════════════════════
+function showLeaveConfirm() {
+  document.getElementById('leave-confirm-modal').classList.add('show');
+}
+
+function closeLeaveConfirm() {
+  document.getElementById('leave-confirm-modal').classList.remove('show');
+}
+
+function confirmLeave() {
+  closeLeaveConfirm();
+  // Send dedicated leave_match event (not leave_room)
+  if (state.socket && state.socket.connected) {
+    state.socket.emit('leave_match');
+  }
+  // Immediately clean up own side
+  forceHome();
+}
+
+// ═══════════════════════════════════════════════════════
+//  MATCH ENDED MODAL (shown to the remaining player)
+// ═══════════════════════════════════════════════════════
+let _matchEndedTimer = null;
+
+function showMatchEndedModal() {
+  const modal = document.getElementById('match-ended-modal');
+  const countdownText = document.getElementById('match-ended-countdown-text');
+  const barFill = document.getElementById('match-ended-bar-fill');
+
+  modal.classList.add('show');
+
+  // Animate bar shrinking over 3s
+  // Start at 100% then transition to 0%
+  barFill.style.width = '100%';
+  // Force reflow then start transition
+  barFill.getBoundingClientRect();
+  barFill.style.width = '0%';
+
+  let secs = 3;
+  countdownText.textContent = 'Returning to dashboard in ' + secs + 's...';
+
+  _matchEndedTimer = setInterval(() => {
+    secs--;
+    if (secs > 0) {
+      countdownText.textContent = 'Returning to dashboard in ' + secs + 's...';
+    } else {
+      clearInterval(_matchEndedTimer);
+      dismissMatchEnded();
+    }
+  }, 1000);
+}
+
+function dismissMatchEnded() {
+  clearInterval(_matchEndedTimer);
+  document.getElementById('match-ended-modal').classList.remove('show');
+  forceHome();
+}
+
+// ═══════════════════════════════════════════════════════
 //  GOOGLE SIGN-IN
 // ═══════════════════════════════════════════════════════
-// Replace with your actual Google Client ID
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
 
 function initGoogleSignIn() {
@@ -723,8 +895,6 @@ function initGoogleSignIn() {
       auto_select: false,
       cancel_on_tap_outside: true,
     });
-
-    // Render button in modal
     google.accounts.id.renderButton(
       document.getElementById('g_id_signin_modal'),
       { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with' }
@@ -744,14 +914,8 @@ function closeSignInModal() {
 
 function handleGoogleCredential(response) {
   try {
-    // Decode JWT payload (no verification needed client-side — server would verify in production)
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
-    state.googleUser = {
-      id: payload.sub,
-      name: payload.name,
-      email: payload.email,
-      picture: payload.picture,
-    };
+    state.googleUser = { id: payload.sub, name: payload.name, email: payload.email, picture: payload.picture };
     closeSignInModal();
     onSignedIn();
   } catch(e) {
@@ -763,12 +927,8 @@ function handleGoogleCredential(response) {
 function onSignedIn() {
   const u = state.googleUser;
   if (!u) return;
-
-  // Update nav
   document.getElementById('nav-auth-area').innerHTML =
     '<img class="nav-avatar" src="' + u.picture + '" alt="' + u.name + '" onclick="showScreen(\'screen-profile\')" title="' + u.name + '">';
-
-  // Pre-fill nickname
   if (!state.nickname) {
     state.nickname = u.name.split(' ')[0];
     const ni = document.getElementById('create-nickname');
@@ -778,12 +938,9 @@ function onSignedIn() {
     const njc = document.getElementById('join-nickname');
     if (njc && !njc.value) njc.value = state.nickname;
   }
-
-  // Save/load profile via socket if connected
   if (state.socket && state.socket.connected) {
     state.socket.emit('save_profile', { googleId: u.id, nickname: u.name.split(' ')[0], avatar: u.picture, email: u.email });
   }
-
   toast('Welcome, ' + u.name.split(' ')[0] + '! 👋', 'success');
   renderProfileScreen();
 }
@@ -800,28 +957,21 @@ function signOut() {
 function renderProfileScreen() {
   const u = state.googleUser;
   const p = state.profile;
-
   const avatarWrap = document.getElementById('profile-avatar-wrap');
   if (u && u.picture) {
     avatarWrap.innerHTML = '<img class="profile-avatar-big" src="' + u.picture + '" alt="avatar">';
   } else {
     avatarWrap.innerHTML = '<div class="profile-avatar-placeholder">🧠</div>';
   }
-
   document.getElementById('profile-display-name').textContent = (u ? u.name : state.nickname) || 'Guest Player';
   document.getElementById('profile-display-email').textContent = u ? u.email : 'Playing as guest';
-
-  // Stats
-  const games     = p ? p.totalGames : 0;
+  const games = p ? p.totalGames : 0;
   const bestCompat = p ? p.bestCompatibility : 0;
-  const avgScore  = p && p.totalGames ? Math.round(p.totalScore / p.totalGames) : 0;
-
+  const avgScore = p && p.totalGames ? Math.round(p.totalScore / p.totalGames) : 0;
   document.getElementById('profile-stats-grid').innerHTML =
     '<div class="pstat"><div class="pstat-val">' + games + '</div><div class="pstat-lbl">Games Played</div></div>'
     + '<div class="pstat"><div class="pstat-val">' + bestCompat + '%</div><div class="pstat-lbl">Best Match</div></div>'
     + '<div class="pstat"><div class="pstat-val">' + avgScore + '</div><div class="pstat-lbl">Avg Score</div></div>';
-
-  // History
   const histEl = document.getElementById('profile-history-list');
   const hist = p ? p.history : [];
   if (!hist || !hist.length) {
@@ -831,21 +981,13 @@ function renderProfileScreen() {
       const d = new Date(h.date);
       const dateStr = d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
       return '<div class="history-item">'
-        + '<div class="hi-info">'
-        + '<div class="hi-title">' + h.title + '</div>'
-        + '<div class="hi-meta">' + h.relationship + ' · ' + h.mode + ' · ' + dateStr + '</div>'
-        + '</div>'
-        + '<div class="hi-score">'
-        + '<div class="hi-compat">' + h.compatibility + '%</div>'
-        + '<div class="hi-pts">' + h.score + ' pts</div>'
-        + '</div>'
-        + '</div>';
+        + '<div class="hi-info"><div class="hi-title">' + h.title + '</div>'
+        + '<div class="hi-meta">' + h.relationship + ' · ' + h.mode + ' · ' + dateStr + '</div></div>'
+        + '<div class="hi-score"><div class="hi-compat">' + h.compatibility + '%</div>'
+        + '<div class="hi-pts">' + h.score + ' pts</div></div></div>';
     }).join('');
   }
-
-  if (u) {
-    document.getElementById('profile-signout-btn').style.display = '';
-  }
+  if (u) document.getElementById('profile-signout-btn').style.display = '';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -857,7 +999,6 @@ function initSocket() {
 
   state.socket.on('connect', () => {
     fetchStats();
-    // Send profile if signed in
     if (state.googleUser) {
       const u = state.googleUser;
       state.socket.emit('save_profile', { googleId: u.id, nickname: u.name.split(' ')[0], avatar: u.picture, email: u.email });
@@ -898,6 +1039,7 @@ function initSocket() {
 
   state.socket.on('game_countdown', ({ count }) => {
     showScreen('screen-countdown');
+    setMatchNavState(true);  // ← show Leave Match button
     const el = document.getElementById('countdown-num');
     el.textContent = count > 0 ? count : '🚀';
     el.style.animation = 'none';
@@ -912,11 +1054,11 @@ function initSocket() {
 
   state.socket.on('question', (data) => {
     showScreen('screen-question');
+    setMatchNavState(true);  // ← keep Leave Match visible
     renderQuestion(data);
   });
 
   state.socket.on('partner_answered', () => {
-    // Show subtle indicator that partner has locked in
     const waiting = document.getElementById('q-waiting');
     if (state.answerLocked && waiting) {
       waiting.innerHTML = '✅ Both answered! Revealing...';
@@ -925,40 +1067,51 @@ function initSocket() {
 
   state.socket.on('reveal', (data) => {
     showScreen('screen-reveal');
+    setMatchNavState(true);  // ← keep Leave Match visible on reveal
     renderReveal(data);
   });
 
   state.socket.on('game_over', (data) => {
     state.gameData = data;
+    setMatchNavState(false); // ← back to Home button on game over screen
     showScreen('screen-gameover');
     renderGameOver(data);
   });
 
-  // ── BUG FIX: partner_left_permanently ──────────────────────────────────
-  // Root cause was forceHome() being called before it was defined (temporal dead zone).
-  // Fix: define forceHome as a regular function declaration (hoisted) at the top scope,
-  // and call it directly here — no closure dependency.
+  // ── MATCH LEFT (clean intentional leave by other player) ──────────────
+  // This is the NEW dedicated event — not a disconnect, not reconnect
+  state.socket.on('match_left', ({ msg }) => {
+    console.log('[match_left] partner intentionally left');
+    setMatchNavState(false);
+    showMatchEndedModal();
+  });
+
+  // Keep legacy handlers for real disconnects (network drop etc.)
   state.socket.on('partner_left_permanently', ({ msg }) => {
     console.log('[partner_left_permanently] received');
     toast(msg || 'Your partner left the game.', 'error');
+    setMatchNavState(false);
     forceHome();
   });
 
   state.socket.on('partner_disconnected', ({ msg }) => {
     toast(msg || 'Partner disconnected.', 'error');
+    setMatchNavState(false);
     forceHome();
   });
 }
 
-// ── BUG FIX: forceHome defined as a proper function declaration (hoisted) ──
-// Previously it was a `const` inside the socket handler block — temporal dead zone
-// meant it was undefined when the 'partner_left_permanently' handler fired.
+// ─────────────────────────────────────────────────────
 function forceHome() {
   console.log('[forceHome] called');
+  clearInterval(_matchEndedTimer);
+  document.getElementById('match-ended-modal').classList.remove('show');
+  document.getElementById('leave-confirm-modal').classList.remove('show');
   state.currentAnswer  = null;
   state.currentPredict = null;
   state.answerLocked   = false;
   state.roomCode       = '';
+  setMatchNavState(false);
   document.getElementById('nav-room-code').classList.add('hidden');
   showScreen('screen-home');
   fetchStats();
@@ -971,6 +1124,10 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
+  // Auto-manage nav state when navigating to non-match screens
+  if (!MATCH_SCREENS.has(id)) {
+    setMatchNavState(false);
+  }
 }
 
 function goHome() {
@@ -1012,8 +1169,7 @@ function createRoom() {
   state.mode = document.getElementById('create-mode').value;
   initSocket();
   state.socket.emit('create_room', {
-    nickname: nick,
-    mode: state.mode,
+    nickname: nick, mode: state.mode,
     relationship: state.relationship,
     googleId: state.googleUser ? state.googleUser.id : null,
   });
@@ -1028,11 +1184,7 @@ function joinRoom() {
   state.nickname = nick;
   state.isP1 = false;
   initSocket();
-  state.socket.emit('join_room', {
-    code,
-    nickname: nick,
-    googleId: state.googleUser ? state.googleUser.id : null,
-  });
+  state.socket.emit('join_room', { code, nickname: nick, googleId: state.googleUser ? state.googleUser.id : null });
 }
 
 function joinRoomFromCode() {
@@ -1045,11 +1197,7 @@ function joinRoomFromCode() {
   state.nickname = nick;
   state.isP1 = false;
   initSocket();
-  state.socket.emit('join_room', {
-    code,
-    nickname: nick,
-    googleId: state.googleUser ? state.googleUser.id : null,
-  });
+  state.socket.emit('join_room', { code, nickname: nick, googleId: state.googleUser ? state.googleUser.id : null });
 }
 
 function quickMatch() {
@@ -1060,10 +1208,7 @@ function quickMatch() {
   state.nickname = nick;
   state.isP1 = false;
   initSocket();
-  state.socket.emit('quick_match', {
-    nickname: nick,
-    googleId: state.googleUser ? state.googleUser.id : null,
-  });
+  state.socket.emit('quick_match', { nickname: nick, googleId: state.googleUser ? state.googleUser.id : null });
 }
 
 function cancelQuickMatch() {
@@ -1162,21 +1307,15 @@ function submitAnswer() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  REVEAL — BUG FIX
+//  REVEAL
 // ═══════════════════════════════════════════════════════
 function renderReveal(data) {
-  // Question text
   document.getElementById('reveal-q-text').textContent = data.question;
-
-  // Match banner: based on whether both players gave the SAME answer
-  const isMatch = data.match; // server now sends this correctly
+  const isMatch = data.match;
   document.getElementById('reveal-match-banner').classList.toggle('hidden', !isMatch);
   document.getElementById('reveal-nomatch-banner').classList.toggle('hidden', isMatch);
   if (isMatch) launchConfetti();
 
-  // Answer cards
-  // BUG FIX: The tick mark should show whether the player's PREDICTION was correct,
-  // not whether their answer matched the other person's answer
   document.getElementById('reveal-cards').innerHTML =
     '<div class="reveal-card ' + (isMatch ? 'match' : 'nomatch') + '" style="animation-delay:.1s">'
     + '<div class="rc-player">' + data.p1Name + '</div>'
@@ -1189,9 +1328,6 @@ function renderReveal(data) {
     + '<div style="font-size:11px;color:var(--muted);margin-top:4px">Their answer</div>'
     + '</div>';
 
-  // Prediction results — BUG FIX: show whether each player's prediction was correct
-  // p1 predicted p2's answer; p1 is correct if p1Predict === p2Answer
-  // server now sends p1PredictCorrect and p2PredictCorrect
   document.getElementById('p1-predict-name').textContent = data.p1Name + ' predicted:';
   document.getElementById('p1-predict-val').textContent  = data.p1Predict;
   document.getElementById('p1-predict-icon').textContent = data.p1PredictCorrect ? '✅ +10' : '❌';
@@ -1200,11 +1336,6 @@ function renderReveal(data) {
   document.getElementById('p2-predict-val').textContent  = data.p2Predict;
   document.getElementById('p2-predict-icon').textContent = data.p2PredictCorrect ? '✅ +10' : '❌';
 
-  // Score update
-  const myScore    = state.isP1 ? data.p1Score : data.p2Score;
-  const theirScore = state.isP1 ? data.p2Score : data.p1Score;
-
-  // Countdown timer — BUG FIX: matches backend 5s delay
   let nextN = 5;
   const nextEl = document.getElementById('reveal-next');
   nextEl.textContent = 'Next question in ' + nextN + 's...';
@@ -1268,7 +1399,6 @@ function renderGameOver(data) {
   document.getElementById('go-match-count').textContent  = data.matchCount + ' / ' + data.total + ' questions matched';
   document.getElementById('go-ai-report').textContent    = AI_REPORTS[Math.floor(Math.random() * AI_REPORTS.length)](data);
 
-  // Recap
   const recap = document.getElementById('go-recap');
   recap.innerHTML = '';
   data.results.slice(0, 8).forEach(r => {
@@ -1282,11 +1412,7 @@ function renderGameOver(data) {
     recap.appendChild(div);
   });
 
-  // Show profile button if signed in
-  if (state.googleUser) {
-    document.getElementById('go-profile-btn').style.display = '';
-  }
-
+  if (state.googleUser) document.getElementById('go-profile-btn').style.display = '';
   if (data.compatibility >= 80) launchConfetti(80);
 }
 
@@ -1395,18 +1521,13 @@ window.addEventListener('load', function() {
     state.mode = e.target.value;
   });
 
-  // Init Google Sign-In (runs after gsi/client loads)
   if (typeof google !== 'undefined') {
     initGoogleSignIn();
   } else {
-    // Retry after script loads
     const gsiScript = document.querySelector('script[src*="gsi/client"]');
-    if (gsiScript) {
-      gsiScript.addEventListener('load', initGoogleSignIn);
-    }
+    if (gsiScript) gsiScript.addEventListener('load', initGoogleSignIn);
   }
 
-  // Handle /join/:code invite links
   const pathMatch = window.location.pathname.match(/^\/join\/(\d{6})$/);
   const params    = new URLSearchParams(window.location.search);
   const joinCode  = (pathMatch && pathMatch[1]) || params.get('join');
