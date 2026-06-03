@@ -129,7 +129,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .score-chip.p1{color:var(--c7)}
 .score-chip.p2{color:var(--c5)}
 .score-spacer{flex:1}
-/* ── MODE BANNER (NEW) ── */
 .mode-banner{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;padding:7px 16px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;width:fit-content;margin-left:auto;margin-right:auto}
 .mode-banner.quick{background:rgba(255,228,102,.12);border:1px solid rgba(255,228,102,.3);color:var(--c3)}
 .mode-banner.standard{background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
@@ -137,12 +136,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .mode-banner.survival{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:var(--c1)}
 .mode-banner.ultimate{background:rgba(255,228,102,.12);border:1px solid rgba(255,228,102,.35);color:var(--c3)}
 @keyframes blitzPulse{0%,100%{opacity:1}50%{opacity:.6}}
-/* ── LIVES ROW (NEW — Survival) ── */
 .lives-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:8px 14px;background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);border-radius:var(--r2)}
 .lives-player{display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:13px;font-weight:800}
 .lives-hearts{letter-spacing:2px;font-size:16px}
 .lives-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
-/* ─── */
 .q-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:28px;margin-bottom:20px;text-align:center}
 .q-number{font-size:11px;font-weight:700;color:var(--c6);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .q-text{font-family:var(--font-display);font-size:clamp(18px,4vw,24px);font-weight:800;line-height:1.35;color:var(--text)}
@@ -180,13 +177,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .predict-name{color:var(--muted);min-width:80px;text-align:left}
 .predict-val{color:var(--text);flex:1;text-align:left}
 .predict-icon{font-size:18px}
-/* ── Survival lives reveal banner (NEW) ── */
 .survival-lives-row{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
 .slr-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 20px;text-align:center;min-width:120px}
 .slr-name{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
 .slr-hearts{font-size:20px;letter-spacing:3px}
 .slr-lost{font-size:11px;color:var(--c1);font-weight:700;margin-top:4px}
-/* ─── */
 .reveal-progress-wrap{background:rgba(255,255,255,.06);border-radius:100px;height:6px;overflow:hidden;margin-top:16px}
 .reveal-progress-fill{height:100%;background:linear-gradient(90deg,var(--c6),var(--c5));border-radius:100px;width:100%;transition:width 5s linear}
 .next-timer{font-size:13px;color:var(--dim);margin-top:10px}
@@ -219,6 +214,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .air-icon{font-size:24px}
 .air-title{font-family:var(--font-display);font-size:16px;font-weight:800}
 .air-text{color:var(--muted);font-size:15px;line-height:1.65}
+/* CHANGE A: Ultimate extra sections styling */
+.ultimate-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px}
+.ultimate-section-title{font-family:var(--font-display);font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ultimate-match-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.ultimate-match-item:last-child{border-bottom:none}
+.ultimate-match-q{flex:1;color:var(--muted)}
+.ultimate-match-ans{font-weight:700;color:var(--c4)}
+.ultimate-accuracy-row{display:flex;gap:12px;margin-top:10px}
+.ultimate-acc-card{flex:1;background:var(--card2);border-radius:var(--r2);padding:14px;text-align:center}
+.ultimate-acc-val{font-family:var(--font-display);font-size:26px;font-weight:900;color:var(--c5)}
+.ultimate-acc-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.rel-score-bar{height:14px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden;margin:10px 0}
+.rel-score-fill{height:100%;background:linear-gradient(90deg,var(--c7),var(--c6));border-radius:100px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+/* ─── */
 .share-section{margin-bottom:24px}
 .share-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .share-btns{display:flex;gap:10px;flex-wrap:wrap}
@@ -232,7 +241,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .ri-a.match{background:rgba(105,219,124,.15);color:var(--c4)}
 .ri-a.nomatch{background:rgba(255,107,107,.12);color:var(--c1)}
 .go-actions{display:flex;flex-direction:column;gap:12px}
-/* ── MODE TAG on game-over ── */
 .go-mode-tag{display:inline-flex;align-items:center;gap:6px;margin:0 auto 20px;padding:6px 18px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
 /* ── JOIN ── */
 #screen-join{padding-top:56px}
@@ -282,6 +290,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   .mode-cards{grid-template-columns:1fr 1fr}
   .players-score{flex-direction:column}
   .survival-lives-row{flex-direction:column}
+  .ultimate-accuracy-row{flex-direction:column}
 }
 </style>
 </head>
@@ -339,7 +348,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     <div class="hero-actions">
       <button class="btn btn-primary btn-lg btn-full" onclick="showScreen('screen-setup');document.getElementById('setup-tab-create').click()">🚀 Create New Room</button>
       <button class="btn btn-cool btn-lg btn-full" onclick="showScreen('screen-join')">🎮 Join a Room</button>
-      <button class="btn btn-warm btn-lg btn-full" onclick="quickMatch()">⚡ Quick Match (Random)</button>
+      <!-- CHANGE B: Quick Match now sends current selected mode -->
+      <button class="btn btn-warm btn-lg btn-full" onclick="quickMatch()">⚡ Quick Match — <span id="home-mode-label">Quick Match</span></button>
     </div>
     <div class="hero-stats">
       <div class="stat-pill">🎯 <span id="stat-questions">38</span> Questions</div>
@@ -348,7 +358,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     </div>
   </div>
   <div style="width:100%;max-width:900px;padding:0 20px">
-    <p style="font-family:var(--font-display);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px;text-align:center">Choose Your Mode</p>
+    <p style="font-family:var(--font-display);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px;text-align:center">Choose Your Mode (also sets Quick Match mode)</p>
   </div>
   <div class="mode-cards">
     <div class="mode-card selected" data-mode="quick" onclick="selectMode(this)">
@@ -503,11 +513,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 </div>
 
 <!-- QUICK MATCH WAITING -->
+<!-- CHANGE C: Show which mode the player is queued for -->
 <div class="screen" id="screen-quickwait">
   <div style="padding:120px 24px;text-align:center;width:100%">
     <div style="font-size:64px;margin-bottom:20px;animation:blobFloat 2s ease-in-out infinite">🔍</div>
     <div class="screen-title mb-16">Finding Your Match...</div>
-    <p class="text-muted mb-24">We're searching for someone online to play with you right now</p>
+    <!-- Mode label shown in waiting screen -->
+    <div id="quickwait-mode-label" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px;padding:6px 18px;border-radius:100px;font-family:var(--font-display);font-size:13px;font-weight:800;background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)">⚡ Quick Match</div>
+    <p class="text-muted mb-24">Searching for a <span id="quickwait-mode-text">Quick Match</span> player online right now</p>
     <div class="waiting-animation" style="justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <div style="margin-top:40px"><button class="btn btn-ghost" onclick="cancelQuickMatch()">✕ Cancel Search</button></div>
   </div>
@@ -518,7 +531,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   <div class="countdown-wrap">
     <div class="countdown-number" id="countdown-num">3</div>
     <div class="countdown-label" id="countdown-label">Get Ready!</div>
-    <!-- Mode label shown during countdown -->
     <div id="cd-mode-label" style="margin-top:16px;font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--muted)"></div>
     <div class="players-preview">
       <div class="player-chip">
@@ -546,9 +558,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div class="score-spacer"></div>
       <div class="score-chip p2" id="q-score-p2">🤩 Friend: 0</div>
     </div>
-    <!-- Mode banner injected here by JS -->
     <div id="q-mode-banner"></div>
-    <!-- Lives row injected here by JS (Survival only) -->
     <div id="q-lives-row"></div>
     <div class="q-card">
       <div class="q-number" id="q-num-label">Question 1</div>
@@ -599,7 +609,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
         <span class="predict-icon" id="p2-predict-icon">—</span>
       </div>
     </div>
-    <!-- Survival lives update (shown only in survival mode) -->
     <div id="reveal-survival-lives" class="hidden survival-lives-row"></div>
     <div class="reveal-progress-wrap">
       <div class="reveal-progress-fill" id="reveal-progress-fill"></div>
@@ -641,6 +650,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div class="air-header"><div class="air-icon">🤖</div><div class="air-title">AI Compatibility Report</div></div>
       <div class="air-text" id="go-ai-report">Generating your report...</div>
     </div>
+    <!-- CHANGE D: Ultimate extras section injected by JS -->
+    <div id="go-ultimate-extras"></div>
     <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px">🎥 Reaction Recap</div>
     <div class="recap-list" id="go-recap"></div>
     <div class="share-section">
@@ -666,7 +677,7 @@ const state = {
   socket: null,
   nickname: '',
   roomCode: '',
-  mode: 'quick',          // selected mode
+  mode: 'quick',
   modeLabel: '⚡ Quick Match',
   relationship: '❤️ Couple',
   isP1: false,
@@ -677,14 +688,12 @@ const state = {
   answerLocked: false,
   gameData: null,
   inActiveMatch: false,
-  // Survival lives (updated from server events)
   p1Lives: null,
   p2Lives: null,
 };
 
 const BACKEND = 'https://mindmatch-game.onrender.com';
 
-// ─── Mode helpers ─────────────────────────────────────
 function livesHearts(lives, max) {
   if (lives === null || lives === undefined) return '';
   var h = '';
@@ -772,7 +781,6 @@ function initSocket() {
     state.p1Name = data.p1;
     state.p2Name = data.p2;
     state.modeLabel = data.modeLabel || data.mode;
-    // Store initial lives
     state.p1Lives = data.lives;
     state.p2Lives = data.lives;
     var partnerName = state.isP1 ? data.p2 : data.p1;
@@ -781,12 +789,10 @@ function initSocket() {
     document.getElementById('lobby-joined').classList.add('show');
     document.getElementById('cd-p1-name').textContent = data.p1;
     document.getElementById('cd-p2-name').textContent = data.p2;
-    // Show mode on countdown screen
     document.getElementById('cd-mode-label').textContent = data.modeLabel || data.mode;
     toast(partnerName + ' joined the room! 🎉', 'success');
   });
 
-  // NEW: receive full mode config at game start
   state.socket.on('game_start_config', function(data) {
     state.mode = data.mode;
     state.modeLabel = data.modeLabel;
@@ -804,8 +810,13 @@ function initSocket() {
     document.getElementById('countdown-label').textContent = data.count > 0 ? 'Get ready...' : "Let's go!";
   });
 
+  // CHANGE E: quick_match_waiting now carries mode info — update waiting screen
   state.socket.on('quick_match_waiting', function(data) {
     showScreen('screen-quickwait');
+    var labelEl = document.getElementById('quickwait-mode-label');
+    var textEl  = document.getElementById('quickwait-mode-text');
+    if (labelEl) labelEl.textContent = data.modeLabel || data.mode || '⚡ Quick Match';
+    if (textEl)  textEl.textContent  = data.modeLabel || data.mode || 'Quick Match';
     toast(data.msg, 'info');
   });
 
@@ -885,14 +896,21 @@ function switchTab(tab) {
   document.getElementById('setup-tab-join').classList.toggle('active',   tab === 'join');
 }
 
-// ── selectMode: sync home card + setup dropdown + state.mode ──────────────
+// CHANGE F: selectMode also updates the Quick Match button label so user
+// always sees which mode they're queuing into
 function selectMode(el) {
   document.querySelectorAll('.mode-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
   state.mode = el.dataset.mode;
-  // Sync the create-room dropdown if on setup screen
   var sel = document.getElementById('create-mode');
   if (sel) sel.value = state.mode;
+  // Update the home Quick Match button label
+  var modeLabelMap = {
+    quick: 'Quick Match', standard: 'Standard', blitz: 'Blitz Mode',
+    survival: 'Survival', ultimate: 'Ultimate',
+  };
+  var homeLbl = document.getElementById('home-mode-label');
+  if (homeLbl) homeLbl.textContent = modeLabelMap[state.mode] || state.mode;
 }
 
 function selectRel(el) {
@@ -936,13 +954,14 @@ function joinRoomFromCode() {
   state.socket.emit('join_room', { code: code, nickname: nick });
 }
 
+// CHANGE G: quickMatch now sends state.mode so server uses the right queue
 function quickMatch() {
   var nick = (prompt('Your nickname for quick match?', 'Player') || '').trim();
   if (!nick) return;
   state.nickname = nick;
   state.isP1 = false;
   initSocket();
-  state.socket.emit('quick_match', { nickname: nick });
+  state.socket.emit('quick_match', { nickname: nick, mode: state.mode });
 }
 
 function cancelQuickMatch() {
@@ -975,11 +994,8 @@ function shareRoomWhatsApp() {
 // ═══════════════════════════════════════════════════════
 function renderModeBanner(mode) {
   var labels = {
-    quick:    '⚡ Quick Match',
-    standard: '🎯 Standard',
-    blitz:    '🔥 Blitz Mode',
-    survival: '💀 Survival',
-    ultimate: '👑 Ultimate',
+    quick:'⚡ Quick Match', standard:'🎯 Standard',
+    blitz:'🔥 Blitz Mode', survival:'💀 Survival', ultimate:'👑 Ultimate',
   };
   var container = document.getElementById('q-mode-banner');
   container.innerHTML = '<div class="mode-banner ' + mode + '">' + (labels[mode] || mode) + '</div>';
@@ -989,26 +1005,20 @@ function renderLivesRow(data) {
   var container = document.getElementById('q-lives-row');
   var isSurvival = data.mode === 'survival';
   if (!isSurvival) { container.innerHTML = ''; return; }
-
-  var maxLives = 3;
+  var maxLives   = 3;
   var myLives    = state.isP1 ? data.p1Lives : data.p2Lives;
   var theirLives = state.isP1 ? data.p2Lives : data.p1Lives;
   var theirName  = state.isP1 ? data.p2Name  : data.p1Name;
-
   container.innerHTML =
     '<div class="lives-row">'
-    + '<div class="lives-player">'
-    +   '<div>'
-    +     '<div class="lives-label">Your Lives</div>'
-    +     '<div class="lives-hearts">' + livesHearts(myLives, maxLives) + '</div>'
-    +   '</div>'
-    + '</div>'
-    + '<div class="lives-player">'
-    +   '<div style="text-align:right">'
-    +     '<div class="lives-label">' + (theirName || 'Partner') + '\'s Lives</div>'
-    +     '<div class="lives-hearts">' + livesHearts(theirLives, maxLives) + '</div>'
-    +   '</div>'
-    + '</div>'
+    + '<div class="lives-player"><div>'
+    +   '<div class="lives-label">Your Lives</div>'
+    +   '<div class="lives-hearts">' + livesHearts(myLives, maxLives) + '</div>'
+    + '</div></div>'
+    + '<div class="lives-player"><div style="text-align:right">'
+    +   '<div class="lives-label">' + (theirName || 'Partner') + '\'s Lives</div>'
+    +   '<div class="lives-hearts">' + livesHearts(theirLives, maxLives) + '</div>'
+    + '</div></div>'
     + '</div>';
 }
 
@@ -1017,7 +1027,6 @@ function renderQuestion(data) {
   state.currentPredict = null;
   state.answerLocked   = false;
 
-  // Update cached lives
   if (data.mode === 'survival') {
     state.p1Lives = data.p1Lives;
     state.p2Lives = data.p2Lives;
@@ -1035,7 +1044,6 @@ function renderQuestion(data) {
   document.getElementById('q-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
   document.getElementById('q-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
 
-  // Mode-specific UI
   renderModeBanner(data.mode || state.mode);
   renderLivesRow(data);
 
@@ -1082,7 +1090,6 @@ function submitAnswer() {
 //  REVEAL RENDER
 // ═══════════════════════════════════════════════════════
 function renderReveal(data) {
-  // Update lives from server
   if (data.mode === 'survival') {
     state.p1Lives = data.p1Lives;
     state.p2Lives = data.p2Lives;
@@ -1107,8 +1114,8 @@ function renderReveal(data) {
     + '<div style="font-size:11px;color:var(--muted);margin-top:4px">Their answer</div>'
     + '</div>';
 
-  // Predictions — show bonus points per mode
-  var ppLabel = data.mode === 'survival' ? '+15' : '+10';
+  // CHANGE H: Point label reflects mode (survival = +15, others = +10)
+  var ppLabel = data.mode === 'survival' ? '+15' : (data.mode === 'blitz' ? '+10+5' : '+10');
   document.getElementById('p1-predict-name').textContent = data.p1Name + ' predicted:';
   document.getElementById('p1-predict-val').textContent  = data.p1Predict;
   document.getElementById('p1-predict-icon').textContent = data.p1PredictCorrect ? '✅ ' + ppLabel : '❌';
@@ -1139,7 +1146,6 @@ function renderReveal(data) {
     survivalDiv.innerHTML = '';
   }
 
-  // ── Progress bar uses revealDuration from server ────────────────────────
   var revealMs  = data.revealDuration || 5000;
   var revealSec = Math.round(revealMs / 1000);
 
@@ -1185,6 +1191,7 @@ var AI_REPORTS = [
   },
 ];
 
+// CHANGE I: renderGameOver handles Ultimate extras section
 function renderGameOver(data) {
   document.getElementById('go-result-title').textContent = data.title;
   document.getElementById('go-names').textContent = data.p1Name + ' + ' + data.p2Name;
@@ -1226,9 +1233,61 @@ function renderGameOver(data) {
   document.getElementById('go-match-count').textContent  = data.matchCount + ' / ' + data.total + ' questions matched';
   document.getElementById('go-ai-report').textContent    = AI_REPORTS[Math.floor(Math.random() * AI_REPORTS.length)](data);
 
+  // ── Ultimate extras ──────────────────────────────────────────────────────
+  var extrasDiv = document.getElementById('go-ultimate-extras');
+  extrasDiv.innerHTML = '';
+  if (data.mode === 'ultimate' && data.ultimateExtras) {
+    var ue = data.ultimateExtras;
+
+    // Relationship score bar
+    extrasDiv.innerHTML +=
+      '<div class="ultimate-section">'
+      + '<div class="ultimate-section-title">💍 Final Relationship Score</div>'
+      + '<div style="font-family:var(--font-display);font-size:42px;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">' + ue.relationshipScore + '%</div>'
+      + '<div class="rel-score-bar"><div class="rel-score-fill" style="width:0%" id="rel-score-fill-bar"></div></div>'
+      + '<div style="text-align:center;color:var(--muted);font-size:13px">Based on compatibility, prediction accuracy, and shared answers</div>'
+      + '</div>';
+
+    // Prediction accuracy
+    extrasDiv.innerHTML +=
+      '<div class="ultimate-section">'
+      + '<div class="ultimate-section-title">🎯 Prediction Accuracy</div>'
+      + '<div class="ultimate-accuracy-row">'
+      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p1Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p1Name + '</div></div>'
+      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
+      + '</div>'
+      + '</div>';
+
+    // Strongest matches
+    if (ue.strongMatches && ue.strongMatches.length > 0) {
+      var strongHtml = '<div class="ultimate-section"><div class="ultimate-section-title">✅ Strongest Matches</div>';
+      ue.strongMatches.forEach(function(r) {
+        strongHtml += '<div class="ultimate-match-item"><span class="ultimate-match-q">' + r.question + '</span><span class="ultimate-match-ans">' + r.p1Answer + '</span></div>';
+      });
+      extrasDiv.innerHTML += strongHtml + '</div>';
+    }
+
+    // Weakest matches (different answers)
+    if (ue.weakMatches && ue.weakMatches.length > 0) {
+      var weakHtml = '<div class="ultimate-section"><div class="ultimate-section-title">❌ Biggest Differences</div>';
+      ue.weakMatches.forEach(function(r) {
+        weakHtml += '<div class="ultimate-match-item"><span class="ultimate-match-q">' + r.question + '</span><span style="font-size:12px;color:var(--muted)">' + data.p1Name + ': ' + r.p1Answer + ' / ' + data.p2Name + ': ' + r.p2Answer + '</span></div>';
+      });
+      extrasDiv.innerHTML += weakHtml + '</div>';
+    }
+
+    // Animate the relationship score bar after render
+    setTimeout(function() {
+      var bar = document.getElementById('rel-score-fill-bar');
+      if (bar) bar.style.width = ue.relationshipScore + '%';
+    }, 600);
+  }
+
+  // Recap (show more items for Ultimate — up to 12, others 8)
+  var recapLimit = data.mode === 'ultimate' ? 12 : 8;
   var recap = document.getElementById('go-recap');
   recap.innerHTML = '';
-  data.results.slice(0, 8).forEach(function(r) {
+  data.results.slice(0, recapLimit).forEach(function(r) {
     var div = document.createElement('div');
     div.className = 'recap-item fade-in';
     div.innerHTML = '<div class="ri-q">' + r.question + '</div>'
@@ -1349,7 +1408,6 @@ window.addEventListener('load', function() {
   // Sync mode dropdown → state.mode
   document.getElementById('create-mode').addEventListener('change', function(e) {
     state.mode = e.target.value;
-    // Also highlight the matching mode card on home screen
     document.querySelectorAll('.mode-card').forEach(function(c) {
       c.classList.toggle('selected', c.dataset.mode === state.mode);
     });
