@@ -99,16 +99,13 @@ function calculateScores(room) {
 
   room.answers.forEach((round, idx) => {
     const q = room.questions[idx];
-    // Each player answers for themselves AND predicts the other
-    // p1Answer = what p1 says about themselves
-    // p1Predict = what p1 thinks p2 will answer
     const p1Answer  = round.p1Answer;
     const p1Predict = round.p1Predict;
     const p2Answer  = round.p2Answer;
     const p2Predict = round.p2Predict;
 
-    const p1Correct = p1Predict === p2Answer;  // did p1 guess p2 correctly?
-    const p2Correct = p2Predict === p1Answer;  // did p2 guess p1 correctly?
+    const p1Correct = p1Predict === p2Answer;
+    const p2Correct = p2Predict === p1Answer;
 
     if (p1Correct) { p1Score += 10; if (round.p1Time < 2) p1Score += 5; else if (round.p1Time < 4) p1Score += 2; }
     if (p2Correct) { p2Score += 10; if (round.p2Time < 2) p2Score += 5; else if (round.p2Time < 4) p2Score += 2; }
@@ -122,7 +119,6 @@ function calculateScores(room) {
   const p1Understanding = Math.round(room.answers.filter(r => r.p1Predict === r.p2Answer).length / total * 100);
   const p2Understanding = Math.round(room.answers.filter(r => r.p2Predict === r.p1Answer).length / total * 100);
 
-  // Derived scores (slightly randomized for personality feel)
   const trust = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 10 - 5));
   const communication = Math.min(100, Math.round(compatibility * 0.9 + Math.random() * 15));
   const humor = Math.min(100, Math.round(Math.random() * 20 + 75));
@@ -155,7 +151,7 @@ io.on('connection', (socket) => {
       config: cfg,
       questions,
       players: { p1: { id: socket.id, nickname, score: 0, ready: false }, p2: null },
-      state: 'waiting',   // waiting | countdown | question | reveal | done
+      state: 'waiting',
       currentQ: 0,
       answers: [],
       timer: null,
@@ -189,21 +185,18 @@ io.on('connection', (socket) => {
       questionCount: room.config.questionCount,
     });
 
-    // Auto-start after 2 seconds
     setTimeout(() => startGame(code), 2000);
     console.log(`[Room] ${nickname} joined ${code}`);
   });
 
   // ── QUICK MATCH ──────────────────────────────────────────────────────────
   socket.on('quick_match', ({ nickname }) => {
-    // Remove stale entries
     for (let i = quickQueue.length - 1; i >= 0; i--) {
       if (!io.sockets.sockets.get(quickQueue[i].id)) quickQueue.splice(i, 1);
     }
 
     if (quickQueue.length > 0) {
       const partner = quickQueue.shift();
-      // Create room
       const code = generateRoomCode();
       const cfg  = getModeConfig('standard');
       const questions = shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
@@ -260,15 +253,31 @@ io.on('connection', (socket) => {
       room.answers[qIdx].p2Time    = time;
     }
 
-    // Notify partner that this player answered
     socket.to(code).emit('partner_answered');
 
-    // Check if both answered
     const ans = room.answers[qIdx];
     if (ans.p1Answer !== undefined && ans.p2Answer !== undefined) {
-      clearTimeout(room.roundTimer);
       revealAnswer(code);
     }
+  });
+
+  // ── LEAVE ROOM (Home button) ─────────────────────────────────────────────
+  socket.on('leave_room', () => {
+    const code = socketRoom.get(socket.id);
+    if (!code) return;
+    const room = rooms.get(code);
+    if (room) {
+      clearTimeout(room.timer);
+      clearTimeout(room.roundTimer);
+      const otherId = room.players.p1.id === socket.id
+        ? room.players.p2?.id
+        : room.players.p1.id;
+      socket.to(code).emit('partner_left_permanently', { msg: 'Your partner left the game.' });
+      rooms.delete(code);
+      if (otherId) socketRoom.delete(otherId);
+    }
+    socketRoom.delete(socket.id);
+    socket.leave(code);
   });
 
   // ── DISCONNECT ───────────────────────────────────────────────────────────
@@ -278,14 +287,13 @@ io.on('connection', (socket) => {
     if (code) {
       const room = rooms.get(code);
       if (room && room.state !== 'done') {
-        io.to(code).emit('partner_disconnected', { msg: 'Your partner disconnected. Game ended.' });
         clearTimeout(room.timer);
         clearTimeout(room.roundTimer);
+        io.to(code).emit('partner_disconnected', { msg: 'Your partner disconnected. Game ended.' });
         rooms.delete(code);
       }
       socketRoom.delete(socket.id);
     }
-    // Remove from quick queue
     const idx = quickQueue.findIndex(p => p.id === socket.id);
     if (idx !== -1) quickQueue.splice(idx, 1);
   });
@@ -322,29 +330,15 @@ function sendQuestion(code) {
   room.answers[qIdx] = {};
   room.state = 'question';
 
-  // Survival mode: timer gets shorter
-  let timerSec = room.config.timerSeconds;
-  if (room.config.survival) {
-    timerSec = Math.max(3, 15 - Math.floor(qIdx / 3) * 2);
-  }
-
   io.to(code).emit('question', {
     index: qIdx,
     total: room.questions.length,
     question: q.q,
     options: opts,
-    timer: timerSec,
+    timer: null,
     p1Name: room.players.p1.nickname,
     p2Name: room.players.p2.nickname,
   });
-
-  // Auto-submit empty if time runs out
-  room.roundTimer = setTimeout(() => {
-    const ans = room.answers[qIdx];
-    if (ans.p1Answer === undefined) { ans.p1Answer = '(No answer)'; ans.p1Predict = '(No answer)'; ans.p1Time = timerSec; }
-    if (ans.p2Answer === undefined) { ans.p2Answer = '(No answer)'; ans.p2Predict = '(No answer)'; ans.p2Time = timerSec; }
-    revealAnswer(code);
-  }, (timerSec + 1) * 1000);
 }
 
 function revealAnswer(code) {
@@ -357,7 +351,6 @@ function revealAnswer(code) {
   const q     = room.questions[qIdx];
   const isMatch = ans.p1Answer === ans.p2Answer;
 
-  // Award running scores
   if (ans.p1Predict === ans.p2Answer) room.players.p1.score += 10;
   if (ans.p2Predict === ans.p1Answer) room.players.p2.score += 10;
 
@@ -376,11 +369,9 @@ function revealAnswer(code) {
     nextIn: 3,
   });
 
-  room.timer = setTimeout(() => {
-    room.currentQ++;
-    room.state = 'question';
-    sendQuestion(code);
-  }, 3500);
+  room.currentQ++;
+  room.state = 'question';
+  sendQuestion(code);
 }
 
 function endGame(code) {
@@ -395,7 +386,6 @@ function endGame(code) {
     mode: room.mode,
     relationship: room.relationship,
   });
-  // Clean up after 10 min
   setTimeout(() => rooms.delete(code), 600000);
 }
 
