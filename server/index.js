@@ -16,10 +16,6 @@ const rooms = new Map();
 const quickQueue = [];
 const socketRoom = new Map();
 
-// ─── PLAYER PROFILES (in-memory, keyed by googleId or nickname+session) ──────
-// For real persistence you'd use a DB; here we store in memory per session
-const playerProfiles = new Map(); // googleId -> { nickname, avatar, totalGames, totalScore, bestCompatibility, history[] }
-
 const QUESTIONS = {
   favorites: [
     { q: "What's my favorite food?", opts: ["Pizza","Biryani","Sushi","Burger","Tacos","Pasta","Noodles","Salad"] },
@@ -84,11 +80,11 @@ function generateRoomCode() {
 
 function getModeConfig(mode) {
   const configs = {
-    quick:    { questionCount: 5,  timerSeconds: 0, label: 'Quick Match' },
-    standard: { questionCount: 20, timerSeconds: 0, label: 'Standard' },
-    ultimate: { questionCount: 50, timerSeconds: 0, label: 'Ultimate Match' },
-    blitz:    { questionCount: 20, timerSeconds: 0, label: 'Blitz ⚡' },
-    survival: { questionCount: 15, timerSeconds: 0, label: 'Survival Mode', survival: true },
+    quick:    { questionCount: 5,  label: 'Quick Match' },
+    standard: { questionCount: 20, label: 'Standard' },
+    ultimate: { questionCount: 50, label: 'Ultimate Match' },
+    blitz:    { questionCount: 20, label: 'Blitz ⚡' },
+    survival: { questionCount: 15, label: 'Survival Mode', survival: true },
   };
   return configs[mode] || configs.standard;
 }
@@ -105,29 +101,20 @@ function calculateScores(room) {
     const p2Answer  = round.p2Answer;
     const p2Predict = round.p2Predict;
 
-    // BUG FIX: p1 scores points when their PREDICTION of p2's answer is correct
     const p1Correct = p1Predict === p2Answer;
-    // p2 scores points when their PREDICTION of p1's answer is correct
     const p2Correct = p2Predict === p1Answer;
 
-    if (p1Correct) { p1Score += 10; }
-    if (p2Correct) { p2Score += 10; }
-    if (p1Answer === p2Answer) matchCount++; // "match" = both gave same answer
+    if (p1Correct) p1Score += 10;
+    if (p2Correct) p2Score += 10;
+    if (p1Answer === p2Answer) matchCount++;
 
-    results.push({
-      question: q.q,
-      p1Answer, p2Answer,
-      p1Predict, p2Predict,
-      p1Correct, p2Correct,
-      match: p1Answer === p2Answer
-    });
+    results.push({ question: q.q, p1Answer, p2Answer, p1Predict, p2Predict, p1Correct, p2Correct, match: p1Answer === p2Answer });
   });
 
   const total = room.questions.length;
   const compatibility = Math.round((matchCount / total) * 100);
   const p1Understanding = Math.round(room.answers.filter(r => r.p1Predict === r.p2Answer).length / total * 100);
   const p2Understanding = Math.round(room.answers.filter(r => r.p2Predict === r.p1Answer).length / total * 100);
-
   const trust = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 10 - 5));
   const communication = Math.min(100, Math.round(compatibility * 0.9 + Math.random() * 15));
   const humor = Math.min(100, Math.round(Math.random() * 20 + 75));
@@ -145,38 +132,45 @@ function calculateScores(room) {
   return { p1Score, p2Score, compatibility, trust, communication, humor, matchCount, total, results, title: getTitle(compatibility), p1Understanding, p2Understanding };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPER: cleanly destroy a room and notify the OTHER player
+// FIX: centralised so every leave/disconnect path uses the same logic,
+//      preventing duplicate emits and missed notifications.
+// ─────────────────────────────────────────────────────────────────────────────
+function destroyRoom(code, leavingSocketId, eventName, msg) {
+  const room = rooms.get(code);
+  if (!room) return;
+
+  // Stop all timers immediately
+  clearTimeout(room.timer);
+  clearTimeout(room.roundTimer);
+  room.state = 'done';
+
+  // Identify the OTHER player
+  const otherId = room.players.p1.id === leavingSocketId
+    ? room.players.p2?.id
+    : room.players.p1.id;
+
+  // Notify other player BEFORE any cleanup so their socket is still in the room
+  if (otherId) {
+    const otherSocket = io.sockets.sockets.get(otherId);
+    if (otherSocket) {
+      otherSocket.emit(eventName, { msg });
+    }
+    socketRoom.delete(otherId);
+  }
+
+  // Clean up the leaving player
+  socketRoom.delete(leavingSocketId);
+  rooms.delete(code);
+}
+
 // ─── SOCKET.IO ───────────────────────────────────────────────────────────────
 io.on('connection', (socket) => {
   console.log(`[+] Connected: ${socket.id}`);
 
-  // ── PROFILE ──────────────────────────────────────────────────────────────
-  socket.on('save_profile', ({ googleId, nickname, avatar, email }) => {
-    if (!googleId) return;
-    if (!playerProfiles.has(googleId)) {
-      playerProfiles.set(googleId, {
-        googleId, nickname, avatar, email,
-        totalGames: 0, totalScore: 0,
-        bestCompatibility: 0,
-        totalMatches: 0,
-        history: []
-      });
-    } else {
-      // Update display info
-      const p = playerProfiles.get(googleId);
-      p.nickname = nickname;
-      p.avatar = avatar;
-    }
-    socket.emit('profile_loaded', playerProfiles.get(googleId));
-  });
-
-  socket.on('get_profile', ({ googleId }) => {
-    if (!googleId) return;
-    const p = playerProfiles.get(googleId);
-    if (p) socket.emit('profile_loaded', p);
-  });
-
-  // ── ROOM CREATE/JOIN ─────────────────────────────────────────────────────
-  socket.on('create_room', ({ nickname, mode, relationship, googleId }) => {
+  // ── ROOM CREATE ───────────────────────────────────────────────────────────
+  socket.on('create_room', ({ nickname, mode, relationship }) => {
     const code = generateRoomCode();
     const cfg  = getModeConfig(mode);
     const questions = shuffleArray(ALL_QUESTIONS).slice(0, cfg.questionCount);
@@ -186,7 +180,7 @@ io.on('connection', (socket) => {
       config: cfg,
       questions,
       players: {
-        p1: { id: socket.id, nickname, score: 0, ready: false, googleId: googleId || null },
+        p1: { id: socket.id, nickname, score: 0 },
         p2: null
       },
       state: 'waiting',
@@ -204,13 +198,14 @@ io.on('connection', (socket) => {
     console.log(`[Room] Created: ${code} by ${nickname}`);
   });
 
-  socket.on('join_room', ({ code, nickname, googleId }) => {
+  // ── ROOM JOIN ─────────────────────────────────────────────────────────────
+  socket.on('join_room', ({ code, nickname }) => {
     const room = rooms.get(code);
     if (!room) { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
     if (room.state !== 'waiting') { socket.emit('error', { msg: 'Game already started!' }); return; }
     if (room.players.p2) { socket.emit('error', { msg: 'Room is full!' }); return; }
 
-    room.players.p2 = { id: socket.id, nickname, score: 0, ready: false, googleId: googleId || null };
+    room.players.p2 = { id: socket.id, nickname, score: 0 };
     socketRoom.set(socket.id, code);
     socket.join(code);
 
@@ -226,7 +221,9 @@ io.on('connection', (socket) => {
     console.log(`[Room] ${nickname} joined ${code}`);
   });
 
-  socket.on('quick_match', ({ nickname, googleId }) => {
+  // ── QUICK MATCH ───────────────────────────────────────────────────────────
+  socket.on('quick_match', ({ nickname }) => {
+    // Remove stale queue entries
     for (let i = quickQueue.length - 1; i >= 0; i--) {
       if (!io.sockets.sockets.get(quickQueue[i].id)) quickQueue.splice(i, 1);
     }
@@ -241,8 +238,8 @@ io.on('connection', (socket) => {
         code, mode: 'standard', relationship: '🌍 Strangers',
         config: cfg, questions,
         players: {
-          p1: { id: partner.id, nickname: partner.nickname, score: 0, ready: false, googleId: partner.googleId || null },
-          p2: { id: socket.id, nickname, score: 0, ready: false, googleId: googleId || null }
+          p1: { id: partner.id, nickname: partner.nickname, score: 0 },
+          p2: { id: socket.id, nickname, score: 0 }
         },
         state: 'waiting', currentQ: 0, answers: [], timer: null, roundTimer: null,
       };
@@ -262,7 +259,7 @@ io.on('connection', (socket) => {
       });
       setTimeout(() => startGame(code), 2000);
     } else {
-      quickQueue.push({ id: socket.id, nickname, googleId: googleId || null });
+      quickQueue.push({ id: socket.id, nickname });
       socket.emit('quick_match_waiting', { msg: 'Searching for a match...' });
     }
   });
@@ -272,111 +269,86 @@ io.on('connection', (socket) => {
     if (idx !== -1) quickQueue.splice(idx, 1);
   });
 
-  socket.on('submit_answer', ({ answer, predict, time }) => {
+  // ── SUBMIT ANSWER ────────────────────────────────────────────────────────
+  // FIX: Added state guard — only process submissions when room is in
+  //      'question' state. Prevents race conditions where a late answer
+  //      arrives during 'reveal' or after 'done' and triggers double-reveal.
+  socket.on('submit_answer', ({ answer, predict }) => {
     const code = socketRoom.get(socket.id);
     const room = rooms.get(code);
-    if (!room || room.state !== 'question') return;
+    if (!room || room.state !== 'question') return; // GUARD
 
     const qIdx = room.currentQ;
     if (!room.answers[qIdx]) room.answers[qIdx] = {};
 
     const isP1 = room.players.p1.id === socket.id;
+
+    // FIX: Prevent overwriting an already-submitted answer (double-click / duplicate emit)
+    if (isP1 && room.answers[qIdx].p1Answer !== undefined) return;
+    if (!isP1 && room.answers[qIdx].p2Answer !== undefined) return;
+
     if (isP1) {
       room.answers[qIdx].p1Answer  = answer;
       room.answers[qIdx].p1Predict = predict;
-      room.answers[qIdx].p1Time    = time || 0;
     } else {
       room.answers[qIdx].p2Answer  = answer;
       room.answers[qIdx].p2Predict = predict;
-      room.answers[qIdx].p2Time    = time || 0;
     }
 
     // Notify the other player their partner has answered
     socket.to(code).emit('partner_answered');
 
     const ans = room.answers[qIdx];
-    // BUG FIX: Only reveal when BOTH players have answered (no timer fallback)
+    // Advance only when BOTH players have locked in — no timer fallback
     if (ans.p1Answer !== undefined && ans.p2Answer !== undefined) {
       revealAnswer(code);
     }
   });
 
-  // ── LEAVE ROOM ───────────────────────────────────────────────────────────
-  // BUG FIX: The original code emitted partner_left_permanently via io.to(code)
-  // but hoisting issues in the frontend meant forceHome was undefined when the
-  // handler fired. We also ensure the emit happens BEFORE any cleanup.
-  socket.on('leave_room', () => {
-    console.log('[leave_room] received from', socket.id);
-
+  // ── LEAVE MATCH (intentional, mid-game) ──────────────────────────────────
+  // FIX: This event was completely missing from the server. The client emits
+  //      'leave_match' but the old server only handled 'leave_room', so the
+  //      remaining player was never notified and the room was never cleaned up.
+  //      Now uses 'match_left' event which the client listens for (not the
+  //      old 'partner_left_permanently' mismatch).
+  socket.on('leave_match', () => {
+    console.log('[leave_match] received from', socket.id);
     const code = socketRoom.get(socket.id);
     if (!code) return;
-
-    const room = rooms.get(code);
-
-    if (room) {
-      // Stop all timers first
-      clearTimeout(room.timer);
-      clearTimeout(room.roundTimer);
-      room.state = 'done';
-
-      // Find the OTHER player's socket id BEFORE any cleanup
-      const otherId = room.players.p1.id === socket.id
-        ? room.players.p2?.id
-        : room.players.p1.id;
-
-      console.log('[leave_room] notifying other player:', otherId);
-
-      // Emit to the ROOM (both players currently in it) before anyone leaves
-      // Use a targeted emit to the other socket directly for reliability
-      if (otherId) {
-        const otherSocket = io.sockets.sockets.get(otherId);
-        if (otherSocket) {
-          otherSocket.emit('partner_left_permanently', { msg: 'Your partner left the game.' });
-          console.log('[leave_room] emitted partner_left_permanently directly to', otherId);
-        }
-        // Also broadcast to room as fallback
-        io.to(code).emit('partner_left_permanently', { msg: 'Your partner left the game.' });
-      }
-
-      // Clean up other player mapping AFTER emit
-      if (otherId) socketRoom.delete(otherId);
-    }
-
-    // Clean up leaving player
-    socketRoom.delete(socket.id);
+    destroyRoom(code, socket.id, 'match_left', 'Your partner left the match.');
     socket.leave(code);
-
-    // Delete room
-    rooms.delete(code);
-    console.log('[leave_room] cleanup done for room', code);
   });
 
+  // ── LEAVE ROOM (from lobby / home navigation) ─────────────────────────────
+  socket.on('leave_room', () => {
+    const code = socketRoom.get(socket.id);
+    if (!code) return;
+    const room = rooms.get(code);
+    // Only notify partner if game was active
+    if (room && room.state !== 'waiting' && room.state !== 'done') {
+      destroyRoom(code, socket.id, 'match_left', 'Your partner left the match.');
+    } else if (room) {
+      clearTimeout(room.timer);
+      clearTimeout(room.roundTimer);
+      socketRoom.delete(socket.id);
+      rooms.delete(code);
+    }
+    socket.leave(code);
+  });
+
+  // ── DISCONNECT (network drop) ─────────────────────────────────────────────
+  // FIX: Unified with destroyRoom helper; previously had duplicate emit paths
+  //      that could fire twice or miss the other player entirely.
   socket.on('disconnect', () => {
     console.log(`[-] Disconnected: ${socket.id}`);
     const code = socketRoom.get(socket.id);
     if (code) {
       const room = rooms.get(code);
       if (room && room.state !== 'done') {
-        clearTimeout(room.timer);
-        clearTimeout(room.roundTimer);
-
-        // Find other player and notify
-        const otherId = room.players.p1.id === socket.id
-          ? room.players.p2?.id
-          : room.players.p1.id;
-
-        if (otherId) {
-          const otherSocket = io.sockets.sockets.get(otherId);
-          if (otherSocket) {
-            otherSocket.emit('partner_disconnected', { msg: 'Your partner disconnected. Game ended.' });
-          }
-        }
-
-        io.to(code).emit('partner_disconnected', { msg: 'Your partner disconnected. Game ended.' });
-        room.state = 'done';
-        rooms.delete(code);
+        destroyRoom(code, socket.id, 'match_left', 'Your partner disconnected. Match ended.');
+      } else {
+        socketRoom.delete(socket.id);
       }
-      socketRoom.delete(socket.id);
     }
     const idx = quickQueue.findIndex(p => p.id === socket.id);
     if (idx !== -1) quickQueue.splice(idx, 1);
@@ -419,7 +391,7 @@ function sendQuestion(code) {
     total: room.questions.length,
     question: q.q,
     options: opts,
-    timer: null, // NO TIMER — round ends only when both players answer
+    // FIX: No timer sent — question stays open until both players answer
     p1Name: room.players.p1.nickname,
     p2Name: room.players.p2.nickname,
     p1Score: room.players.p1.score,
@@ -431,15 +403,14 @@ function revealAnswer(code) {
   const room = rooms.get(code);
   if (!room) return;
 
-  // Guard: only reveal once per question
-  if (room.state === 'reveal') return;
+  // FIX: State guard prevents double-reveal if somehow called twice
+  if (room.state === 'reveal' || room.state === 'done') return;
   room.state = 'reveal';
 
   const qIdx = room.currentQ;
   const ans  = room.answers[qIdx];
   const q    = room.questions[qIdx];
 
-  // BUG FIX: Correctly determine if predictions were right
   const p1PredictCorrect = ans.p1Predict === ans.p2Answer;
   const p2PredictCorrect = ans.p2Predict === ans.p1Answer;
   const isAnswerMatch    = ans.p1Answer === ans.p2Answer;
@@ -461,12 +432,12 @@ function revealAnswer(code) {
     p2Name: room.players.p2.nickname,
     p1Score: room.players.p1.score,
     p2Score: room.players.p2.score,
-    match:   isAnswerMatch, // both gave the same answer
-    nextIn:  5,  // FIX: 5 second reveal window matches the setTimeout below
+    match: isAnswerMatch,
   });
 
-  // BUG FIX: 5000ms delay so the reveal stays visible for the full 5 seconds
+  // Show reveal for 5 seconds then advance
   room.roundTimer = setTimeout(() => {
+    if (!rooms.get(code)) return; // room may have been destroyed
     room.currentQ++;
     if (room.currentQ >= room.questions.length) {
       endGame(code);
@@ -487,34 +458,9 @@ function endGame(code) {
     ...scores,
     p1Name: room.players.p1.nickname,
     p2Name: room.players.p2.nickname,
-    p1GoogleId: room.players.p1.googleId,
-    p2GoogleId: room.players.p2.googleId,
     mode: room.mode,
     relationship: room.relationship,
   });
-
-  // Update profiles if players are signed in
-  const updateProfile = (googleId, score, compat) => {
-    if (!googleId) return;
-    const p = playerProfiles.get(googleId);
-    if (!p) return;
-    p.totalGames++;
-    p.totalScore += score;
-    if (compat > p.bestCompatibility) p.bestCompatibility = compat;
-    p.totalMatches += scores.matchCount;
-    p.history.unshift({
-      date: new Date().toISOString(),
-      mode: room.mode,
-      relationship: room.relationship,
-      compatibility: scores.compatibility,
-      score,
-      title: scores.title,
-    });
-    if (p.history.length > 20) p.history = p.history.slice(0, 20);
-  };
-
-  updateProfile(room.players.p1.googleId, scores.p1Score, scores.compatibility);
-  updateProfile(room.players.p2?.googleId, scores.p2Score, scores.compatibility);
 
   setTimeout(() => rooms.delete(code), 600000);
 }
@@ -522,12 +468,6 @@ function endGame(code) {
 // ─── API ─────────────────────────────────────────────────────────────────────
 app.get('/api/stats', (req, res) => {
   res.json({ activeRooms: rooms.size, queueLength: quickQueue.length, totalQuestions: ALL_QUESTIONS.length });
-});
-
-app.get('/api/profile/:googleId', (req, res) => {
-  const p = playerProfiles.get(req.params.googleId);
-  if (!p) return res.status(404).json({ error: 'Profile not found' });
-  res.json(p);
 });
 
 app.get('*', (req, res) => {
