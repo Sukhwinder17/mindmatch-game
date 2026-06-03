@@ -13,12 +13,10 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ─── IN-MEMORY STORE ────────────────────────────────────────────────────────
-const rooms = new Map();       // roomCode → Room
-const quickQueue = [];         // waiting sockets for quick match
-const socketRoom = new Map();  // socketId → roomCode
+const rooms = new Map();
+const quickQueue = [];
+const socketRoom = new Map();
 
-// ─── QUESTION BANK ──────────────────────────────────────────────────────────
 const QUESTIONS = {
   favorites: [
     { q: "What's my favorite food?", opts: ["Pizza","Biryani","Sushi","Burger","Tacos","Pasta","Noodles","Salad"] },
@@ -140,7 +138,6 @@ function calculateScores(room) {
 io.on('connection', (socket) => {
   console.log(`[+] Connected: ${socket.id}`);
 
-  // ── CREATE ROOM ──────────────────────────────────────────────────────────
   socket.on('create_room', ({ nickname, mode, relationship }) => {
     const code = generateRoomCode();
     const cfg  = getModeConfig(mode);
@@ -166,7 +163,6 @@ io.on('connection', (socket) => {
     console.log(`[Room] Created: ${code} by ${nickname}`);
   });
 
-  // ── JOIN ROOM ────────────────────────────────────────────────────────────
   socket.on('join_room', ({ code, nickname }) => {
     const room = rooms.get(code);
     if (!room) { socket.emit('error', { msg: 'Room not found. Check the code!' }); return; }
@@ -189,7 +185,6 @@ io.on('connection', (socket) => {
     console.log(`[Room] ${nickname} joined ${code}`);
   });
 
-  // ── QUICK MATCH ──────────────────────────────────────────────────────────
   socket.on('quick_match', ({ nickname }) => {
     for (let i = quickQueue.length - 1; i >= 0; i--) {
       if (!io.sockets.sockets.get(quickQueue[i].id)) quickQueue.splice(i, 1);
@@ -233,7 +228,6 @@ io.on('connection', (socket) => {
     if (idx !== -1) quickQueue.splice(idx, 1);
   });
 
-  // ── SUBMIT ANSWER ────────────────────────────────────────────────────────
   socket.on('submit_answer', ({ answer, predict, time }) => {
     const code = socketRoom.get(socket.id);
     const room = rooms.get(code);
@@ -264,24 +258,43 @@ io.on('connection', (socket) => {
   // ── LEAVE ROOM (Home button) ─────────────────────────────────────────────
   socket.on('leave_room', () => {
     console.log('LEAVE_ROOM RECEIVED', socket.id);
+
     const code = socketRoom.get(socket.id);
+    console.log('LEAVE_ROOM code:', code);
     if (!code) return;
+
     const room = rooms.get(code);
+    console.log('LEAVE_ROOM room exists:', !!room);
+
     if (room) {
+      // 1. Stop all timers first
       clearTimeout(room.timer);
       clearTimeout(room.roundTimer);
+
+      // 2. Grab other player id BEFORE deleting anything
       const otherId = room.players.p1.id === socket.id
         ? room.players.p2?.id
         : room.players.p1.id;
-      socket.to(code).emit('partner_left_permanently', { msg: 'Your partner left the game.' });
-      rooms.delete(code);
+      console.log('LEAVE_ROOM otherId:', otherId);
+
+      // 3. Emit via io.to (server-side broadcast, not socket.to)
+      //    This does NOT depend on sender socket membership state
+      io.to(code).emit('partner_left_permanently', { msg: 'Your partner left the game.' });
+      console.log('LEAVE_ROOM emitted partner_left_permanently to room', code);
+
+      // 4. Clean up other player AFTER emit is queued
       if (otherId) socketRoom.delete(otherId);
     }
+
+    // 5. Clean up leaving player
     socketRoom.delete(socket.id);
     socket.leave(code);
+
+    // 6. Delete room last
+    rooms.delete(code);
+    console.log('LEAVE_ROOM cleanup done for room', code);
   });
 
-  // ── DISCONNECT ───────────────────────────────────────────────────────────
   socket.on('disconnect', () => {
     console.log(`[-] Disconnected: ${socket.id}`);
     const code = socketRoom.get(socket.id);
@@ -370,19 +383,15 @@ function revealAnswer(code) {
     nextIn: 3,
   });
 
- setTimeout(() => {
-
-  room.currentQ++;
-
-  if (room.currentQ >= room.questions.length) {
-    endGame(code);
-    return;
-  }
-
-  room.state = 'question';
-  sendQuestion(code);
-
-}, 5000);
+  setTimeout(() => {
+    room.currentQ++;
+    if (room.currentQ >= room.questions.length) {
+      endGame(code);
+      return;
+    }
+    room.state = 'question';
+    sendQuestion(code);
+  }, 5000);
 }
 
 function endGame(code) {
