@@ -132,10 +132,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .mode-banner{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;padding:7px 16px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;width:fit-content;margin-left:auto;margin-right:auto}
 .mode-banner.quick{background:rgba(255,228,102,.12);border:1px solid rgba(255,228,102,.3);color:var(--c3)}
 .mode-banner.standard{background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
-.mode-banner.blitz{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3);color:var(--c1);animation:blitzPulse 1s ease-in-out infinite}
+.mode-banner.guess{background:rgba(77,171,247,.12);border:1px solid rgba(77,171,247,.3);color:var(--c5)}
 .mode-banner.survival{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:var(--c1)}
 .mode-banner.ultimate{background:rgba(255,228,102,.12);border:1px solid rgba(255,228,102,.35);color:var(--c3)}
-@keyframes blitzPulse{0%,100%{opacity:1}50%{opacity:.6}}
 .lives-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:8px 14px;background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);border-radius:var(--r2)}
 .lives-player{display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:13px;font-weight:800}
 .lives-hearts{letter-spacing:2px;font-size:16px}
@@ -153,6 +152,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .opt-btn.predict-selected{border-color:var(--c5);background:rgba(77,171,247,.18);color:var(--c5)}
 .opt-btn[disabled]{opacity:.5;cursor:default}
 .waiting-msg{text-align:center;padding:20px;background:rgba(105,219,124,.08);border:1px solid rgba(105,219,124,.2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--c4)}
+/* ── GUESS MODE INPUT UI ── */
+.guess-input-wrap{position:relative;margin-bottom:6px}
+.guess-input{width:100%;background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:var(--r2);padding:16px 20px;font-family:var(--font-body);font-size:18px;color:var(--text);outline:none;transition:all .2s;resize:none}
+.guess-input:focus{border-color:var(--c5);background:rgba(77,171,247,.08);box-shadow:0 0 0 4px rgba(77,171,247,.12)}
+.guess-input::placeholder{color:var(--dim);font-size:15px}
+.guess-input.locked{border-color:var(--c4);background:rgba(105,219,124,.08);color:var(--c4);cursor:default}
+.guess-char-count{font-size:11px;color:var(--dim);text-align:right;margin-bottom:12px}
+.guess-preview{background:rgba(77,171,247,.08);border:1px solid rgba(77,171,247,.2);border-radius:var(--r2);padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--c5);font-weight:600;display:none}
+.guess-preview.show{display:block}
+.guess-phase-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;margin-bottom:16px}
+.guess-phase-badge.answer-phase{background:rgba(77,171,247,.12);border:1px solid rgba(77,171,247,.3);color:var(--c5)}
+.guess-phase-badge.predict-phase{background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
+.guess-waiting{text-align:center;padding:16px;background:rgba(105,219,124,.08);border:1px solid rgba(105,219,124,.2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--c4);margin-top:12px}
 /* ── REVEAL ── */
 #screen-reveal{padding-top:56px;justify-content:center}
 .reveal-wrap{width:100%;max-width:560px;padding:30px 20px 60px;text-align:center}
@@ -214,7 +226,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .air-icon{font-size:24px}
 .air-title{font-family:var(--font-display);font-size:16px;font-weight:800}
 .air-text{color:var(--muted);font-size:15px;line-height:1.65}
-/* CHANGE A: Ultimate extra sections styling */
 .ultimate-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px}
 .ultimate-section-title{font-family:var(--font-display);font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .ultimate-match-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
@@ -227,6 +238,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .ultimate-acc-lbl{font-size:12px;color:var(--muted);margin-top:4px}
 .rel-score-bar{height:14px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden;margin:10px 0}
 .rel-score-fill{height:100%;background:linear-gradient(90deg,var(--c7),var(--c6));border-radius:100px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+/* ── GUESS MODE END REPORT ── */
+.guess-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px}
+.guess-section-title{font-family:var(--font-display);font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.guess-match-item{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.guess-match-item:last-child{border-bottom:none}
+.guess-match-q{color:var(--muted);font-size:12px;margin-bottom:4px}
+.guess-match-same{font-weight:700;color:var(--c4)}
+.guess-match-diff{display:flex;gap:8px}
+.guess-match-diff span{font-weight:600;font-size:12px;padding:3px 10px;border-radius:100px}
+.guess-match-diff .d1{background:rgba(255,140,200,.15);color:var(--c7)}
+.guess-match-diff .d2{background:rgba(77,171,247,.15);color:var(--c5)}
 /* ─── */
 .share-section{margin-bottom:24px}
 .share-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
@@ -348,7 +370,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     <div class="hero-actions">
       <button class="btn btn-primary btn-lg btn-full" onclick="showScreen('screen-setup');document.getElementById('setup-tab-create').click()">🚀 Create New Room</button>
       <button class="btn btn-cool btn-lg btn-full" onclick="showScreen('screen-join')">🎮 Join a Room</button>
-      <!-- CHANGE B: Quick Match now sends current selected mode -->
       <button class="btn btn-warm btn-lg btn-full" onclick="quickMatch()">⚡ Quick Match — <span id="home-mode-label">Quick Match</span></button>
     </div>
     <div class="hero-stats">
@@ -371,10 +392,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div class="mode-desc">20 questions. The real test of how well you know each other.</div>
       <div class="mode-badge">~8 min</div>
     </div>
-    <div class="mode-card" data-mode="blitz" onclick="selectMode(this)">
-      <div class="mode-icon">🔥</div><div class="mode-name">Blitz Mode</div>
-      <div class="mode-desc">20 questions, 2s reveal. Gut feeling only — no thinking!</div>
-      <div class="mode-badge">~5 min</div>
+    <div class="mode-card" data-mode="guess" onclick="selectMode(this)">
+      <div class="mode-icon">📝</div><div class="mode-name">Guess Mode</div>
+      <div class="mode-desc">Type your own answers freely. Guess what your partner wrote. No options — just pure knowledge!</div>
+      <div class="mode-badge">~6 min</div>
     </div>
     <div class="mode-card" data-mode="survival" onclick="selectMode(this)">
       <div class="mode-icon">💀</div><div class="mode-name">Survival</div>
@@ -410,7 +431,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
         <select class="input" id="create-mode">
           <option value="quick">⚡ Quick Match (5Q)</option>
           <option value="standard" selected>🎯 Standard (20Q)</option>
-          <option value="blitz">🔥 Blitz Mode (20Q, 2s reveal)</option>
+          <option value="guess">📝 Guess Mode (15Q, type answers)</option>
           <option value="survival">💀 Survival (15Q, 3 lives)</option>
           <option value="ultimate">👑 Ultimate Match (50Q)</option>
         </select>
@@ -513,12 +534,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 </div>
 
 <!-- QUICK MATCH WAITING -->
-<!-- CHANGE C: Show which mode the player is queued for -->
 <div class="screen" id="screen-quickwait">
   <div style="padding:120px 24px;text-align:center;width:100%">
     <div style="font-size:64px;margin-bottom:20px;animation:blobFloat 2s ease-in-out infinite">🔍</div>
     <div class="screen-title mb-16">Finding Your Match...</div>
-    <!-- Mode label shown in waiting screen -->
     <div id="quickwait-mode-label" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px;padding:6px 18px;border-radius:100px;font-family:var(--font-display);font-size:13px;font-weight:800;background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)">⚡ Quick Match</div>
     <p class="text-muted mb-24">Searching for a <span id="quickwait-mode-text">Quick Match</span> player online right now</p>
     <div class="waiting-animation" style="justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -546,7 +565,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   </div>
 </div>
 
-<!-- QUESTION -->
+<!-- QUESTION (standard modes) -->
 <div class="screen" id="screen-question">
   <div class="question-wrap">
     <div class="q-topbar">
@@ -579,6 +598,63 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     <div id="q-submit-btn-wrap">
       <button class="btn btn-primary btn-full" id="q-submit-btn" onclick="submitAnswer()" disabled>🔒 Lock In Answers</button>
       <p style="text-align:center;font-size:12px;color:var(--dim);margin-top:8px">Select both your answer and your prediction to submit</p>
+    </div>
+  </div>
+</div>
+
+<!-- GUESS MODE QUESTION SCREEN -->
+<div class="screen" id="screen-guess-question">
+  <div class="question-wrap">
+    <div class="q-topbar">
+      <div class="q-progress-wrap"><div class="q-progress-fill" id="gq-progress" style="width:0%"></div></div>
+      <div class="q-counter" id="gq-counter">1 / 15</div>
+    </div>
+    <div class="q-scores-bar">
+      <div class="score-chip p1" id="gq-score-p1">😎 You: 0</div>
+      <div class="score-spacer"></div>
+      <div class="score-chip p2" id="gq-score-p2">🤩 Friend: 0</div>
+    </div>
+    <div style="text-align:center;margin-bottom:14px">
+      <div class="mode-banner guess">📝 Guess Mode</div>
+    </div>
+    <div class="q-card">
+      <div class="q-number" id="gq-num-label">Question 1</div>
+      <div class="q-text" id="gq-text">Loading...</div>
+    </div>
+
+    <!-- PHASE 1: Answer -->
+    <div id="gq-answer-phase">
+      <div class="guess-phase-badge answer-phase">✍️ Phase 1 — Your Answer</div>
+      <div class="answer-section">
+        <div class="section-label">🙋 Your Answer <span class="badge">Type what applies to YOU</span></div>
+        <div class="guess-input-wrap">
+          <textarea class="guess-input" id="gq-answer-input" placeholder="Type your answer here..." maxlength="100" rows="2" oninput="onGuessAnswerInput()"></textarea>
+        </div>
+        <div class="guess-char-count"><span id="gq-answer-chars">0</span> / 100</div>
+        <div class="guess-preview" id="gq-answer-preview"></div>
+        <button class="btn btn-cool btn-full" id="gq-answer-btn" onclick="submitGuessAnswer()" disabled>🔒 Lock Answer</button>
+      </div>
+      <div id="gq-answer-waiting" class="guess-waiting hidden">
+        ✅ Answer locked! Waiting for partner to answer...
+        <div style="margin-top:8px;display:flex;gap:6px;justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+    </div>
+
+    <!-- PHASE 2: Prediction (shown after both answer) -->
+    <div id="gq-predict-phase" class="hidden">
+      <div class="guess-phase-badge predict-phase">🔮 Phase 2 — Guess Your Partner</div>
+      <div class="answer-section">
+        <div class="section-label">🔮 Your Prediction <span class="badge" style="background:rgba(77,171,247,.2);color:var(--c5)">What did THEY write?</span></div>
+        <div class="guess-input-wrap">
+          <textarea class="guess-input" id="gq-predict-input" placeholder="What do you think your partner answered?" maxlength="100" rows="2" oninput="onGuessPredictInput()"></textarea>
+        </div>
+        <div class="guess-char-count"><span id="gq-predict-chars">0</span> / 100</div>
+        <button class="btn btn-primary btn-full" id="gq-predict-btn" onclick="submitGuessPredict()" disabled>🔒 Lock Prediction</button>
+      </div>
+      <div id="gq-predict-waiting" class="guess-waiting hidden">
+        ✅ Prediction locked! Waiting for partner...
+        <div style="margin-top:8px;display:flex;gap:6px;justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -650,8 +726,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div class="air-header"><div class="air-icon">🤖</div><div class="air-title">AI Compatibility Report</div></div>
       <div class="air-text" id="go-ai-report">Generating your report...</div>
     </div>
-    <!-- CHANGE D: Ultimate extras section injected by JS -->
     <div id="go-ultimate-extras"></div>
+    <div id="go-guess-extras"></div>
     <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px">🎥 Reaction Recap</div>
     <div class="recap-list" id="go-recap"></div>
     <div class="share-section">
@@ -690,6 +766,9 @@ const state = {
   inActiveMatch: false,
   p1Lives: null,
   p2Lives: null,
+  // Guess mode state
+  guessAnswerLocked: false,
+  guessPredictLocked: false,
 };
 
 const BACKEND = 'https://mindmatch-game.onrender.com';
@@ -704,7 +783,7 @@ function livesHearts(lives, max) {
 // ═══════════════════════════════════════════════════════
 //  MATCH SCREENS SET
 // ═══════════════════════════════════════════════════════
-const MATCH_SCREENS = new Set(['screen-countdown','screen-question','screen-reveal']);
+const MATCH_SCREENS = new Set(['screen-countdown','screen-question','screen-reveal','screen-guess-question']);
 
 function setMatchNavState(inMatch) {
   state.inActiveMatch = inMatch;
@@ -810,7 +889,6 @@ function initSocket() {
     document.getElementById('countdown-label').textContent = data.count > 0 ? 'Get ready...' : "Let's go!";
   });
 
-  // CHANGE E: quick_match_waiting now carries mode info — update waiting screen
   state.socket.on('quick_match_waiting', function(data) {
     showScreen('screen-quickwait');
     var labelEl = document.getElementById('quickwait-mode-label');
@@ -820,10 +898,40 @@ function initSocket() {
     toast(data.msg, 'info');
   });
 
+  // Standard question (non-guess modes)
   state.socket.on('question', function(data) {
     showScreen('screen-question');
     setMatchNavState(true);
     renderQuestion(data);
+  });
+
+  // Guess Mode: phase 1 — type answer
+  state.socket.on('guess_question', function(data) {
+    showScreen('screen-guess-question');
+    setMatchNavState(true);
+    renderGuessQuestion(data);
+  });
+
+  // Guess Mode: partner locked their answer — we stay on screen
+  state.socket.on('guess_partner_answered', function() {
+    // If we already locked, show "partner answered too" hint
+    if (state.guessAnswerLocked) {
+      var w = document.getElementById('gq-answer-waiting');
+      if (w) w.innerHTML = '✅ Partner answered! Waiting for prediction phase...';
+    }
+  });
+
+  // Guess Mode: phase 2 — predict
+  state.socket.on('guess_predict_phase', function(data) {
+    renderGuessPredictPhase(data);
+  });
+
+  // Guess Mode: partner locked prediction
+  state.socket.on('guess_partner_predicted', function() {
+    if (state.guessPredictLocked) {
+      var w = document.getElementById('gq-predict-waiting');
+      if (w) w.innerHTML = '✅ Partner predicted! Revealing...';
+    }
   });
 
   state.socket.on('partner_answered', function() {
@@ -865,6 +973,8 @@ function forceHome() {
   state.currentAnswer  = null;
   state.currentPredict = null;
   state.answerLocked   = false;
+  state.guessAnswerLocked  = false;
+  state.guessPredictLocked = false;
   state.roomCode       = '';
   state.p1Lives = null;
   state.p2Lives = null;
@@ -896,17 +1006,14 @@ function switchTab(tab) {
   document.getElementById('setup-tab-join').classList.toggle('active',   tab === 'join');
 }
 
-// CHANGE F: selectMode also updates the Quick Match button label so user
-// always sees which mode they're queuing into
 function selectMode(el) {
   document.querySelectorAll('.mode-card').forEach(function(c) { c.classList.remove('selected'); });
   el.classList.add('selected');
   state.mode = el.dataset.mode;
   var sel = document.getElementById('create-mode');
   if (sel) sel.value = state.mode;
-  // Update the home Quick Match button label
   var modeLabelMap = {
-    quick: 'Quick Match', standard: 'Standard', blitz: 'Blitz Mode',
+    quick: 'Quick Match', standard: 'Standard', guess: 'Guess Mode',
     survival: 'Survival', ultimate: 'Ultimate',
   };
   var homeLbl = document.getElementById('home-mode-label');
@@ -954,7 +1061,6 @@ function joinRoomFromCode() {
   state.socket.emit('join_room', { code: code, nickname: nick });
 }
 
-// CHANGE G: quickMatch now sends state.mode so server uses the right queue
 function quickMatch() {
   var nick = (prompt('Your nickname for quick match?', 'Player') || '').trim();
   if (!nick) return;
@@ -990,12 +1096,12 @@ function shareRoomWhatsApp() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  QUESTION RENDER
+//  STANDARD QUESTION RENDER
 // ═══════════════════════════════════════════════════════
 function renderModeBanner(mode) {
   var labels = {
     quick:'⚡ Quick Match', standard:'🎯 Standard',
-    blitz:'🔥 Blitz Mode', survival:'💀 Survival', ultimate:'👑 Ultimate',
+    guess:'📝 Guess Mode', survival:'💀 Survival', ultimate:'👑 Ultimate',
   };
   var container = document.getElementById('q-mode-banner');
   container.innerHTML = '<div class="mode-banner ' + mode + '">' + (labels[mode] || mode) + '</div>';
@@ -1087,6 +1193,118 @@ function submitAnswer() {
 }
 
 // ═══════════════════════════════════════════════════════
+//  GUESS MODE QUESTION RENDER
+// ═══════════════════════════════════════════════════════
+function renderGuessQuestion(data) {
+  state.guessAnswerLocked  = false;
+  state.guessPredictLocked = false;
+
+  var pct = (data.index / data.total) * 100;
+  document.getElementById('gq-progress').style.width = pct + '%';
+  document.getElementById('gq-counter').textContent  = (data.index + 1) + ' / ' + data.total;
+  document.getElementById('gq-num-label').textContent = 'Question ' + (data.index + 1);
+  document.getElementById('gq-text').textContent     = data.question;
+
+  var myScore    = state.isP1 ? (data.p1Score || 0) : (data.p2Score || 0);
+  var theirScore = state.isP1 ? (data.p2Score || 0) : (data.p1Score || 0);
+  var theirName  = state.isP1 ? data.p2Name : data.p1Name;
+  document.getElementById('gq-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
+  document.getElementById('gq-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
+
+  // Reset answer phase
+  var ansInput = document.getElementById('gq-answer-input');
+  ansInput.value = '';
+  ansInput.disabled = false;
+  ansInput.classList.remove('locked');
+  document.getElementById('gq-answer-chars').textContent = '0';
+  document.getElementById('gq-answer-preview').classList.remove('show');
+  document.getElementById('gq-answer-preview').textContent = '';
+  document.getElementById('gq-answer-btn').disabled = true;
+  document.getElementById('gq-answer-waiting').classList.add('hidden');
+
+  // Reset predict phase — hide it
+  document.getElementById('gq-answer-phase').style.display = '';
+  document.getElementById('gq-predict-phase').classList.add('hidden');
+
+  var predInput = document.getElementById('gq-predict-input');
+  predInput.value = '';
+  predInput.disabled = false;
+  predInput.classList.remove('locked');
+  document.getElementById('gq-predict-chars').textContent = '0';
+  document.getElementById('gq-predict-btn').disabled = true;
+  document.getElementById('gq-predict-waiting').classList.add('hidden');
+}
+
+function onGuessAnswerInput() {
+  if (state.guessAnswerLocked) return;
+  var inp = document.getElementById('gq-answer-input');
+  var val = inp.value;
+  document.getElementById('gq-answer-chars').textContent = val.length;
+  var preview = document.getElementById('gq-answer-preview');
+  if (val.trim().length > 0) {
+    preview.textContent = '👁 Preview: ' + val.trim();
+    preview.classList.add('show');
+  } else {
+    preview.classList.remove('show');
+  }
+  document.getElementById('gq-answer-btn').disabled = val.trim().length === 0;
+}
+
+function submitGuessAnswer() {
+  if (state.guessAnswerLocked) return;
+  var val = document.getElementById('gq-answer-input').value.trim();
+  if (!val) { toast('Please type your answer first!', 'error'); return; }
+  state.guessAnswerLocked = true;
+  var inp = document.getElementById('gq-answer-input');
+  inp.disabled = true;
+  inp.classList.add('locked');
+  document.getElementById('gq-answer-btn').disabled = true;
+  document.getElementById('gq-answer-waiting').classList.remove('hidden');
+  state.socket.emit('guess_submit_answer', { answer: val });
+}
+
+function renderGuessPredictPhase(data) {
+  // Update scores
+  var myScore    = state.isP1 ? (data.p1Score || 0) : (data.p2Score || 0);
+  var theirScore = state.isP1 ? (data.p2Score || 0) : (data.p1Score || 0);
+  var theirName  = state.isP1 ? data.p2Name : data.p1Name;
+  document.getElementById('gq-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
+  document.getElementById('gq-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
+
+  // Hide answer waiting, show predict phase
+  document.getElementById('gq-answer-waiting').classList.add('hidden');
+  document.getElementById('gq-predict-phase').classList.remove('hidden');
+
+  // Focus predict input
+  setTimeout(function() {
+    document.getElementById('gq-predict-input').focus();
+  }, 100);
+
+  toast('Both answered! Now guess what your partner wrote 🔮', 'info');
+}
+
+function onGuessPredictInput() {
+  if (state.guessPredictLocked) return;
+  var inp = document.getElementById('gq-predict-input');
+  var val = inp.value;
+  document.getElementById('gq-predict-chars').textContent = val.length;
+  document.getElementById('gq-predict-btn').disabled = val.trim().length === 0;
+}
+
+function submitGuessPredict() {
+  if (state.guessPredictLocked) return;
+  var val = document.getElementById('gq-predict-input').value.trim();
+  if (!val) { toast('Please type your prediction!', 'error'); return; }
+  state.guessPredictLocked = true;
+  var inp = document.getElementById('gq-predict-input');
+  inp.disabled = true;
+  inp.classList.add('locked');
+  document.getElementById('gq-predict-btn').disabled = true;
+  document.getElementById('gq-predict-waiting').classList.remove('hidden');
+  state.socket.emit('guess_submit_predict', { predict: val });
+}
+
+// ═══════════════════════════════════════════════════════
 //  REVEAL RENDER
 // ═══════════════════════════════════════════════════════
 function renderReveal(data) {
@@ -1114,8 +1332,7 @@ function renderReveal(data) {
     + '<div style="font-size:11px;color:var(--muted);margin-top:4px">Their answer</div>'
     + '</div>';
 
-  // CHANGE H: Point label reflects mode (survival = +15, others = +10)
-  var ppLabel = data.mode === 'survival' ? '+15' : (data.mode === 'blitz' ? '+10+5' : '+10');
+  var ppLabel = data.mode === 'survival' ? '+15' : '+10';
   document.getElementById('p1-predict-name').textContent = data.p1Name + ' predicted:';
   document.getElementById('p1-predict-val').textContent  = data.p1Predict;
   document.getElementById('p1-predict-icon').textContent = data.p1PredictCorrect ? '✅ ' + ppLabel : '❌';
@@ -1123,7 +1340,6 @@ function renderReveal(data) {
   document.getElementById('p2-predict-val').textContent  = data.p2Predict;
   document.getElementById('p2-predict-icon').textContent = data.p2PredictCorrect ? '✅ ' + ppLabel : '❌';
 
-  // Survival lives update row
   var survivalDiv = document.getElementById('reveal-survival-lives');
   if (data.mode === 'survival') {
     var maxLives = 3;
@@ -1159,16 +1375,12 @@ function renderReveal(data) {
   barFill.style.width = '0%';
 
   var secs = revealSec;
-  nextEl.textContent = data.mode === 'blitz'
-    ? '⚡ Blitz — next in ' + secs + 's!'
-    : 'Next question in ' + secs + 's...';
+  nextEl.textContent = 'Next question in ' + secs + 's...';
 
   var ni = setInterval(function() {
     secs--;
     if (secs > 0) {
-      nextEl.textContent = data.mode === 'blitz'
-        ? '⚡ Blitz — next in ' + secs + 's!'
-        : 'Next question in ' + secs + 's...';
+      nextEl.textContent = 'Next question in ' + secs + 's...';
     } else {
       nextEl.textContent = 'Loading next question...';
       clearInterval(ni);
@@ -1191,7 +1403,6 @@ var AI_REPORTS = [
   },
 ];
 
-// CHANGE I: renderGameOver handles Ultimate extras section
 function renderGameOver(data) {
   document.getElementById('go-result-title').textContent = data.title;
   document.getElementById('go-names').textContent = data.p1Name + ' + ' + data.p2Name;
@@ -1233,13 +1444,11 @@ function renderGameOver(data) {
   document.getElementById('go-match-count').textContent  = data.matchCount + ' / ' + data.total + ' questions matched';
   document.getElementById('go-ai-report').textContent    = AI_REPORTS[Math.floor(Math.random() * AI_REPORTS.length)](data);
 
-  // ── Ultimate extras ──────────────────────────────────────────────────────
+  // ── Ultimate extras ────────────────────────────────────────────────────
   var extrasDiv = document.getElementById('go-ultimate-extras');
   extrasDiv.innerHTML = '';
   if (data.mode === 'ultimate' && data.ultimateExtras) {
     var ue = data.ultimateExtras;
-
-    // Relationship score bar
     extrasDiv.innerHTML +=
       '<div class="ultimate-section">'
       + '<div class="ultimate-section-title">💍 Final Relationship Score</div>'
@@ -1247,8 +1456,6 @@ function renderGameOver(data) {
       + '<div class="rel-score-bar"><div class="rel-score-fill" style="width:0%" id="rel-score-fill-bar"></div></div>'
       + '<div style="text-align:center;color:var(--muted);font-size:13px">Based on compatibility, prediction accuracy, and shared answers</div>'
       + '</div>';
-
-    // Prediction accuracy
     extrasDiv.innerHTML +=
       '<div class="ultimate-section">'
       + '<div class="ultimate-section-title">🎯 Prediction Accuracy</div>'
@@ -1257,8 +1464,6 @@ function renderGameOver(data) {
       +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
       + '</div>'
       + '</div>';
-
-    // Strongest matches
     if (ue.strongMatches && ue.strongMatches.length > 0) {
       var strongHtml = '<div class="ultimate-section"><div class="ultimate-section-title">✅ Strongest Matches</div>';
       ue.strongMatches.forEach(function(r) {
@@ -1266,8 +1471,6 @@ function renderGameOver(data) {
       });
       extrasDiv.innerHTML += strongHtml + '</div>';
     }
-
-    // Weakest matches (different answers)
     if (ue.weakMatches && ue.weakMatches.length > 0) {
       var weakHtml = '<div class="ultimate-section"><div class="ultimate-section-title">❌ Biggest Differences</div>';
       ue.weakMatches.forEach(function(r) {
@@ -1275,15 +1478,57 @@ function renderGameOver(data) {
       });
       extrasDiv.innerHTML += weakHtml + '</div>';
     }
-
-    // Animate the relationship score bar after render
     setTimeout(function() {
       var bar = document.getElementById('rel-score-fill-bar');
       if (bar) bar.style.width = ue.relationshipScore + '%';
     }, 600);
   }
 
-  // Recap (show more items for Ultimate — up to 12, others 8)
+  // ── Guess Mode extras ─────────────────────────────────────────────────
+  var guessDiv = document.getElementById('go-guess-extras');
+  guessDiv.innerHTML = '';
+  if (data.mode === 'guess' && data.guessExtras) {
+    var ge = data.guessExtras;
+    // Prediction accuracy
+    guessDiv.innerHTML +=
+      '<div class="guess-section">'
+      + '<div class="guess-section-title">🎯 Prediction Accuracy</div>'
+      + '<div class="ultimate-accuracy-row">'
+      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ge.p1Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p1Name + '</div></div>'
+      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ge.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
+      + '</div>'
+      + '<div style="text-align:center;margin-top:12px;font-size:13px;color:var(--muted)">✅ ' + ge.correctPredictions + ' correct predictions total</div>'
+      + '</div>';
+
+    // Best matches (same answers)
+    if (ge.bestMatches && ge.bestMatches.length > 0) {
+      var bmHtml = '<div class="guess-section"><div class="guess-section-title">✨ Strongest Agreements</div>';
+      ge.bestMatches.forEach(function(r) {
+        bmHtml += '<div class="guess-match-item">'
+          + '<div class="guess-match-q">' + r.question + '</div>'
+          + '<div class="guess-match-same">Both wrote: ' + r.p1Answer + '</div>'
+          + '</div>';
+      });
+      guessDiv.innerHTML += bmHtml + '</div>';
+    }
+
+    // Most different answers
+    if (ge.diffAnswers && ge.diffAnswers.length > 0) {
+      var daHtml = '<div class="guess-section"><div class="guess-section-title">⚡ Biggest Differences</div>';
+      ge.diffAnswers.forEach(function(r) {
+        daHtml += '<div class="guess-match-item">'
+          + '<div class="guess-match-q">' + r.question + '</div>'
+          + '<div class="guess-match-diff">'
+          + '<span class="d1">' + data.p1Name + ': ' + r.p1Answer + '</span>'
+          + '<span class="d2">' + data.p2Name + ': ' + r.p2Answer + '</span>'
+          + '</div>'
+          + '</div>';
+      });
+      guessDiv.innerHTML += daHtml + '</div>';
+    }
+  }
+
+  // Recap
   var recapLimit = data.mode === 'ultimate' ? 12 : 8;
   var recap = document.getElementById('go-recap');
   recap.innerHTML = '';
@@ -1405,7 +1650,6 @@ window.addEventListener('load', function() {
   fetchStats();
   setInterval(fetchStats, 10000);
 
-  // Sync mode dropdown → state.mode
   document.getElementById('create-mode').addEventListener('change', function(e) {
     state.mode = e.target.value;
     document.querySelectorAll('.mode-card').forEach(function(c) {
@@ -1413,7 +1657,6 @@ window.addEventListener('load', function() {
     });
   });
 
-  // Handle invite link auto-join
   var pathMatch = window.location.pathname.match(/^\/join\/(\d{6})$/);
   var params    = new URLSearchParams(window.location.search);
   var joinCode  = (pathMatch && pathMatch[1]) || params.get('join');
