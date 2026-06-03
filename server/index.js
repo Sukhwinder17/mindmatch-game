@@ -369,9 +369,19 @@ function revealAnswer(code) {
     nextIn: 3,
   });
 
+ setTimeout(() => {
+
   room.currentQ++;
+
+  if (room.currentQ >= room.questions.length) {
+    endGame(code);
+    return;
+  }
+
   room.state = 'question';
   sendQuestion(code);
+
+}, 5000);
 }
 
 function endGame(code) {
