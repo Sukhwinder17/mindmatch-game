@@ -57,7 +57,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .input::placeholder{color:var(--dim)}
 .input-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:28px}
-/* ── HOME ── */
+/* HOME */
 #screen-home{padding-top:56px;justify-content:flex-start}
 .home-hero{width:100%;max-width:900px;padding:60px 24px 40px;text-align:center}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(204,93,232,.15);border:1px solid rgba(204,93,232,.3);border-radius:100px;padding:6px 18px;font-size:13px;font-weight:700;color:var(--c6);letter-spacing:.5px;margin-bottom:28px}
@@ -77,7 +77,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .mode-name{font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:6px}
 .mode-desc{font-size:13px;color:var(--muted);line-height:1.5}
 .mode-badge{display:inline-block;margin-top:10px;background:rgba(255,255,255,.08);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--muted)}
-/* ── SETUP ── */
+/* SETUP */
 #screen-setup{padding-top:56px}
 .setup-wrap{width:100%;max-width:560px;padding:40px 24px 60px}
 .setup-header{text-align:center;margin-bottom:36px}
@@ -92,7 +92,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .tab-bar{display:flex;background:rgba(255,255,255,.04);border-radius:var(--r2);padding:4px;gap:4px;margin-bottom:24px}
 .tab{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
 .tab.active{background:var(--card2);color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,.3)}
-/* ── LOBBY ── */
+/* LOBBY */
 #screen-lobby{padding-top:56px}
 .lobby-wrap{width:100%;max-width:500px;padding:40px 24px 60px;text-align:center}
 .room-code-display{background:var(--card2);border:2px solid var(--c6);border-radius:var(--r);padding:24px;margin:24px 0;position:relative;overflow:hidden}
@@ -106,7 +106,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 @keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
 .partner-joined{background:rgba(105,219,124,.12);border:2px solid rgba(105,219,124,.3);border-radius:var(--r);padding:20px;display:none}
 .partner-joined.show{display:block;animation:fadeIn .4s ease}
-/* ── COUNTDOWN ── */
+/* COUNTDOWN */
 #screen-countdown{padding-top:56px;justify-content:center;text-align:center}
 .countdown-wrap{padding:40px 24px}
 .countdown-number{font-family:var(--font-display);font-size:120px;font-weight:900;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:countPop .5s cubic-bezier(.68,-0.6,.32,1.6)}
@@ -117,7 +117,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .pc-emoji{font-size:36px}
 .pc-name{font-family:var(--font-display);font-size:16px;font-weight:800;margin-top:8px}
 .vs-badge{background:linear-gradient(135deg,var(--c1),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-display);font-size:28px;font-weight:900;align-self:center}
-/* ── QUESTION ── */
+/* QUESTION */
 #screen-question{padding-top:56px}
 .question-wrap{width:100%;max-width:640px;padding:20px 20px 60px}
 .q-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
@@ -152,7 +152,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .opt-btn.predict-selected{border-color:var(--c5);background:rgba(77,171,247,.18);color:var(--c5)}
 .opt-btn[disabled]{opacity:.5;cursor:default}
 .waiting-msg{text-align:center;padding:20px;background:rgba(105,219,124,.08);border:1px solid rgba(105,219,124,.2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--c4)}
-/* ── GUESS MODE INPUT UI ── */
+/* GUESS MODE INPUT */
 .guess-input-wrap{position:relative;margin-bottom:6px}
 .guess-input{width:100%;background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:var(--r2);padding:16px 20px;font-family:var(--font-body);font-size:18px;color:var(--text);outline:none;transition:all .2s;resize:none}
 .guess-input:focus{border-color:var(--c5);background:rgba(77,171,247,.08);box-shadow:0 0 0 4px rgba(77,171,247,.12)}
@@ -165,39 +165,53 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .guess-phase-badge.answer-phase{background:rgba(77,171,247,.12);border:1px solid rgba(77,171,247,.3);color:var(--c5)}
 .guess-phase-badge.predict-phase{background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
 .guess-waiting{text-align:center;padding:16px;background:rgba(105,219,124,.08);border:1px solid rgba(105,219,124,.2);border-radius:var(--r2);font-size:14px;font-weight:600;color:var(--c4);margin-top:12px}
-/* ── REVEAL ── */
+
+/* ═══════════════════════════════════════════
+   REVEAL — PREDICTION-FIRST LAYOUT
+═══════════════════════════════════════════ */
 #screen-reveal{padding-top:56px;justify-content:center}
-.reveal-wrap{width:100%;max-width:560px;padding:30px 20px 60px;text-align:center}
+.reveal-wrap{width:100%;max-width:580px;padding:24px 20px 60px;text-align:center}
 .reveal-q{font-size:15px;font-weight:700;color:var(--text);margin-bottom:20px;font-family:var(--font-display);line-height:1.4}
-.reveal-cards{display:flex;gap:16px;margin-bottom:20px}
-.reveal-card{flex:1;background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;animation:revealPop .5s cubic-bezier(.68,-0.6,.32,1.6) forwards}
-.reveal-card.match{border-color:var(--c4);background:rgba(105,219,124,.1)}
-.reveal-card.nomatch{border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.06)}
-@keyframes revealPop{from{transform:scale(0.7) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-.rc-player{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.rc-answer{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px}
-.match-banner{background:linear-gradient(135deg,rgba(105,219,124,.2),rgba(32,201,151,.1));border:2px solid rgba(105,219,124,.4);border-radius:var(--r);padding:20px;margin-bottom:20px;animation:bannerIn .4s ease}
-.nomatch-banner{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:var(--r);padding:16px;margin-bottom:20px}
-@keyframes bannerIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
-.match-title{font-family:var(--font-display);font-size:24px;font-weight:900;margin-bottom:4px}
-.match-title.ok{background:linear-gradient(135deg,var(--c4),#20c997);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.match-title.fail{color:var(--c1)}
-.predict-row{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:16px}
-.predict-row-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
-.predict-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;font-weight:600}
-.predict-item:last-child{margin-bottom:0}
-.predict-name{color:var(--muted);min-width:80px;text-align:left}
-.predict-val{color:var(--text);flex:1;text-align:left}
-.predict-icon{font-size:18px}
+
+/* PREDICTION RESULTS — PRIMARY section */
+.pred-results-card{background:var(--card);border:2px solid rgba(204,93,232,.35);border-radius:var(--r);padding:20px;margin-bottom:16px;animation:revealPop .45s cubic-bezier(.68,-0.6,.32,1.6) forwards}
+.pred-results-title{font-family:var(--font-display);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--c6);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.pred-player-row{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:var(--r2);margin-bottom:10px;border:1px solid var(--border)}
+.pred-player-row:last-child{margin-bottom:0}
+.pred-player-row.correct{background:rgba(105,219,124,.08);border-color:rgba(105,219,124,.3)}
+.pred-player-row.incorrect{background:rgba(255,107,107,.06);border-color:rgba(255,107,107,.2)}
+.pred-player-name{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.pred-actual-answer{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--text)}
+.pred-prediction-row{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;font-weight:600}
+.pred-prediction-label{color:var(--dim);font-size:11px;flex-shrink:0}
+.pred-prediction-val{color:var(--muted);flex:1;text-align:left}
+.pred-result-badge{font-size:14px;font-weight:800;white-space:nowrap}
+.pred-result-badge.hit{color:var(--c4)}
+.pred-result-badge.miss{color:var(--c1)}
+
+/* PREDICTION ACCURACY — secondary */
+.pred-accuracy-bar{background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;animation:revealPop .5s cubic-bezier(.68,-0.6,.32,1.6) .1s both}
+.pred-acc-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.pred-acc-score{font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--c6)}
+.pred-acc-detail{font-size:12px;color:var(--dim);margin-top:2px}
+
+/* COMPATIBILITY BONUS — small badge only */
+.compat-bonus-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,140,200,.1);border:1px solid rgba(255,140,200,.25);border-radius:100px;padding:7px 16px;font-family:var(--font-display);font-size:12px;font-weight:800;color:var(--c7);margin-bottom:14px;animation:fadeIn .4s ease .2s both}
+
+@keyframes revealPop{from{transform:scale(0.8) translateY(16px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+
+/* Survival lives on reveal */
 .survival-lives-row{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
 .slr-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 20px;text-align:center;min-width:120px}
 .slr-name{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
 .slr-hearts{font-size:20px;letter-spacing:3px}
 .slr-lost{font-size:11px;color:var(--c1);font-weight:700;margin-top:4px}
+
 .reveal-progress-wrap{background:rgba(255,255,255,.06);border-radius:100px;height:6px;overflow:hidden;margin-top:16px}
 .reveal-progress-fill{height:100%;background:linear-gradient(90deg,var(--c6),var(--c5));border-radius:100px;width:100%;transition:width 5s linear}
 .next-timer{font-size:13px;color:var(--dim);margin-top:10px}
-/* ── GAME OVER ── */
+
+/* GAME OVER */
 #screen-gameover{padding-top:56px;justify-content:flex-start}
 .go-wrap{width:100%;max-width:640px;padding:40px 20px 80px}
 .go-title{font-family:var(--font-display);font-size:clamp(26px,6vw,46px);font-weight:900;text-align:center;margin-bottom:6px}
@@ -209,10 +223,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .compat-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .compat-pct{font-family:var(--font-display);font-size:38px;font-weight:900;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .compat-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+/* ── SCORE GRID — prediction first ── */
 .score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
 .score-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center}
+.score-box.primary{border-color:rgba(204,93,232,.4);background:rgba(204,93,232,.07)}
 .sb-val{font-family:var(--font-display);font-size:30px;font-weight:900;margin-bottom:4px}
 .sb-lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.sb-sub{font-size:11px;color:var(--dim);margin-top:3px}
+
 .players-score{display:flex;gap:12px;margin-bottom:24px}
 .ps-card{flex:1;background:var(--card2);border:2px solid var(--border);border-radius:var(--r);padding:20px;text-align:center}
 .ps-name{font-family:var(--font-display);font-size:17px;font-weight:800;margin-bottom:6px}
@@ -238,7 +257,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .ultimate-acc-lbl{font-size:12px;color:var(--muted);margin-top:4px}
 .rel-score-bar{height:14px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden;margin:10px 0}
 .rel-score-fill{height:100%;background:linear-gradient(90deg,var(--c7),var(--c6));border-radius:100px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-/* ── GUESS MODE END REPORT ── */
 .guess-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px}
 .guess-section-title{font-family:var(--font-display);font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .guess-match-item{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
@@ -249,7 +267,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .guess-match-diff span{font-weight:600;font-size:12px;padding:3px 10px;border-radius:100px}
 .guess-match-diff .d1{background:rgba(255,140,200,.15);color:var(--c7)}
 .guess-match-diff .d2{background:rgba(77,171,247,.15);color:var(--c5)}
-/* ─── */
 .share-section{margin-bottom:24px}
 .share-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .share-btns{display:flex;gap:10px;flex-wrap:wrap}
@@ -264,13 +281,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .ri-a.nomatch{background:rgba(255,107,107,.12);color:var(--c1)}
 .go-actions{display:flex;flex-direction:column;gap:12px}
 .go-mode-tag{display:inline-flex;align-items:center;gap:6px;margin:0 auto 20px;padding:6px 18px;border-radius:100px;font-family:var(--font-display);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:rgba(204,93,232,.12);border:1px solid rgba(204,93,232,.3);color:var(--c6)}
-/* ── JOIN ── */
+/* JOIN */
 #screen-join{padding-top:56px}
 .join-wrap{width:100%;max-width:440px;padding:40px 24px 60px;text-align:center}
 .code-inputs{display:flex;gap:10px;justify-content:center;margin:24px 0}
 .code-digit{width:52px;height:64px;text-align:center;font-family:var(--font-display);font-size:28px;font-weight:900;background:var(--card2);border:2px solid var(--border);border-radius:var(--r2);color:var(--text);outline:none;transition:all .2s}
 .code-digit:focus{border-color:var(--c6);box-shadow:0 0 0 4px rgba(204,93,232,.15)}
-/* ── LEAVE CONFIRM MODAL ── */
+/* LEAVE CONFIRM MODAL */
 #leave-confirm-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px}
 #leave-confirm-modal.show{display:flex;animation:fadeIn .2s ease}
 .leave-confirm-box{background:var(--card);border:1px solid rgba(255,107,107,.3);border-radius:var(--r);padding:36px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.6)}
@@ -278,7 +295,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .leave-confirm-title{font-family:var(--font-display);font-size:22px;font-weight:900;margin-bottom:10px;color:var(--text)}
 .leave-confirm-desc{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:28px}
 .leave-confirm-actions{display:flex;flex-direction:column;gap:12px}
-/* ── MATCH ENDED MODAL ── */
+/* MATCH ENDED MODAL */
 #match-ended-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);align-items:center;justify-content:center;padding:24px}
 #match-ended-modal.show{display:flex;animation:fadeIn .25s ease}
 .match-ended-box{background:var(--card);border:1px solid rgba(255,107,107,.35);border-radius:var(--r);padding:40px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.7)}
@@ -288,7 +305,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .match-ended-countdown{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--dim);margin-bottom:28px}
 .match-ended-bar{height:4px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden;margin-bottom:24px}
 .match-ended-bar-fill{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:100px;width:100%;transition:width 3s linear}
-/* ── UTILS ── */
+/* UTILS */
 .hidden{display:none!important}
 .flex{display:flex}.flex-center{display:flex;align-items:center;justify-content:center}
 .gap-8{gap:8px}.gap-12{gap:12px}
@@ -304,7 +321,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 .confetti-piece{position:fixed;width:10px;height:10px;top:-20px;z-index:999;pointer-events:none;border-radius:2px;animation:confettiFall linear forwards}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 @media(max-width:600px){
-  .reveal-cards{flex-direction:column}
   .options-grid{grid-template-columns:1fr}
   .score-grid{grid-template-columns:1fr}
   .code-inputs{gap:7px}.code-digit{width:44px;height:56px;font-size:22px}
@@ -363,10 +379,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   <div class="home-hero">
     <div class="hero-eyebrow">🎮 Real-time Multiplayer • Live Rooms • No App Needed</div>
     <h1 class="hero-title">
-      <span class="line1">How Well Do You</span>
-      <span class="line2">Know Each Other?</span>
+      <span class="line1">How Well Can You</span>
+      <span class="line2">Predict Your Partner?</span>
     </h1>
-    <p class="hero-sub">Answer questions, predict your partner, and discover how deep your connection really goes. Play with friends or match with strangers!</p>
+    <p class="hero-sub">Answer questions, predict your partner's choices, and see how well you truly know each other. The better you predict, the higher you score!</p>
     <div class="hero-actions">
       <button class="btn btn-primary btn-lg btn-full" onclick="showScreen('screen-setup');document.getElementById('setup-tab-create').click()">🚀 Create New Room</button>
       <button class="btn btn-cool btn-lg btn-full" onclick="showScreen('screen-join')">🎮 Join a Room</button>
@@ -384,17 +400,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   <div class="mode-cards">
     <div class="mode-card selected" data-mode="quick" onclick="selectMode(this)">
       <div class="mode-icon">⚡</div><div class="mode-name">Quick Match</div>
-      <div class="mode-desc">5 questions, fast & fun. Perfect for a quick vibe check.</div>
+      <div class="mode-desc">5 questions, fast & fun. A quick prediction challenge.</div>
       <div class="mode-badge">~2 min</div>
     </div>
     <div class="mode-card" data-mode="standard" onclick="selectMode(this)">
       <div class="mode-icon">🎯</div><div class="mode-name">Standard</div>
-      <div class="mode-desc">20 questions. The real test of how well you know each other.</div>
+      <div class="mode-desc">20 questions. The real test of how well you can predict each other.</div>
       <div class="mode-badge">~8 min</div>
     </div>
     <div class="mode-card" data-mode="guess" onclick="selectMode(this)">
       <div class="mode-icon">📝</div><div class="mode-name">Guess Mode</div>
-      <div class="mode-desc">Type your own answers freely. Guess what your partner wrote. No options — just pure knowledge!</div>
+      <div class="mode-desc">Type your own answers freely. Guess what your partner wrote. No options — pure knowledge!</div>
       <div class="mode-badge">~6 min</div>
     </div>
     <div class="mode-card" data-mode="survival" onclick="selectMode(this)">
@@ -404,7 +420,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     </div>
     <div class="mode-card" data-mode="ultimate" onclick="selectMode(this)">
       <div class="mode-icon">👑</div><div class="mode-name">Ultimate Match</div>
-      <div class="mode-desc">50 questions. The most thorough compatibility test ever.</div>
+      <div class="mode-desc">50 questions. The most thorough prediction challenge ever.</div>
       <div class="mode-badge">~18 min</div>
     </div>
   </div>
@@ -552,20 +568,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     <div class="countdown-label" id="countdown-label">Get Ready!</div>
     <div id="cd-mode-label" style="margin-top:16px;font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--muted)"></div>
     <div class="players-preview">
-      <div class="player-chip">
-        <div class="pc-emoji">😎</div>
-        <div class="pc-name" id="cd-p1-name">Player 1</div>
-      </div>
+      <div class="player-chip"><div class="pc-emoji">😎</div><div class="pc-name" id="cd-p1-name">Player 1</div></div>
       <div class="vs-badge">VS</div>
-      <div class="player-chip">
-        <div class="pc-emoji">🤩</div>
-        <div class="pc-name" id="cd-p2-name">Player 2</div>
-      </div>
+      <div class="player-chip"><div class="pc-emoji">🤩</div><div class="pc-name" id="cd-p2-name">Player 2</div></div>
     </div>
   </div>
 </div>
 
-<!-- QUESTION (standard modes) -->
+<!-- QUESTION -->
 <div class="screen" id="screen-question">
   <div class="question-wrap">
     <div class="q-topbar">
@@ -602,7 +612,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   </div>
 </div>
 
-<!-- GUESS MODE QUESTION SCREEN -->
+<!-- GUESS MODE QUESTION -->
 <div class="screen" id="screen-guess-question">
   <div class="question-wrap">
     <div class="q-topbar">
@@ -614,15 +624,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       <div class="score-spacer"></div>
       <div class="score-chip p2" id="gq-score-p2">🤩 Friend: 0</div>
     </div>
-    <div style="text-align:center;margin-bottom:14px">
-      <div class="mode-banner guess">📝 Guess Mode</div>
-    </div>
+    <div style="text-align:center;margin-bottom:14px"><div class="mode-banner guess">📝 Guess Mode</div></div>
     <div class="q-card">
       <div class="q-number" id="gq-num-label">Question 1</div>
       <div class="q-text" id="gq-text">Loading...</div>
     </div>
-
-    <!-- PHASE 1: Answer -->
     <div id="gq-answer-phase">
       <div class="guess-phase-badge answer-phase">✍️ Phase 1 — Your Answer</div>
       <div class="answer-section">
@@ -639,8 +645,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
         <div style="margin-top:8px;display:flex;gap:6px;justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
       </div>
     </div>
-
-    <!-- PHASE 2: Prediction (shown after both answer) -->
     <div id="gq-predict-phase" class="hidden">
       <div class="guess-phase-badge predict-phase">🔮 Phase 2 — Guess Your Partner</div>
       <div class="answer-section">
@@ -659,33 +663,32 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
   </div>
 </div>
 
-<!-- REVEAL -->
+<!-- REVEAL — PREDICTION-FIRST -->
 <div class="screen" id="screen-reveal">
   <div class="reveal-wrap">
     <div class="reveal-q" id="reveal-q-text">Question text here</div>
-    <div id="reveal-match-banner" class="match-banner hidden">
-      <div class="match-title ok">🎉 PERFECT MATCH!</div>
-      <div style="color:var(--c4);font-size:14px;margin-top:4px">You both answered the same!</div>
+
+    <!-- PRIMARY: Prediction Results -->
+    <div class="pred-results-card" id="reveal-pred-card">
+      <div class="pred-results-title">🎯 Prediction Results</div>
+      <div id="reveal-pred-rows"><!-- built by JS --></div>
     </div>
-    <div id="reveal-nomatch-banner" class="nomatch-banner hidden">
-      <div class="match-title fail">❌ Different Answers</div>
-      <div style="color:var(--c1);font-size:13px;margin-top:4px">You went different ways this round</div>
-    </div>
-    <div class="reveal-cards" id="reveal-cards"></div>
-    <div class="predict-row">
-      <div class="predict-row-title">🔮 Predictions</div>
-      <div class="predict-item">
-        <span class="predict-name" id="p1-predict-name">P1</span>
-        <span class="predict-val" id="p1-predict-val">—</span>
-        <span class="predict-icon" id="p1-predict-icon">—</span>
+
+    <!-- PREDICTION ACCURACY -->
+    <div class="pred-accuracy-bar" id="reveal-acc-bar">
+      <div>
+        <div class="pred-acc-label">🧠 Prediction Accuracy</div>
+        <div class="pred-acc-detail" id="reveal-acc-detail">This round</div>
       </div>
-      <div class="predict-item">
-        <span class="predict-name" id="p2-predict-name">P2</span>
-        <span class="predict-val" id="p2-predict-val">—</span>
-        <span class="predict-icon" id="p2-predict-icon">—</span>
-      </div>
+      <div class="pred-acc-score" id="reveal-acc-score">0/2</div>
     </div>
+
+    <!-- COMPATIBILITY BONUS — small, only if match -->
+    <div class="compat-bonus-badge hidden" id="reveal-compat-bonus">❤️ Compatibility Bonus +2 pts each</div>
+
+    <!-- Survival lives -->
     <div id="reveal-survival-lives" class="hidden survival-lives-row"></div>
+
     <div class="reveal-progress-wrap">
       <div class="reveal-progress-fill" id="reveal-progress-fill"></div>
     </div>
@@ -713,14 +716,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
       </svg>
       <div class="compat-num">
         <div class="compat-pct" id="compat-pct">0%</div>
-        <div class="compat-lbl">Match</div>
+        <div class="compat-lbl">Prediction</div>
       </div>
     </div>
     <div class="players-score" id="go-player-scores"></div>
+    <!-- Score grid: Prediction Accuracy FIRST -->
     <div class="score-grid" id="go-score-grid"></div>
     <div class="result-title-box">
       <div class="rtb-title" id="go-compat-title">✨ Soul Readers</div>
-      <div style="font-size:14px;color:var(--muted)" id="go-match-count">17 / 20 questions matched</div>
+      <div style="font-size:14px;color:var(--muted)" id="go-match-count">17 / 20 predictions correct</div>
     </div>
     <div class="ai-report">
       <div class="air-header"><div class="air-icon">🤖</div><div class="air-title">AI Compatibility Report</div></div>
@@ -728,7 +732,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
     </div>
     <div id="go-ultimate-extras"></div>
     <div id="go-guess-extras"></div>
-    <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px">🎥 Reaction Recap</div>
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px">🎥 Round Recap</div>
     <div class="recap-list" id="go-recap"></div>
     <div class="share-section">
       <div class="share-label">Share Your Results</div>
@@ -749,7 +753,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(13,11,30,.85
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
-const state = {
+var state = {
   socket: null,
   nickname: '',
   roomCode: '',
@@ -766,12 +770,11 @@ const state = {
   inActiveMatch: false,
   p1Lives: null,
   p2Lives: null,
-  // Guess mode state
   guessAnswerLocked: false,
   guessPredictLocked: false,
 };
 
-const BACKEND = 'https://mindmatch-game.onrender.com';
+var BACKEND = 'https://mindmatch-game.onrender.com';
 
 function livesHearts(lives, max) {
   if (lives === null || lives === undefined) return '';
@@ -781,9 +784,9 @@ function livesHearts(lives, max) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  MATCH SCREENS SET
+//  MATCH SCREENS / NAV
 // ═══════════════════════════════════════════════════════
-const MATCH_SCREENS = new Set(['screen-countdown','screen-question','screen-reveal','screen-guess-question']);
+var MATCH_SCREENS = new Set(['screen-countdown','screen-question','screen-reveal','screen-guess-question']);
 
 function setMatchNavState(inMatch) {
   state.inActiveMatch = inMatch;
@@ -792,7 +795,7 @@ function setMatchNavState(inMatch) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  LEAVE MATCH FLOW
+//  LEAVE MATCH
 // ═══════════════════════════════════════════════════════
 function showLeaveConfirm() { document.getElementById('leave-confirm-modal').classList.add('show'); }
 function closeLeaveConfirm() { document.getElementById('leave-confirm-modal').classList.remove('show'); }
@@ -837,7 +840,7 @@ function dismissMatchEnded() {
 // ═══════════════════════════════════════════════════════
 function initSocket() {
   if (state.socket && state.socket.connected) return;
-  state.socket = io(BACKEND, { transports: ['websocket', 'polling'] });
+  state.socket = io(BACKEND, { transports: ['websocket','polling'] });
 
   state.socket.on('connect', function() { fetchStats(); });
   state.socket.on('disconnect', function() { toast('Disconnected from server', 'error'); });
@@ -893,40 +896,34 @@ function initSocket() {
     showScreen('screen-quickwait');
     var labelEl = document.getElementById('quickwait-mode-label');
     var textEl  = document.getElementById('quickwait-mode-text');
-    if (labelEl) labelEl.textContent = data.modeLabel || data.mode || '⚡ Quick Match';
-    if (textEl)  textEl.textContent  = data.modeLabel || data.mode || 'Quick Match';
+    if (labelEl) labelEl.textContent = data.modeLabel || '⚡ Quick Match';
+    if (textEl)  textEl.textContent  = data.modeLabel || 'Quick Match';
     toast(data.msg, 'info');
   });
 
-  // Standard question (non-guess modes)
   state.socket.on('question', function(data) {
     showScreen('screen-question');
     setMatchNavState(true);
     renderQuestion(data);
   });
 
-  // Guess Mode: phase 1 — type answer
   state.socket.on('guess_question', function(data) {
     showScreen('screen-guess-question');
     setMatchNavState(true);
     renderGuessQuestion(data);
   });
 
-  // Guess Mode: partner locked their answer — we stay on screen
   state.socket.on('guess_partner_answered', function() {
-    // If we already locked, show "partner answered too" hint
     if (state.guessAnswerLocked) {
       var w = document.getElementById('gq-answer-waiting');
       if (w) w.innerHTML = '✅ Partner answered! Waiting for prediction phase...';
     }
   });
 
-  // Guess Mode: phase 2 — predict
   state.socket.on('guess_predict_phase', function(data) {
     renderGuessPredictPhase(data);
   });
 
-  // Guess Mode: partner locked prediction
   state.socket.on('guess_partner_predicted', function() {
     if (state.guessPredictLocked) {
       var w = document.getElementById('gq-predict-waiting');
@@ -975,9 +972,9 @@ function forceHome() {
   state.answerLocked   = false;
   state.guessAnswerLocked  = false;
   state.guessPredictLocked = false;
-  state.roomCode       = '';
-  state.p1Lives = null;
-  state.p2Lives = null;
+  state.roomCode  = '';
+  state.p1Lives   = null;
+  state.p2Lives   = null;
   setMatchNavState(false);
   document.getElementById('nav-room-code').classList.add('hidden');
   showScreen('screen-home');
@@ -1012,10 +1009,7 @@ function selectMode(el) {
   state.mode = el.dataset.mode;
   var sel = document.getElementById('create-mode');
   if (sel) sel.value = state.mode;
-  var modeLabelMap = {
-    quick: 'Quick Match', standard: 'Standard', guess: 'Guess Mode',
-    survival: 'Survival', ultimate: 'Ultimate',
-  };
+  var modeLabelMap = { quick:'Quick Match', standard:'Standard', guess:'Guess Mode', survival:'Survival', ultimate:'Ultimate' };
   var homeLbl = document.getElementById('home-mode-label');
   if (homeLbl) homeLbl.textContent = modeLabelMap[state.mode] || state.mode;
 }
@@ -1043,8 +1037,7 @@ function joinRoom() {
   var code = document.getElementById('join-code-setup').value.trim();
   if (!nick) { toast('Enter your nickname!', 'error'); return; }
   if (!code || code.length !== 6) { toast('Enter valid 6-digit code!', 'error'); return; }
-  state.nickname = nick;
-  state.isP1 = false;
+  state.nickname = nick; state.isP1 = false;
   initSocket();
   state.socket.emit('join_room', { code: code, nickname: nick });
 }
@@ -1055,8 +1048,7 @@ function joinRoomFromCode() {
   var code = Array.from(digits).map(function(d) { return d.value; }).join('');
   if (!nick) { toast('Enter your nickname!', 'error'); return; }
   if (code.length !== 6) { toast('Enter all 6 digits!', 'error'); return; }
-  state.nickname = nick;
-  state.isP1 = false;
+  state.nickname = nick; state.isP1 = false;
   initSocket();
   state.socket.emit('join_room', { code: code, nickname: nick });
 }
@@ -1064,8 +1056,7 @@ function joinRoomFromCode() {
 function quickMatch() {
   var nick = (prompt('Your nickname for quick match?', 'Player') || '').trim();
   if (!nick) return;
-  state.nickname = nick;
-  state.isP1 = false;
+  state.nickname = nick; state.isP1 = false;
   initSocket();
   state.socket.emit('quick_match', { nickname: nick, mode: state.mode });
 }
@@ -1076,7 +1067,7 @@ function cancelQuickMatch() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  INVITE LINKS & SHARE
+//  INVITE & SHARE
 // ═══════════════════════════════════════════════════════
 function buildInviteUrl(code) { return window.location.origin + '/join/' + code; }
 function copyRoomCode() {
@@ -1090,65 +1081,46 @@ function shareRoom() {
   else { navigator.clipboard.writeText(text).then(function() { toast('Invite copied! 📋', 'success'); }); }
 }
 function shareRoomWhatsApp() {
-  var url = buildInviteUrl(state.roomCode);
-  var text = '💕 Join my MindMatch game!\n\n' + url + '\n\nTap the link to join instantly — no code needed! 🧠❤️';
-  window.open('https://wa.me/?text=' + encodeURIComponent(text));
+  window.open('https://wa.me/?text=' + encodeURIComponent('💕 Join my MindMatch game!\n\n' + buildInviteUrl(state.roomCode) + '\n\nTap the link to join instantly! 🧠❤️'));
 }
 
 // ═══════════════════════════════════════════════════════
-//  STANDARD QUESTION RENDER
+//  QUESTION RENDER
 // ═══════════════════════════════════════════════════════
 function renderModeBanner(mode) {
-  var labels = {
-    quick:'⚡ Quick Match', standard:'🎯 Standard',
-    guess:'📝 Guess Mode', survival:'💀 Survival', ultimate:'👑 Ultimate',
-  };
-  var container = document.getElementById('q-mode-banner');
-  container.innerHTML = '<div class="mode-banner ' + mode + '">' + (labels[mode] || mode) + '</div>';
+  var labels = { quick:'⚡ Quick Match', standard:'🎯 Standard', guess:'📝 Guess Mode', survival:'💀 Survival', ultimate:'👑 Ultimate' };
+  document.getElementById('q-mode-banner').innerHTML = '<div class="mode-banner ' + mode + '">' + (labels[mode] || mode) + '</div>';
 }
 
 function renderLivesRow(data) {
   var container = document.getElementById('q-lives-row');
-  var isSurvival = data.mode === 'survival';
-  if (!isSurvival) { container.innerHTML = ''; return; }
-  var maxLives   = 3;
+  if (data.mode !== 'survival') { container.innerHTML = ''; return; }
+  var maxLives = 3;
   var myLives    = state.isP1 ? data.p1Lives : data.p2Lives;
   var theirLives = state.isP1 ? data.p2Lives : data.p1Lives;
   var theirName  = state.isP1 ? data.p2Name  : data.p1Name;
   container.innerHTML =
     '<div class="lives-row">'
-    + '<div class="lives-player"><div>'
-    +   '<div class="lives-label">Your Lives</div>'
-    +   '<div class="lives-hearts">' + livesHearts(myLives, maxLives) + '</div>'
-    + '</div></div>'
-    + '<div class="lives-player"><div style="text-align:right">'
-    +   '<div class="lives-label">' + (theirName || 'Partner') + '\'s Lives</div>'
-    +   '<div class="lives-hearts">' + livesHearts(theirLives, maxLives) + '</div>'
-    + '</div></div>'
+    + '<div class="lives-player"><div><div class="lives-label">Your Lives</div><div class="lives-hearts">' + livesHearts(myLives, maxLives) + '</div></div></div>'
+    + '<div class="lives-player"><div style="text-align:right"><div class="lives-label">' + (theirName||'Partner') + '\'s Lives</div><div class="lives-hearts">' + livesHearts(theirLives, maxLives) + '</div></div></div>'
     + '</div>';
 }
 
 function renderQuestion(data) {
-  state.currentAnswer  = null;
-  state.currentPredict = null;
-  state.answerLocked   = false;
-
-  if (data.mode === 'survival') {
-    state.p1Lives = data.p1Lives;
-    state.p2Lives = data.p2Lives;
-  }
+  state.currentAnswer = null; state.currentPredict = null; state.answerLocked = false;
+  if (data.mode === 'survival') { state.p1Lives = data.p1Lives; state.p2Lives = data.p2Lives; }
 
   var pct = (data.index / data.total) * 100;
   document.getElementById('q-progress').style.width = pct + '%';
   document.getElementById('q-counter').textContent  = (data.index + 1) + ' / ' + data.total;
   document.getElementById('q-num-label').textContent = 'Question ' + (data.index + 1);
-  document.getElementById('q-text').textContent     = data.question;
+  document.getElementById('q-text').textContent = data.question;
 
-  var myScore    = state.isP1 ? (data.p1Score || 0) : (data.p2Score || 0);
-  var theirScore = state.isP1 ? (data.p2Score || 0) : (data.p1Score || 0);
+  var myScore    = state.isP1 ? (data.p1Score||0) : (data.p2Score||0);
+  var theirScore = state.isP1 ? (data.p2Score||0) : (data.p1Score||0);
   var theirName  = state.isP1 ? data.p2Name : data.p1Name;
   document.getElementById('q-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
-  document.getElementById('q-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
+  document.getElementById('q-score-p2').textContent = '🤩 ' + (theirName||'Partner') + ': ' + theirScore;
 
   renderModeBanner(data.mode || state.mode);
   renderLivesRow(data);
@@ -1169,7 +1141,6 @@ function renderQuestion(data) {
       container.appendChild(btn);
     });
   }
-
   buildOpts('answer-opts',  'selected',        function(opt) { state.currentAnswer  = opt; });
   buildOpts('predict-opts', 'predict-selected', function(opt) { state.currentPredict = opt; });
 
@@ -1183,8 +1154,7 @@ function checkBothSelected() {
 }
 
 function submitAnswer() {
-  if (!state.currentAnswer || !state.currentPredict) return;
-  if (state.answerLocked) return;
+  if (!state.currentAnswer || !state.currentPredict || state.answerLocked) return;
   state.answerLocked = true;
   document.querySelectorAll('.opt-btn').forEach(function(b) { b.disabled = true; });
   document.getElementById('q-submit-btn-wrap').style.display = 'none';
@@ -1193,43 +1163,30 @@ function submitAnswer() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  GUESS MODE QUESTION RENDER
+//  GUESS MODE
 // ═══════════════════════════════════════════════════════
 function renderGuessQuestion(data) {
-  state.guessAnswerLocked  = false;
-  state.guessPredictLocked = false;
-
+  state.guessAnswerLocked = false; state.guessPredictLocked = false;
   var pct = (data.index / data.total) * 100;
   document.getElementById('gq-progress').style.width = pct + '%';
   document.getElementById('gq-counter').textContent  = (data.index + 1) + ' / ' + data.total;
   document.getElementById('gq-num-label').textContent = 'Question ' + (data.index + 1);
-  document.getElementById('gq-text').textContent     = data.question;
-
-  var myScore    = state.isP1 ? (data.p1Score || 0) : (data.p2Score || 0);
-  var theirScore = state.isP1 ? (data.p2Score || 0) : (data.p1Score || 0);
+  document.getElementById('gq-text').textContent = data.question;
+  var myScore    = state.isP1 ? (data.p1Score||0) : (data.p2Score||0);
+  var theirScore = state.isP1 ? (data.p2Score||0) : (data.p1Score||0);
   var theirName  = state.isP1 ? data.p2Name : data.p1Name;
   document.getElementById('gq-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
-  document.getElementById('gq-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
-
-  // Reset answer phase
+  document.getElementById('gq-score-p2').textContent = '🤩 ' + (theirName||'Partner') + ': ' + theirScore;
   var ansInput = document.getElementById('gq-answer-input');
-  ansInput.value = '';
-  ansInput.disabled = false;
-  ansInput.classList.remove('locked');
+  ansInput.value = ''; ansInput.disabled = false; ansInput.classList.remove('locked');
   document.getElementById('gq-answer-chars').textContent = '0';
   document.getElementById('gq-answer-preview').classList.remove('show');
-  document.getElementById('gq-answer-preview').textContent = '';
   document.getElementById('gq-answer-btn').disabled = true;
   document.getElementById('gq-answer-waiting').classList.add('hidden');
-
-  // Reset predict phase — hide it
   document.getElementById('gq-answer-phase').style.display = '';
   document.getElementById('gq-predict-phase').classList.add('hidden');
-
   var predInput = document.getElementById('gq-predict-input');
-  predInput.value = '';
-  predInput.disabled = false;
-  predInput.classList.remove('locked');
+  predInput.value = ''; predInput.disabled = false; predInput.classList.remove('locked');
   document.getElementById('gq-predict-chars').textContent = '0';
   document.getElementById('gq-predict-btn').disabled = true;
   document.getElementById('gq-predict-waiting').classList.add('hidden');
@@ -1241,12 +1198,8 @@ function onGuessAnswerInput() {
   var val = inp.value;
   document.getElementById('gq-answer-chars').textContent = val.length;
   var preview = document.getElementById('gq-answer-preview');
-  if (val.trim().length > 0) {
-    preview.textContent = '👁 Preview: ' + val.trim();
-    preview.classList.add('show');
-  } else {
-    preview.classList.remove('show');
-  }
+  if (val.trim().length > 0) { preview.textContent = '👁 Preview: ' + val.trim(); preview.classList.add('show'); }
+  else { preview.classList.remove('show'); }
   document.getElementById('gq-answer-btn').disabled = val.trim().length === 0;
 }
 
@@ -1256,39 +1209,29 @@ function submitGuessAnswer() {
   if (!val) { toast('Please type your answer first!', 'error'); return; }
   state.guessAnswerLocked = true;
   var inp = document.getElementById('gq-answer-input');
-  inp.disabled = true;
-  inp.classList.add('locked');
+  inp.disabled = true; inp.classList.add('locked');
   document.getElementById('gq-answer-btn').disabled = true;
   document.getElementById('gq-answer-waiting').classList.remove('hidden');
   state.socket.emit('guess_submit_answer', { answer: val });
 }
 
 function renderGuessPredictPhase(data) {
-  // Update scores
-  var myScore    = state.isP1 ? (data.p1Score || 0) : (data.p2Score || 0);
-  var theirScore = state.isP1 ? (data.p2Score || 0) : (data.p1Score || 0);
+  var myScore    = state.isP1 ? (data.p1Score||0) : (data.p2Score||0);
+  var theirScore = state.isP1 ? (data.p2Score||0) : (data.p1Score||0);
   var theirName  = state.isP1 ? data.p2Name : data.p1Name;
   document.getElementById('gq-score-p1').textContent = '😎 ' + state.nickname + ': ' + myScore;
-  document.getElementById('gq-score-p2').textContent = '🤩 ' + (theirName || 'Partner') + ': ' + theirScore;
-
-  // Hide answer waiting, show predict phase
+  document.getElementById('gq-score-p2').textContent = '🤩 ' + (theirName||'Partner') + ': ' + theirScore;
   document.getElementById('gq-answer-waiting').classList.add('hidden');
   document.getElementById('gq-predict-phase').classList.remove('hidden');
-
-  // Focus predict input
-  setTimeout(function() {
-    document.getElementById('gq-predict-input').focus();
-  }, 100);
-
+  setTimeout(function() { document.getElementById('gq-predict-input').focus(); }, 100);
   toast('Both answered! Now guess what your partner wrote 🔮', 'info');
 }
 
 function onGuessPredictInput() {
   if (state.guessPredictLocked) return;
   var inp = document.getElementById('gq-predict-input');
-  var val = inp.value;
-  document.getElementById('gq-predict-chars').textContent = val.length;
-  document.getElementById('gq-predict-btn').disabled = val.trim().length === 0;
+  document.getElementById('gq-predict-chars').textContent = inp.value.length;
+  document.getElementById('gq-predict-btn').disabled = inp.value.trim().length === 0;
 }
 
 function submitGuessPredict() {
@@ -1297,109 +1240,126 @@ function submitGuessPredict() {
   if (!val) { toast('Please type your prediction!', 'error'); return; }
   state.guessPredictLocked = true;
   var inp = document.getElementById('gq-predict-input');
-  inp.disabled = true;
-  inp.classList.add('locked');
+  inp.disabled = true; inp.classList.add('locked');
   document.getElementById('gq-predict-btn').disabled = true;
   document.getElementById('gq-predict-waiting').classList.remove('hidden');
   state.socket.emit('guess_submit_predict', { predict: val });
 }
 
 // ═══════════════════════════════════════════════════════
-//  REVEAL RENDER
+//  REVEAL — PREDICTION-FIRST
 // ═══════════════════════════════════════════════════════
 function renderReveal(data) {
-  if (data.mode === 'survival') {
-    state.p1Lives = data.p1Lives;
-    state.p2Lives = data.p2Lives;
-  }
+  if (data.mode === 'survival') { state.p1Lives = data.p1Lives; state.p2Lives = data.p2Lives; }
 
   document.getElementById('reveal-q-text').textContent = data.question;
 
-  var isMatch = data.match;
-  document.getElementById('reveal-match-banner').classList.toggle('hidden', !isMatch);
-  document.getElementById('reveal-nomatch-banner').classList.toggle('hidden', isMatch);
-  if (isMatch) launchConfetti();
+  var isP1 = state.isP1;
+  var myName    = isP1 ? data.p1Name : data.p2Name;
+  var theirName = isP1 ? data.p2Name : data.p1Name;
 
-  document.getElementById('reveal-cards').innerHTML =
-    '<div class="reveal-card ' + (isMatch ? 'match' : 'nomatch') + '" style="animation-delay:.1s">'
-    + '<div class="rc-player">' + data.p1Name + '</div>'
-    + '<div class="rc-answer">' + data.p1Answer + '</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-top:4px">Their answer</div>'
+  // Which prediction belongs to which player
+  // p1's prediction = what p1 said p2 would answer
+  // p1PredictCorrect = was p1's prediction of p2 correct?
+  var rowsHtml = '';
+
+  // Row for p1
+  rowsHtml +=
+    '<div class="pred-player-row ' + (data.p1PredictCorrect ? 'correct' : 'incorrect') + '">'
+    + '<div class="pred-player-name">' + data.p1Name + '\'s answer</div>'
+    + '<div class="pred-actual-answer">' + data.p1Answer + '</div>'
+    + '<div class="pred-prediction-row">'
+    +   '<span class="pred-prediction-label">' + data.p2Name + ' predicted:</span>'
+    +   '<span class="pred-prediction-val">' + (data.p2Predict || '—') + '</span>'
+    +   '<span class="pred-result-badge ' + (data.p2PredictCorrect ? 'hit' : 'miss') + '">'
+    +     (data.p2PredictCorrect ? '✅ +' + (data.ppLabel||'10') : '❌') + '</span>'
     + '</div>'
-    + '<div class="reveal-card ' + (isMatch ? 'match' : 'nomatch') + '" style="animation-delay:.25s">'
-    + '<div class="rc-player">' + data.p2Name + '</div>'
-    + '<div class="rc-answer">' + data.p2Answer + '</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-top:4px">Their answer</div>'
     + '</div>';
 
-  var ppLabel = data.mode === 'survival' ? '+15' : '+10';
-  document.getElementById('p1-predict-name').textContent = data.p1Name + ' predicted:';
-  document.getElementById('p1-predict-val').textContent  = data.p1Predict;
-  document.getElementById('p1-predict-icon').textContent = data.p1PredictCorrect ? '✅ ' + ppLabel : '❌';
-  document.getElementById('p2-predict-name').textContent = data.p2Name + ' predicted:';
-  document.getElementById('p2-predict-val').textContent  = data.p2Predict;
-  document.getElementById('p2-predict-icon').textContent = data.p2PredictCorrect ? '✅ ' + ppLabel : '❌';
+  // Row for p2
+  rowsHtml +=
+    '<div class="pred-player-row ' + (data.p2PredictCorrect ? 'correct' : 'incorrect') + '">'
+    + '<div class="pred-player-name">' + data.p2Name + '\'s answer</div>'
+    + '<div class="pred-actual-answer">' + data.p2Answer + '</div>'
+    + '<div class="pred-prediction-row">'
+    +   '<span class="pred-prediction-label">' + data.p1Name + ' predicted:</span>'
+    +   '<span class="pred-prediction-val">' + (data.p1Predict || '—') + '</span>'
+    +   '<span class="pred-result-badge ' + (data.p1PredictCorrect ? 'hit' : 'miss') + '">'
+    +     (data.p1PredictCorrect ? '✅ +' + (data.ppLabel||'10') : '❌') + '</span>'
+    + '</div>'
+    + '</div>';
 
+  document.getElementById('reveal-pred-rows').innerHTML = rowsHtml;
+
+  // Prediction accuracy this round
+  var correct = (data.p1PredictCorrect ? 1 : 0) + (data.p2PredictCorrect ? 1 : 0);
+  var accText  = correct === 2 ? '🎯 Both predicted correctly!' : correct === 1 ? '🤔 One correct prediction' : '😬 Neither predicted correctly';
+  document.getElementById('reveal-acc-score').textContent = correct + '/2 Correct';
+  document.getElementById('reveal-acc-detail').textContent = accText;
+
+  // Confetti if both correct
+  if (correct === 2) launchConfetti();
+
+  // Compatibility bonus badge — small, only if match
+  var compatBonus = document.getElementById('reveal-compat-bonus');
+  if (data.match) {
+    compatBonus.classList.remove('hidden');
+  } else {
+    compatBonus.classList.add('hidden');
+  }
+
+  // Survival lives
   var survivalDiv = document.getElementById('reveal-survival-lives');
   if (data.mode === 'survival') {
     var maxLives = 3;
-    var p1Lost = !data.p1PredictCorrect;
-    var p2Lost = !data.p2PredictCorrect;
     survivalDiv.classList.remove('hidden');
     survivalDiv.innerHTML =
-      '<div class="slr-card">'
-      + '<div class="slr-name">' + data.p1Name + '</div>'
+      '<div class="slr-card"><div class="slr-name">' + data.p1Name + '</div>'
       + '<div class="slr-hearts">' + livesHearts(data.p1Lives, maxLives) + '</div>'
-      + (p1Lost ? '<div class="slr-lost">-1 ❤️</div>' : '')
-      + '</div>'
-      + '<div class="slr-card">'
-      + '<div class="slr-name">' + data.p2Name + '</div>'
+      + (!data.p1PredictCorrect ? '<div class="slr-lost">-1 ❤️</div>' : '') + '</div>'
+      + '<div class="slr-card"><div class="slr-name">' + data.p2Name + '</div>'
       + '<div class="slr-hearts">' + livesHearts(data.p2Lives, maxLives) + '</div>'
-      + (p2Lost ? '<div class="slr-lost">-1 ❤️</div>' : '')
-      + '</div>';
+      + (!data.p2PredictCorrect ? '<div class="slr-lost">-1 ❤️</div>' : '') + '</div>';
   } else {
     survivalDiv.classList.add('hidden');
     survivalDiv.innerHTML = '';
   }
 
+  // Progress bar countdown
   var revealMs  = data.revealDuration || 5000;
   var revealSec = Math.round(revealMs / 1000);
-
-  var barFill = document.getElementById('reveal-progress-fill');
-  var nextEl  = document.getElementById('reveal-next');
+  var barFill   = document.getElementById('reveal-progress-fill');
+  var nextEl    = document.getElementById('reveal-next');
 
   barFill.style.transition = 'none';
   barFill.style.width = '100%';
   barFill.getBoundingClientRect();
-  barFill.style.transition = 'width ' + (revealMs / 1000) + 's linear';
+  barFill.style.transition = 'width ' + (revealMs/1000) + 's linear';
   barFill.style.width = '0%';
 
   var secs = revealSec;
   nextEl.textContent = 'Next question in ' + secs + 's...';
-
   var ni = setInterval(function() {
     secs--;
-    if (secs > 0) {
-      nextEl.textContent = 'Next question in ' + secs + 's...';
-    } else {
-      nextEl.textContent = 'Loading next question...';
-      clearInterval(ni);
-    }
+    if (secs > 0) { nextEl.textContent = 'Next question in ' + secs + 's...'; }
+    else { nextEl.textContent = 'Loading next question...'; clearInterval(ni); }
   }, 1000);
 }
 
 // ═══════════════════════════════════════════════════════
-//  GAME OVER RENDER
+//  GAME OVER — PREDICTION-FIRST
 // ═══════════════════════════════════════════════════════
 var AI_REPORTS = [
   function(d) {
-    return 'You both have ' + (d.compatibility >= 80 ? 'remarkably similar' : 'quite different') + ' instincts. Your communication score of ' + d.communication + '% suggests you ' + (d.communication >= 75 ? 'understand each other deeply.' : 'still have room to grow in understanding.') + ' Humor alignment at ' + d.humor + '% — ' + (d.humor >= 85 ? 'you laugh at the same things, a great sign!' : 'you bring different vibes to the table.');
+    var avgAcc = Math.round((d.p1Understanding + d.p2Understanding) / 2);
+    return 'Your prediction accuracy was ' + avgAcc + '% — ' + (avgAcc >= 75 ? 'remarkable! You truly know each other.' : avgAcc >= 50 ? 'solid. You know each other well in many areas.' : 'there\'s room to discover more about each other.') + ' ' + d.p1Name + ' predicted ' + d.p1Understanding + '% correctly and ' + d.p2Name + ' predicted ' + d.p2Understanding + '% correctly. ' + (Math.abs(d.p1Understanding - d.p2Understanding) < 10 ? 'Almost perfectly balanced — you both know each other equally well.' : 'One of you knows the other a little better...');
   },
   function(d) {
-    return 'Compatibility: ' + d.compatibility + '%. That\'s ' + (d.compatibility >= 80 ? 'genuinely impressive' : 'a solid start') + '. The most revealing part? You scored ' + d.p1Understanding + '% and ' + d.p2Understanding + '% on predicting each other — ' + (Math.abs(d.p1Understanding - d.p2Understanding) < 10 ? 'almost perfectly balanced!' : 'one of you knows the other a little better...');
+    var avgAcc = Math.round((d.p1Understanding + d.p2Understanding) / 2);
+    return (avgAcc >= 80 ? '🔮 You practically read each other\'s minds. ' : avgAcc >= 60 ? '💫 Strong prediction accuracy — you clearly pay attention. ' : '🌱 Prediction is a skill. Keep playing to know each other better. ') + 'Compatibility (matching answers) came in at ' + d.compatibility + '% — but what really matters is how well you predicted each other, and that score speaks for itself.';
   },
   function(d) {
-    return d.compatibility >= 95 ? '🤯 This score is almost suspicious. Are you secretly the same person?' : d.compatibility >= 80 ? '💫 You clearly pay attention to each other — this kind of understanding takes real effort.' : d.compatibility >= 60 ? '🌱 Good connection. You know the big things, but the details might still surprise you.' : '👀 Hey, knowing someone deeply takes time. Keep playing!';
+    return d.mindReadingScore >= 85 ? '🤯 ' + d.mindReadingScore + '% average prediction accuracy. Are you secretly telepathic?' : d.mindReadingScore >= 65 ? '✨ ' + d.mindReadingScore + '% prediction accuracy is genuinely impressive. You pay attention to each other.' : d.mindReadingScore >= 45 ? '🎯 ' + d.mindReadingScore + '% — decent! You know the big things, but the details might still surprise you.' : '👀 ' + d.mindReadingScore + '% prediction accuracy. Time to learn more about each other!';
   },
 ];
 
@@ -1408,13 +1368,15 @@ function renderGameOver(data) {
   document.getElementById('go-names').textContent = data.p1Name + ' + ' + data.p2Name;
   document.getElementById('go-mode-tag').textContent = data.modeLabel || state.modeLabel || '🎯 Standard';
 
+  // Ring shows average PREDICTION accuracy, not just compatibility
+  var avgAccuracy = data.mindReadingScore || Math.round((data.p1Understanding + data.p2Understanding) / 2);
   var circumference = 2 * Math.PI * 68;
   var fill = document.getElementById('compat-ring-fill');
   fill.style.strokeDasharray  = circumference;
   fill.style.strokeDashoffset = circumference;
   setTimeout(function() {
-    fill.style.strokeDashoffset = circumference * (1 - data.compatibility / 100);
-    animateNumber(document.getElementById('compat-pct'), 0, data.compatibility, 1500, function(v) { return v + '%'; });
+    fill.style.strokeDashoffset = circumference * (1 - avgAccuracy / 100);
+    animateNumber(document.getElementById('compat-pct'), 0, avgAccuracy, 1500, function(v) { return v + '%'; });
   }, 400);
 
   var myScore    = state.isP1 ? data.p1Score : data.p2Score;
@@ -1434,38 +1396,37 @@ function renderGameOver(data) {
     + '<div style="font-size:12px;color:var(--dim);margin-top:4px">pts</div>'
     + '</div>';
 
+  // SCORE GRID — prediction accuracy FIRST, compatibility second
   document.getElementById('go-score-grid').innerHTML =
-    '<div class="score-box"><div class="sb-val" style="color:var(--c7)">'  + data.trust         + '%</div><div class="sb-lbl">Trust</div></div>'
-    + '<div class="score-box"><div class="sb-val" style="color:var(--c4)">'+ data.communication + '%</div><div class="sb-lbl">Communication</div></div>'
-    + '<div class="score-box"><div class="sb-val" style="color:var(--c3)">'+ data.humor         + '%</div><div class="sb-lbl">Humor Match</div></div>'
-    + '<div class="score-box"><div class="sb-val" style="color:var(--c1)">'+ data.matchCount + '/' + data.total + '</div><div class="sb-lbl">Exact Matches</div></div>';
+    '<div class="score-box primary"><div class="sb-val" style="color:var(--c6)">' + data.p1Understanding + '%</div><div class="sb-lbl">🎯 ' + data.p1Name + ' Accuracy</div><div class="sb-sub">Prediction score</div></div>'
+    + '<div class="score-box primary"><div class="sb-val" style="color:var(--c5)">' + data.p2Understanding + '%</div><div class="sb-lbl">🎯 ' + data.p2Name + ' Accuracy</div><div class="sb-sub">Prediction score</div></div>'
+    + '<div class="score-box"><div class="sb-val" style="color:var(--c4)">' + data.compatibility + '%</div><div class="sb-lbl">❤️ Compatibility</div><div class="sb-sub">Same answers</div></div>'
+    + '<div class="score-box"><div class="sb-val" style="color:var(--c3)">' + data.matchCount + '/' + data.total + '</div><div class="sb-lbl">🏆 Final Score</div><div class="sb-sub">Matched answers</div></div>';
 
   document.getElementById('go-compat-title').textContent = data.title;
-  document.getElementById('go-match-count').textContent  = data.matchCount + ' / ' + data.total + ' questions matched';
-  document.getElementById('go-ai-report').textContent    = AI_REPORTS[Math.floor(Math.random() * AI_REPORTS.length)](data);
+  // Show prediction accuracy in subtitle, not match count
+  var avgAcc2 = data.mindReadingScore || Math.round((data.p1Understanding + data.p2Understanding) / 2);
+  document.getElementById('go-match-count').textContent = avgAcc2 + '% avg prediction accuracy · ' + data.matchCount + '/' + data.total + ' answers matched';
+  document.getElementById('go-ai-report').textContent = AI_REPORTS[Math.floor(Math.random() * AI_REPORTS.length)](data);
 
-  // ── Ultimate extras ────────────────────────────────────────────────────
+  // Ultimate extras
   var extrasDiv = document.getElementById('go-ultimate-extras');
   extrasDiv.innerHTML = '';
   if (data.mode === 'ultimate' && data.ultimateExtras) {
     var ue = data.ultimateExtras;
     extrasDiv.innerHTML +=
-      '<div class="ultimate-section">'
-      + '<div class="ultimate-section-title">💍 Final Relationship Score</div>'
+      '<div class="ultimate-section"><div class="ultimate-section-title">💍 Final Relationship Score</div>'
       + '<div style="font-family:var(--font-display);font-size:42px;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--c7),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">' + ue.relationshipScore + '%</div>'
       + '<div class="rel-score-bar"><div class="rel-score-fill" style="width:0%" id="rel-score-fill-bar"></div></div>'
-      + '<div style="text-align:center;color:var(--muted);font-size:13px">Based on compatibility, prediction accuracy, and shared answers</div>'
-      + '</div>';
+      + '<div style="text-align:center;color:var(--muted);font-size:13px">Based on prediction accuracy, compatibility, and shared answers</div></div>';
     extrasDiv.innerHTML +=
-      '<div class="ultimate-section">'
-      + '<div class="ultimate-section-title">🎯 Prediction Accuracy</div>'
+      '<div class="ultimate-section"><div class="ultimate-section-title">🎯 Prediction Accuracy Breakdown</div>'
       + '<div class="ultimate-accuracy-row">'
-      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p1Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p1Name + '</div></div>'
-      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
-      + '</div>'
-      + '</div>';
+      + '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p1Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p1Name + '</div></div>'
+      + '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ue.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
+      + '</div></div>';
     if (ue.strongMatches && ue.strongMatches.length > 0) {
-      var strongHtml = '<div class="ultimate-section"><div class="ultimate-section-title">✅ Strongest Matches</div>';
+      var strongHtml = '<div class="ultimate-section"><div class="ultimate-section-title">✅ Strongest Agreements</div>';
       ue.strongMatches.forEach(function(r) {
         strongHtml += '<div class="ultimate-match-item"><span class="ultimate-match-q">' + r.question + '</span><span class="ultimate-match-ans">' + r.p1Answer + '</span></div>';
       });
@@ -1484,51 +1445,35 @@ function renderGameOver(data) {
     }, 600);
   }
 
-  // ── Guess Mode extras ─────────────────────────────────────────────────
+  // Guess extras
   var guessDiv = document.getElementById('go-guess-extras');
   guessDiv.innerHTML = '';
   if (data.mode === 'guess' && data.guessExtras) {
     var ge = data.guessExtras;
-    // Prediction accuracy
     guessDiv.innerHTML +=
-      '<div class="guess-section">'
-      + '<div class="guess-section-title">🎯 Prediction Accuracy</div>'
+      '<div class="guess-section"><div class="guess-section-title">🎯 Prediction Accuracy</div>'
       + '<div class="ultimate-accuracy-row">'
-      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ge.p1Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p1Name + '</div></div>'
-      +   '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ge.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
-      + '</div>'
-      + '<div style="text-align:center;margin-top:12px;font-size:13px;color:var(--muted)">✅ ' + ge.correctPredictions + ' correct predictions total</div>'
-      + '</div>';
-
-    // Best matches (same answers)
+      + '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ge.p1Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p1Name + '</div></div>'
+      + '<div class="ultimate-acc-card"><div class="ultimate-acc-val">' + ge.p2Accuracy + '%</div><div class="ultimate-acc-lbl">' + data.p2Name + '</div></div>'
+      + '</div><div style="text-align:center;margin-top:12px;font-size:13px;color:var(--muted)">✅ ' + ge.correctPredictions + ' correct predictions total</div></div>';
     if (ge.bestMatches && ge.bestMatches.length > 0) {
       var bmHtml = '<div class="guess-section"><div class="guess-section-title">✨ Strongest Agreements</div>';
       ge.bestMatches.forEach(function(r) {
-        bmHtml += '<div class="guess-match-item">'
-          + '<div class="guess-match-q">' + r.question + '</div>'
-          + '<div class="guess-match-same">Both wrote: ' + r.p1Answer + '</div>'
-          + '</div>';
+        bmHtml += '<div class="guess-match-item"><div class="guess-match-q">' + r.question + '</div><div class="guess-match-same">Both wrote: ' + r.p1Answer + '</div></div>';
       });
       guessDiv.innerHTML += bmHtml + '</div>';
     }
-
-    // Most different answers
     if (ge.diffAnswers && ge.diffAnswers.length > 0) {
       var daHtml = '<div class="guess-section"><div class="guess-section-title">⚡ Biggest Differences</div>';
       ge.diffAnswers.forEach(function(r) {
-        daHtml += '<div class="guess-match-item">'
-          + '<div class="guess-match-q">' + r.question + '</div>'
-          + '<div class="guess-match-diff">'
-          + '<span class="d1">' + data.p1Name + ': ' + r.p1Answer + '</span>'
-          + '<span class="d2">' + data.p2Name + ': ' + r.p2Answer + '</span>'
-          + '</div>'
-          + '</div>';
+        daHtml += '<div class="guess-match-item"><div class="guess-match-q">' + r.question + '</div>'
+          + '<div class="guess-match-diff"><span class="d1">' + data.p1Name + ': ' + r.p1Answer + '</span><span class="d2">' + data.p2Name + ': ' + r.p2Answer + '</span></div></div>';
       });
       guessDiv.innerHTML += daHtml + '</div>';
     }
   }
 
-  // Recap
+  // Recap — show prediction correctness
   var recapLimit = data.mode === 'ultimate' ? 12 : 8;
   var recap = document.getElementById('go-recap');
   recap.innerHTML = '';
@@ -1537,13 +1482,13 @@ function renderGameOver(data) {
     div.className = 'recap-item fade-in';
     div.innerHTML = '<div class="ri-q">' + r.question + '</div>'
       + '<div class="ri-answers">'
-      + '<div class="ri-a ' + (r.p1Correct ? 'match' : 'nomatch') + '">' + data.p1Name + ': ' + r.p1Answer + ' ' + (r.p1Correct ? '✅' : '❌') + '</div>'
-      + '<div class="ri-a ' + (r.p2Correct ? 'match' : 'nomatch') + '">' + data.p2Name + ': ' + r.p2Answer + ' ' + (r.p2Correct ? '✅' : '❌') + '</div>'
+      + '<div class="ri-a ' + (r.p1Correct ? 'match' : 'nomatch') + '">' + data.p1Name + ': ' + r.p1Answer + ' ' + (r.p1Correct ? '🎯' : '❌') + '</div>'
+      + '<div class="ri-a ' + (r.p2Correct ? 'match' : 'nomatch') + '">' + data.p2Name + ': ' + r.p2Answer + ' ' + (r.p2Correct ? '🎯' : '❌') + '</div>'
       + '</div>';
     recap.appendChild(div);
   });
 
-  if (data.compatibility >= 80) launchConfetti(80);
+  if (avgAcc2 >= 75) launchConfetti(60);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1552,7 +1497,8 @@ function renderGameOver(data) {
 function getShareText() {
   var d = state.gameData;
   if (!d) return '';
-  return '🧠❤️ MindMatch Result\n' + d.p1Name + ' + ' + d.p2Name + '\nCompatibility: ' + d.compatibility + '%\n' + d.title + '\nMode: ' + (d.modeLabel || '') + '\n\nPlay at: ' + window.location.origin;
+  var avgAcc = d.mindReadingScore || Math.round((d.p1Understanding + d.p2Understanding) / 2);
+  return '🧠❤️ MindMatch Result\n' + d.p1Name + ' + ' + d.p2Name + '\n🎯 Prediction Accuracy: ' + avgAcc + '%\n❤️ Compatibility: ' + d.compatibility + '%\n' + d.title + '\nMode: ' + (d.modeLabel||'') + '\n\nPlay at: ' + window.location.origin;
 }
 function shareWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(getShareText())); }
 function shareTwitter()  { window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(getShareText())); }
@@ -1593,8 +1539,7 @@ function toast(msg, type) {
   t.textContent = msg;
   document.getElementById('toast-container').appendChild(t);
   setTimeout(function() {
-    t.style.opacity = '0';
-    t.style.transition = 'opacity .3s';
+    t.style.opacity = '0'; t.style.transition = 'opacity .3s';
     setTimeout(function() { t.remove(); }, 300);
   }, 3000);
 }
@@ -1634,11 +1579,8 @@ document.querySelectorAll('.code-digit').forEach(function(input, i, all) {
     if (e.key === 'Backspace' && !input.value && i > 0) all[i - 1].focus();
   });
   input.addEventListener('paste', function(e) {
-    var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
-    if (paste.length === 6) {
-      all.forEach(function(inp, idx) { inp.value = paste[idx] || ''; });
-      all[5].focus();
-    }
+    var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+    if (paste.length === 6) { all.forEach(function(inp, idx) { inp.value = paste[idx]||''; }); all[5].focus(); }
     e.preventDefault();
   });
 });
