@@ -20,6 +20,7 @@ const modeQueues = {
   guess:    [],
   survival: [],
   ultimate: [],
+  story:    [],
 };
 
 const socketRoom = new Map();
@@ -150,7 +151,23 @@ const QUESTION_BANKS = {
     { q: "How do I feel about pay-to-win mechanics?", opts: ["I hate it passionately","I spend a little","I spend a lot honestly","It's just business","Ruins the game for me","Doesn't affect me","I complain but keep playing","I find workarounds"] },
   ],
 
-  // ── 🎭 GENERAL / MIXED (used for all relationship types as filler) ──────
+  // ── 🎬 STORY MODE — narrative questions that build a movie together ─────
+  story: [
+    { q: "Our story takes place in…", opts: ["A futuristic city","A small mountain village","A tropical island","A haunted old mansion","Outer space","An enchanted forest","A bustling megacity","A post-apocalyptic wasteland"] },
+    { q: "We meet for the first time at…", opts: ["A coffee shop","A music festival","A library","An airport","A rainy bus stop","A rooftop party","A hospital","A bookstore"] },
+    { q: "The main conflict we face together is…", opts: ["A dangerous secret","A race against time","A forbidden love","A mysterious disappearance","A corporate conspiracy","A supernatural threat","A natural disaster","An impossible heist"] },
+    { q: "Our biggest strength as a team is…", opts: ["We trust each other completely","We balance each other perfectly","We never give up","We're both highly skilled","We communicate without words","We're unpredictable","We inspire each other","We protect each other fiercely"] },
+    { q: "The villain in our story is…", opts: ["A corrupt billionaire","A childhood friend turned enemy","An AI gone rogue","A jealous rival","A secret organization","A supernatural entity","Our own past mistakes","The system itself"] },
+    { q: "When things get really dangerous, I…", opts: ["Step up and lead","Stay calm and strategize","Protect my partner at all costs","Use my unique skill","Run toward the danger","Try to negotiate","Look for a creative solution","Trust my gut instincts"] },
+    { q: "The most emotional moment in our story is…", opts: ["Almost losing each other","A sudden betrayal","A sacrifice one of us makes","Discovering a hidden truth","A long-awaited reunion","An unexpected goodbye","Finally achieving our goal","Realizing what we mean to each other"] },
+    { q: "Our story's setting feels most like…", opts: ["A Christopher Nolan film","A Studio Ghibli anime","A Marvel blockbuster","A Bollywood drama","A gritty thriller","A fairy tale","A sci-fi epic","A romantic comedy"] },
+    { q: "The turning point where everything changes is…", opts: ["We discover the real enemy","One of us makes a huge mistake","We unlock a hidden power","A third person changes everything","We get separated and must find each other","The plan completely falls apart","We learn a devastating truth","Unexpected help arrives from nowhere"] },
+    { q: "Our story ends with…", opts: ["A triumphant victory","A bittersweet sacrifice","A new beginning","A shocking twist","Peace and happiness","Leaving for a new adventure","Achieving the impossible","Love conquering everything"] },
+    { q: "If our story became a movie, the soundtrack would be…", opts: ["Epic orchestral scores","Indie acoustic vibes","Intense electronic beats","Romantic Bollywood songs","Classic rock anthems","Emotional piano pieces","Hip-hop bangers","A mix of everything"] },
+    { q: "The title card at the end would read…", opts: ["'And so the adventure continued...'","'Based on a true story'","'They lived happily ever after'","'The end is only the beginning'","'For everyone who never gave up'","'Some bonds are unbreakable'","'The legend lives on'","'To be continued...'"] },
+  ],
+
+  // ── GENERAL / MIXED ──────────────────────────────────────────────────────
   general: [
     { q: "What's my favorite food?", opts: ["Pizza","Biryani","Sushi","Burger","Tacos","Pasta","Noodles","Salad"] },
     { q: "What's my favorite movie genre?", opts: ["Action","Comedy","Romance","Horror","Sci-Fi","Thriller","Animation","Documentary"] },
@@ -245,13 +262,15 @@ function getRelationshipKey(relationship) {
 }
 
 // ── SMART QUESTION SELECTION ─────────────────────────────────────────────────
-// 70% from relationship-specific bank + 30% from general pool
-function selectQuestions(relationship, count) {
+function selectQuestions(relationship, count, isStory) {
+  if (isStory) {
+    return shuffleArray(QUESTION_BANKS.story).slice(0, Math.min(count, QUESTION_BANKS.story.length));
+  }
+
   const key = getRelationshipKey(relationship);
   const specificBank = QUESTION_BANKS[key] || [];
   const generalBank  = QUESTION_BANKS.general;
 
-  // Combine all non-guess banks for fallback
   const allStandardBanks = [
     ...QUESTION_BANKS.couple,
     ...QUESTION_BANKS.longdistance,
@@ -266,7 +285,6 @@ function selectQuestions(relationship, count) {
   let specificCount = Math.ceil(count * 0.7);
   let generalCount  = count - specificCount;
 
-  // If specific bank is smaller than needed, take all of it and fill rest from general
   if (specificBank.length < specificCount) {
     specificCount = specificBank.length;
     generalCount  = count - specificCount;
@@ -275,7 +293,6 @@ function selectQuestions(relationship, count) {
   const specificShuffled = shuffleArray(specificBank).slice(0, specificCount);
   const generalShuffled  = shuffleArray(generalBank).slice(0, generalCount);
 
-  // If we still need more (e.g. ultimate 50), pull from all banks
   let combined = shuffleArray([...specificShuffled, ...generalShuffled]);
   if (combined.length < count) {
     const extra = shuffleArray(allStandardBanks)
@@ -315,7 +332,6 @@ function answersMatch(a, b) {
   const na = normalizeAnswer(a);
   const nb = normalizeAnswer(b);
   if (na === nb) return true;
-  // Contains check for longer answers
   if (na.length > 3 && nb.includes(na)) return true;
   if (nb.length > 3 && na.includes(nb)) return true;
   const synonyms = [
@@ -338,19 +354,17 @@ function answersMatch(a, b) {
   return false;
 }
 
-// Close match: partial credit (5pts) — for standard modes
 function answersCloseMatch(a, b) {
   const na = normalizeAnswer(a);
   const nb = normalizeAnswer(b);
-  if (na === nb) return false; // exact match handled separately
-  // One is contained in the other
+  if (na === nb) return false;
   if (na.length > 2 && nb.includes(na)) return true;
   if (nb.length > 2 && na.includes(nb)) return true;
   return false;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  MODE CONFIG
+//  MODE CONFIG — PREDICTION IS PRIMARY SCORING
 // ═══════════════════════════════════════════════════════════════════════════
 function getModeConfig(mode) {
   // SCORING PHILOSOPHY:
@@ -361,12 +375,13 @@ function getModeConfig(mode) {
       questionCount:    5,
       revealDuration:   5000,
       lives:            null,
-      pointsPerPredict: 10,    // Primary: correct prediction
-      pointsClosePredict: 5,   // Secondary: close prediction
-      pointsPerMatch:   2,     // Bonus only: same answer
+      pointsPerPredict: 10,
+      pointsClosePredict: 5,
+      pointsPerMatch:   2,   // Bonus only
       pointsForBeingGuessed: 0,
       label: '⚡ Quick Match',
       isGuess: false,
+      isStory: false,
     },
     standard: {
       questionCount:    20,
@@ -378,6 +393,7 @@ function getModeConfig(mode) {
       pointsForBeingGuessed: 0,
       label: '🎯 Standard',
       isGuess: false,
+      isStory: false,
     },
     guess: {
       questionCount:    15,
@@ -389,6 +405,7 @@ function getModeConfig(mode) {
       pointsForBeingGuessed: 3,
       label: '📝 Guess Mode',
       isGuess: true,
+      isStory: false,
     },
     survival: {
       questionCount:    15,
@@ -400,6 +417,7 @@ function getModeConfig(mode) {
       pointsForBeingGuessed: 0,
       label: '💀 Survival',
       isGuess: false,
+      isStory: false,
     },
     ultimate: {
       questionCount:    50,
@@ -411,13 +429,26 @@ function getModeConfig(mode) {
       pointsForBeingGuessed: 0,
       label: '👑 Ultimate Match',
       isGuess: false,
+      isStory: false,
+    },
+    story: {
+      questionCount:    12,
+      revealDuration:   5000,
+      lives:            null,
+      pointsPerPredict: 10,
+      pointsClosePredict: 5,
+      pointsPerMatch:   2,
+      pointsForBeingGuessed: 0,
+      label: '🎬 Story Mode',
+      isGuess: false,
+      isStory: true,
     },
   };
   return configs[mode] || configs.standard;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  SCORE CALCULATION — Prediction-focused
+//  SCORE CALCULATION — Prediction-FIRST, matching is bonus only
 // ═══════════════════════════════════════════════════════════════════════════
 function calculateScores(room) {
   let p1Score = 0, p2Score = 0;
@@ -432,14 +463,10 @@ function calculateScores(room) {
   const cfg = room.config;
   const isGuess = cfg.isGuess;
 
-  // Category tracking (for breakdown)
-  const categoryScores = {};
-
   room.answers.forEach((round, idx) => {
     const q = room.questions[idx];
     const { p1Answer, p1Predict, p2Answer, p2Predict } = round;
 
-    // Determine correctness
     const p1Correct = isGuess
       ? answersMatch(p1Predict, p2Answer)
       : (p1Predict === p2Answer);
@@ -447,7 +474,6 @@ function calculateScores(room) {
       ? answersMatch(p2Predict, p1Answer)
       : (p2Predict === p1Answer);
 
-    // Close match (partial credit, standard modes only)
     const p1Close = !p1Correct && !isGuess && answersCloseMatch(p1Predict, p2Answer);
     const p2Close = !p2Correct && !isGuess && answersCloseMatch(p2Predict, p1Answer);
 
@@ -455,7 +481,7 @@ function calculateScores(room) {
       ? answersMatch(p1Answer, p2Answer)
       : (p1Answer === p2Answer);
 
-    // === PRIMARY: Prediction scoring ===
+    // PRIMARY: Prediction scoring
     if (p1Correct) {
       p1Score += cfg.pointsPerPredict;
       p1PredictCorrectCount++;
@@ -482,16 +508,16 @@ function calculateScores(room) {
       p2Streak = 0;
     }
 
-    // === BONUS: Matching answers ===
+    // BONUS ONLY: Matching answers (+2 each)
     if (ansMatch) {
       p1Score += cfg.pointsPerMatch;
       p2Score += cfg.pointsPerMatch;
       matchCount++;
     }
 
-    // === Guess Mode: bonus for being guessed ===
+    // Guess Mode: bonus for being guessed
     if (isGuess && cfg.pointsForBeingGuessed) {
-      if (p1Correct) p2Score += cfg.pointsForBeingGuessed; // p2 gets bonus for being guessed correctly
+      if (p1Correct) p2Score += cfg.pointsForBeingGuessed;
       if (p2Correct) p1Score += cfg.pointsForBeingGuessed;
     }
 
@@ -508,22 +534,19 @@ function calculateScores(room) {
 
   const total = room.answers.length;
 
-  // === COMPATIBILITY = % of matching answers (both picked same) ===
+  // Compatibility = % matching answers (secondary, bonus only)
   const compatibility = total > 0 ? Math.round((matchCount / total) * 100) : 0;
 
-  // === PREDICTION ACCURACY = PRIMARY metric ===
+  // PREDICTION ACCURACY = PRIMARY metric
   const p1Understanding = total > 0 ? Math.round(p1PredictCorrectCount / total * 100) : 0;
   const p2Understanding = total > 0 ? Math.round(p2PredictCorrectCount / total * 100) : 0;
 
-  // Secondary stats
   const trust         = Math.min(100, Math.round((p1Understanding + p2Understanding) / 2 + Math.random() * 8 - 4));
   const communication = Math.min(100, Math.round(compatibility * 0.7 + (p1Understanding + p2Understanding) / 2 * 0.3 + Math.random() * 10));
   const humor         = Math.min(100, Math.round(Math.random() * 20 + 75));
 
   // Mind reading score = average prediction accuracy
   const mindReadingScore = Math.round((p1Understanding + p2Understanding) / 2);
-
-  // Best streak
   const bestPredictStreak = Math.max(p1BestStreak, p2BestStreak);
 
   function getTitle(accuracy) {
@@ -537,8 +560,13 @@ function calculateScores(room) {
     return "👀 Do You Even Know Them?";
   }
 
-  // Title based on prediction accuracy (primary metric), not just match %
   const avgAccuracy = Math.round((p1Understanding + p2Understanding) / 2);
+
+  // ── Story Mode movie generation data ────────────────────────────────────
+  let storyExtras = null;
+  if (room.config.isStory) {
+    storyExtras = buildStoryData(room, results, p1Understanding, p2Understanding);
+  }
 
   // Guess extras
   let guessExtras = null;
@@ -577,14 +605,139 @@ function calculateScores(room) {
     matchCount, total,
     results,
     title: getTitle(avgAccuracy),
-    // Prediction accuracy (primary)
     p1Understanding, p2Understanding,
     mindReadingScore,
     bestPredictStreak,
     p1BestStreak, p2BestStreak,
     p1PredictCorrectCount, p2PredictCorrectCount,
     p1PredictCloseCount, p2PredictCloseCount,
-    ultimateExtras, guessExtras,
+    ultimateExtras, guessExtras, storyExtras,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  STORY MODE: Build movie data from answers
+// ═══════════════════════════════════════════════════════════════════════════
+function buildStoryData(room, results, p1Acc, p2Acc) {
+  const p1Name = room.players.p1.nickname;
+  const p2Name = room.players.p2.nickname;
+
+  // Extract answers to key story questions
+  const answers = {};
+  results.forEach((r, i) => {
+    const q = room.questions[i];
+    if (q && q.q) {
+      answers[q.q] = { p1: r.p1Answer, p2: r.p2Answer };
+    }
+  });
+
+  // Derive movie elements from answers
+  const settingQ    = Object.entries(answers).find(([k]) => k.includes('takes place'));
+  const conflictQ   = Object.entries(answers).find(([k]) => k.includes('conflict'));
+  const endingQ     = Object.entries(answers).find(([k]) => k.includes('ends with'));
+  const styleQ      = Object.entries(answers).find(([k]) => k.includes('feels most like'));
+  const strengthQ   = Object.entries(answers).find(([k]) => k.includes('strength'));
+  const villainQ    = Object.entries(answers).find(([k]) => k.includes('villain'));
+  const emotionalQ  = Object.entries(answers).find(([k]) => k.includes('emotional moment'));
+  const soundtrackQ = Object.entries(answers).find(([k]) => k.includes('soundtrack'));
+
+  const setting    = settingQ    ? (settingQ[1].p1 || settingQ[1].p2)       : 'A mysterious world';
+  const conflict   = conflictQ   ? (conflictQ[1].p1 || conflictQ[1].p2)     : 'An unknown threat';
+  const ending     = endingQ     ? (endingQ[1].p1 || endingQ[1].p2)         : 'A new beginning';
+  const style      = styleQ      ? (styleQ[1].p1 || styleQ[1].p2)           : 'A cinematic epic';
+  const strength   = strengthQ   ? (strengthQ[1].p1 || strengthQ[1].p2)     : 'Unbreakable trust';
+  const villain    = villainQ    ? (villainQ[1].p1 || villainQ[1].p2)       : 'A hidden enemy';
+  const emotional  = emotionalQ  ? (emotionalQ[1].p1 || emotionalQ[1].p2)   : 'An unexpected sacrifice';
+  const soundtrack = soundtrackQ ? (soundtrackQ[1].p1 || soundtrackQ[1].p2) : 'A powerful score';
+
+  // Generate movie title from names + conflict
+  const titleTemplates = [
+    `${p1Name.toUpperCase()} & ${p2Name.toUpperCase()}`,
+    `THE LAST ${conflict.split(' ').pop().toUpperCase()}`,
+    `${setting.split(' ').slice(-1)[0].toUpperCase()} OF NO RETURN`,
+    `BEYOND ${setting.split(' ').slice(-1)[0].toUpperCase()}`,
+    `THE ${p1Name.toUpperCase()} PROTOCOL`,
+    `UNBREAKABLE`,
+    `TOGETHER FOREVER`,
+    `THROUGH THE ${setting.split(' ').slice(-1)[0].toUpperCase()}`,
+  ];
+  const movieTitle = titleTemplates[Math.floor(Math.random() * titleTemplates.length)];
+
+  // Determine genre from style
+  let genre = 'Action/Adventure';
+  if (style.includes('Ghibli') || style.includes('Anime'))       genre = 'Animated Fantasy';
+  else if (style.includes('Marvel'))                              genre = 'Superhero Action';
+  else if (style.includes('Bollywood'))                          genre = 'Romantic Drama';
+  else if (style.includes('Nolan'))                              genre = 'Psychological Thriller';
+  else if (style.includes('Pixar'))                              genre = 'Animated Adventure';
+  else if (style.includes('romantic comedy'))                    genre = 'Romantic Comedy';
+  else if (style.includes('thriller') || style.includes('gritty')) genre = 'Action Thriller';
+  else if (style.includes('sci-fi') || style.includes('epic'))   genre = 'Sci-Fi Epic';
+  else if (style.includes('fairy tale'))                         genre = 'Fantasy Romance';
+
+  // Build story narrative
+  const story = `${p1Name} and ${p2Name}'s story unfolds ${setting.toLowerCase()}. ` +
+    `United by ${strength.toLowerCase()}, they face ${conflict.toLowerCase()}. ` +
+    `Their greatest enemy: ${villain.toLowerCase()}. ` +
+    `The most unforgettable moment comes when ${emotional.toLowerCase()}. ` +
+    `With a soundtrack of ${soundtrack.toLowerCase()}, their journey ends with ${ending.toLowerCase()}.`;
+
+  // Character analysis
+  const p1Trait = p1Acc >= 75 ? 'the intuitive one — deeply perceptive' : p1Acc >= 50 ? 'the steady one — reliable under pressure' : 'the wildcard — full of surprises';
+  const p2Trait = p2Acc >= 75 ? 'the intuitive one — deeply perceptive' : p2Acc >= 50 ? 'the steady one — reliable under pressure' : 'the wildcard — full of surprises';
+
+  const characterAnalysis = `${p1Name} is ${p1Trait}. ${p2Name} is ${p2Trait}. Together they form a ${genre.toLowerCase()} duo whose chemistry is felt in every scene.`;
+
+  // Movie ending detail
+  const endingDetail = ending.includes('triumphant') ? `${p1Name} and ${p2Name} emerge victorious, their bond stronger than ever.`
+    : ending.includes('bittersweet') ? `One sacrifice changes everything. The cost of victory is something neither expected.`
+    : ending.includes('new beginning') ? `The credits roll on one chapter, but a new adventure is just beginning.`
+    : ending.includes('twist') ? `Nothing is as it seemed. The final revelation changes the meaning of everything that came before.`
+    : ending.includes('love') ? `In the end, love was the only weapon that mattered.`
+    : `Their story doesn't end — it evolves into something neither could have imagined alone.`;
+
+  // Build poster prompt (7 style variants)
+  const posterPrompts = buildPosterPrompts(movieTitle, genre, p1Name, p2Name, setting, conflict, style, ending);
+
+  return {
+    movieTitle,
+    genre,
+    story,
+    characterAnalysis,
+    endingDetail,
+    setting,
+    conflict,
+    ending,
+    style,
+    strength,
+    villain,
+    emotional,
+    soundtrack,
+    posterPrompts,
+    p1Accuracy: p1Acc,
+    p2Accuracy: p2Acc,
+  };
+}
+
+function buildPosterPrompts(title, genre, p1Name, p2Name, setting, conflict, style, ending) {
+  const base = `Two protagonists named ${p1Name} and ${p2Name}, movie poster for "${title}", ${genre} film`;
+  const settingDesc = setting.toLowerCase().replace('a ', '').replace('an ', '');
+  const endingMood = ending.toLowerCase().includes('triumph') || ending.toLowerCase().includes('love') ? 'hopeful warm golden light' : 'dramatic tense atmosphere';
+
+  return {
+    hollywood: `Cinematic Hollywood movie poster, ${base}, ${settingDesc} backdrop, dramatic lighting, ${endingMood}, ultra-realistic, photorealistic, 8K resolution, professional movie poster design, two heroic figures standing back to back, title "${title}" in bold metallic letters, tagline "Some bonds are unbreakable", anamorphic lens flare, epic composition, Oscar-worthy cinematography`,
+
+    anime: `Anime-style movie poster, ${base}, ${settingDesc} background, vibrant saturated colors, dynamic action poses, Studio Ghibli inspired aesthetics, cel-shaded illustration, flowing hair, expressive eyes, dramatic sky with clouds, title "${title}" in stylized Japanese-English font, cherry blossoms or dramatic weather effects, deeply emotional atmosphere`,
+
+    marvel: `Marvel Cinematic Universe style movie poster, ${base}, superhero aesthetic, dynamic power poses, ${settingDesc} destroyed background, electric visual effects, bold primary colors, heroic lighting from below, title "${title}" in MCU font style, action-packed composition, glowing energy effects, dramatic storm clouds, Avengers-level epic scale`,
+
+    pixar: `Pixar animation style movie poster, ${base}, adorable stylized characters with big expressive eyes, colorful whimsical ${settingDesc} environment, warm soft lighting, charming and heartwarming atmosphere, title "${title}" in playful rounded font, magical sparkles and glowing elements, family-friendly adventure feel, beautifully rendered 3D animation aesthetic`,
+
+    bollywood: `Bollywood movie poster style, ${base}, vibrant rich colors, ornate decorative borders, ${settingDesc} dramatic background, romantic dramatic lighting, both characters in stylish outfits, title "${title}" in colorful Devanagari-inspired decorative font, rose petals and dramatic fabric, emotional intense expressions, classic Indian cinema grandeur`,
+
+    cyberpunk: `Cyberpunk neon-noir movie poster, ${base}, futuristic dystopian ${settingDesc} cityscape, neon pink and cyan lighting, rain-soaked reflective surfaces, holographic billboards, dark atmospheric shadows, title "${title}" in glowing neon letters, retrofuturistic aesthetic, blade runner vibes, high contrast dramatic shadows, 4K hyperdetailed render`,
+
+    fantasy: `Epic fantasy movie poster, ${base}, magical ${settingDesc} landscape, dragons or mystical creatures in background, glowing runes and magical effects, enchanted golden hour lighting, characters in fantasy armor or robes, title "${title}" in ancient stone-carved font with glowing details, misty mountains and magical forests, Lord of the Rings level epic grandeur, painterly illustration style`,
   };
 }
 
@@ -620,9 +773,14 @@ io.on('connection', (socket) => {
     const code = generateRoomCode();
     const cfg  = getModeConfig(mode);
 
-    const questions = cfg.isGuess
-      ? shuffleArray(QUESTION_BANKS.guess).slice(0, cfg.questionCount)
-      : selectQuestions(relationship, cfg.questionCount); // ← smart selection
+    let questions;
+    if (cfg.isGuess) {
+      questions = shuffleArray(QUESTION_BANKS.guess).slice(0, cfg.questionCount);
+    } else if (cfg.isStory) {
+      questions = selectQuestions(relationship, cfg.questionCount, true);
+    } else {
+      questions = selectQuestions(relationship, cfg.questionCount, false);
+    }
 
     const room = {
       code, mode, relationship,
@@ -689,7 +847,9 @@ io.on('connection', (socket) => {
       const code      = generateRoomCode();
       const questions = cfg.isGuess
         ? shuffleArray(QUESTION_BANKS.guess).slice(0, cfg.questionCount)
-        : selectQuestions('🌍 Strangers', cfg.questionCount);
+        : cfg.isStory
+          ? selectQuestions('story', cfg.questionCount, true)
+          : selectQuestions('🌍 Strangers', cfg.questionCount, false);
 
       const room = {
         code, mode: safeMode, relationship: '🌍 Strangers',
@@ -881,6 +1041,7 @@ function startGame(code) {
     lives:         room.config.lives,
     questionCount: room.config.questionCount,
     isGuess:       room.config.isGuess || false,
+    isStory:       room.config.isStory || false,
   });
 
   io.to(code).emit('game_countdown', { count: 3 });
@@ -950,7 +1111,6 @@ function revealAnswer(code) {
   const q    = room.questions[qIdx];
   const cfg  = room.config;
 
-  // Determine correctness
   const p1PredictCorrect = cfg.isGuess
     ? answersMatch(ans.p1Predict, ans.p2Answer)
     : (ans.p1Predict === ans.p2Answer);
@@ -963,11 +1123,13 @@ function revealAnswer(code) {
     ? answersMatch(ans.p1Answer, ans.p2Answer)
     : (ans.p1Answer === ans.p2Answer);
 
-  // === Apply scores in real-time on server ===
+  // Apply scores in real-time — PREDICTION PRIMARY
   if (p1PredictCorrect)  room.players.p1.score += cfg.pointsPerPredict;
   else if (p1Close)      room.players.p1.score += cfg.pointsClosePredict;
   if (p2PredictCorrect)  room.players.p2.score += cfg.pointsPerPredict;
   else if (p2Close)      room.players.p2.score += cfg.pointsClosePredict;
+
+  // Matching bonus only (+2)
   if (isAnswerMatch) {
     room.players.p1.score += cfg.pointsPerMatch;
     room.players.p2.score += cfg.pointsPerMatch;
@@ -1011,6 +1173,9 @@ function revealAnswer(code) {
     revealDuration: cfg.revealDuration,
     isGuess: cfg.isGuess || false,
     ppLabel,
+    // PATCH: explicitly flag what is primary vs bonus
+    predictionIsPrimary: true,
+    matchIsBonus: true,
   });
 
   if (p1Eliminated || p2Eliminated) {
@@ -1045,6 +1210,7 @@ function endGame(code) {
     mode:      room.mode,
     modeLabel: room.config.label,
     relationship: room.relationship,
+    isStory:   room.config.isStory || false,
   });
 
   setTimeout(() => rooms.delete(code), 600000);
@@ -1072,4 +1238,7 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`\n🧠 MindMatch running → http://localhost:${PORT}\n`));
+server.listen(PORT, () => {
+  console.log(`[Server] MindMatch running on port ${PORT}`);
+  console.log(`[Server] Total questions loaded: ${totalQCount}`);
+});
